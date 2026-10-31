@@ -7,6 +7,7 @@
 \usepackage{enumitem}
 \usepackage{hyperref}
 \usepackage{xcolor}
+\usepackage[most]{tcolorbox}
 \usepackage{microtype}
 
 \hypersetup{
@@ -31,6 +32,48 @@
 \newcommand{\Nop}{\mathcal N}
 \newcommand{\Ksp}{\mathcal K}
 \newcommand{\avg}[1]{\left\langle #1\right\rangle}
+
+\newtcolorbox{chaptersummary}{
+  breakable,
+  colback=blue!3,
+  colframe=blue!45!black,
+  title={本章总结},
+  fonttitle=\bfseries,
+  boxrule=0.6pt,
+  arc=2mm,
+  left=2mm,
+  right=2mm,
+  top=1mm,
+  bottom=1mm
+}
+
+\newtcolorbox{authornote}{
+  breakable,
+  colback=yellow!8,
+  colframe=orange!75!black,
+  title={作者补充：这里可能存在认知跳跃},
+  fonttitle=\bfseries,
+  boxrule=0.8pt,
+  arc=2mm,
+  left=2mm,
+  right=2mm,
+  top=1mm,
+  bottom=1mm
+}
+
+\newtcolorbox{askai}{
+  breakable,
+  colback=violet!3,
+  colframe=violet!55!black,
+  title={你应该问 AI},
+  fonttitle=\bfseries,
+  boxrule=0.7pt,
+  arc=2mm,
+  left=2mm,
+  right=2mm,
+  top=1mm,
+  bottom=1mm
+}
 
 \title{从粒子到计算网格\\
 \large 面向数学背景读者的计算力学入门}
@@ -68,6 +111,10 @@
 
 \chapter{从多粒子动力学到动理学方程}
 
+\begin{chaptersummary}
+前言已经把计算力学描述为从物理信息到代数系统的压缩链；本章进入第一步：为什么不能直接追踪所有粒子，而要改用统计描述。它承接微观力学直觉，引出相空间概率密度、边缘化和封闭假设，为后面的连续介质方程与等离子体模型准备共同语言。若只记住一个思想，应是：动理学不是放弃微观物理，而是在可计算性要求下选择保留哪些统计信息。
+\end{chaptersummary}
+
 设系统中有 \(N\) 个粒子，第 \(i\) 个粒子的位置和动量为
 \[
 \bm x_i,\qquad \bm p_i.
@@ -89,12 +136,45 @@
 \[
 \rho_N(\Gamma,t).
 \]
+
+\begin{authornote}
+\textbf{读者此处可能会问：}
+“为什么我们突然从确定性的 \(N\) 粒子轨道转向概率密度？”
+
+\textbf{建议作者补充：}
+许多工程问题关注密度、温度或平均流速，而非每个粒子的精确轨道。对于粒子数巨大的系统，逐一追踪所有自由度通常代价过高；若直接计算所有粒子对之间的相互作用，仅力的计算就有 $O(N^2)$ 的成本。概率描述将关注点转向可能状态及其统计规律，也允许描述对初始微观状态的不确定性。需要追踪特定粒子时，仍可使用粒子方法或欧拉--拉格朗日混合方法。
+
+\textbf{需要建立的 conceptual bridge：}
+\[
+\text{deterministic particle trajectory}
+\longrightarrow
+\text{phase-space probability description}
+\]
+\end{authornote}
+
 概率守恒给出高维连续性方程
 \[
 \frac{\partial \rho_N}{\partial t}
 +
 \nabla_\Gamma\cdot(\rho_N\dot\Gamma)=0.
 \]
+
+\begin{askai}
+可以问：
+\begin{quote}
+从普通三维连续性方程开始，逐步类比到 \(6N\) 维相空间，解释为什么概率密度 \(\rho_N(\Gamma,t)\) 满足
+\[
+\partial_t\rho_N+\nabla_\Gamma\cdot(\rho_N\dot\Gamma)=0.
+\]
+请不要跳过“通量”在相空间中的含义。
+\end{quote}
+
+如果仍然不理解，可以继续问：
+\begin{quote}
+用一个一维位置加一维动量的 Hamilton 系统做 toy example，说明概率云团如何被相空间速度场搬运。
+\end{quote}
+\end{askai}
+
 Hamilton 系统满足
 \[
 \nabla_\Gamma\cdot\dot\Gamma=0,
@@ -112,6 +192,23 @@ Hamilton 系统满足
 
 刘维尔方程表达的是相空间中的概率云团随微观动力学被搬运，但相空间流不压缩概率体积。它仍然是 \(6N\) 维方程，真正的降维来自边缘化。
 
+\begin{authornote}
+\textbf{读者此处可能会问：}
+“既然已经用了概率密度，为什么仍然不够低维？边缘化到底在物理上丢掉了什么？”
+
+\textbf{建议作者补充：}
+概率密度 \(\rho_N\) 依赖整个系统的 \(6N\) 个相空间坐标，因此改用概率描述本身并未降低维数。即使降到单粒子分布 \(f(\bm x,\bm v,t)\)，直接张量网格离散仍需约 \(N_x^3N_v^3\) 个自由度：每个空间网格点都要存储一份三维速度分布。例如每个坐标方向取 100 点便有 \(10^{12}\) 个数，仅以双精度存储一个标量数组就约需 8 TB。实际代价还取决于维度约化、网格、碰撞模型及并行实现。
+
+边缘化对其余粒子的位置和速度积分，只保留所选粒子的统计状态；它丢弃了被积分自由度的具体状态以及单粒子分布无法表达的联合关联。相互作用使这些关联仍影响所保留变量的演化，因此通常需要另作闭合近似。边缘化是积分操作，闭合是补充模型假设，二者不同于指定初值和边界条件。
+
+\textbf{需要建立的 conceptual bridge：}
+\[
+\rho_N(\Gamma,t)
+\longrightarrow
+f(\bm x,\bm v,t)
+\]
+\end{authornote}
+
 定义单粒子分布函数
 \[
 f(\bm x,\bm v,t),
@@ -127,6 +224,23 @@ f(\bm x,\bm v,t)\dd\bm x\dd\bm v
 f_1\longrightarrow f_2\longrightarrow f_3\longrightarrow\cdots,
 \]
 即 BBGKY 层级。单粒子方程依赖双粒子关联，双粒子方程又依赖三粒子关联。要得到封闭模型，必须对关联作假设。
+
+\begin{authornote}
+\textbf{读者此处可能会问：}
+“为什么从边缘化会自然出现 \(f_1,f_2,f_3,\dots\) 这个层级，而不是直接得到一个单粒子方程？”
+
+\textbf{建议作者补充：}
+单粒子受到其他粒子的作用，其平均效果依赖于这些粒子与所选粒子同时处于不同状态的概率，也就是双粒子分布。对其余变量积分虽消去了它们的显式坐标，却没有消除相互作用；同理，双粒子分布的演化又依赖三粒子分布。要只求解低阶方程，就需要在适用条件下近似高阶关联，这一步称为闭合。
+
+\textbf{需要建立的 conceptual bridge：}
+\[
+\text{marginalization}
+\longrightarrow
+\text{BBGKY hierarchy}
+\longrightarrow
+\text{closure problem}
+\]
+\end{authornote}
 
 一般动理学方程写成
 \[
@@ -170,6 +284,18 @@ Q(f,f)
 f_2(\bm v,\bm v_*)\approx f(\bm v)f(\bm v_*).
 \]
 
+\begin{askai}
+可以问：
+\begin{quote}
+用两个粒子的速度分布做一个最小例子，解释 \(f_2(\bm v,\bm v_*)\approx f(\bm v)f(\bm v_*)\) 意味着什么。请分别说明“无关联”在概率论上、物理碰撞上、以及 Boltzmann 方程封闭上各是什么意思。
+\end{quote}
+
+如果仍然不理解，可以继续问：
+\begin{quote}
+给出一个 \(f_2\neq f f_*\) 的反例，并说明这种相关性会让单粒子 Boltzmann 方程少掉哪些信息。
+\end{quote}
+\end{askai}
+
 完整碰撞积分计算昂贵，BGK 模型用单一松弛过程替代：
 \[
 C[f]=\frac{f^{\mathrm{eq}}-f}{\tau},
@@ -197,6 +323,10 @@ n\left(\frac{m}{2\pi k_BT}\right)^{3/2}
 
 \chapter{从速度矩到连续介质方程}
 
+\begin{chaptersummary}
+上一章得到的分布函数仍然含有完整速度信息，远多于多数工程问题真正观测和求解的量。本章解释为什么要从动理学描述转向密度、速度、压力、能量等宏观变量，并说明这种转向必然带来矩方程封闭问题。它为后面的 Navier--Stokes、Euler、有限体积守恒形式和模型选择做准备。核心思想是：连续介质方程是对分布函数做有限信息投影后的封闭模型。
+\end{chaptersummary}
+
 分布函数包含完整速度分布，但宏观工程只保留少数矩。
 
 数密度、质量密度和宏观速度分别为
@@ -223,6 +353,24 @@ n=\int f\dd\bm v,
 \[
 \int Q(f,f)\dd\bm v=0,
 \]
+
+\begin{authornote}
+\textbf{读者此处可能会问：}
+“为什么宏观方程可以通过对速度变量取矩得到？取零阶矩、一阶矩的物理含义是什么？”
+
+\textbf{建议作者补充：}
+分布函数包含每个位置处全部速度的信息，而密度、平均速度和能量等可观测量只需对速度作相应的加权积分。选取这些矩，是因为它们直接连接守恒律、实验测量和工程关注的宏观状态；代价是不同的速度分布可能具有相同的有限个矩，因此这些变量不能唯一恢复原分布。
+
+\textbf{需要建立的 conceptual bridge：}
+\[
+f(\bm x,\bm v,t)
+\longrightarrow
+\text{moments}
+\longrightarrow
+\text{macroscopic observables}
+\]
+\end{authornote}
+
 得到连续性方程
 \[
 \boxed{
@@ -247,6 +395,23 @@ n=\int f\dd\bm v,
 =
 \rho\bm b.
 \]
+
+\begin{askai}
+可以问：
+\begin{quote}
+从一般动理学方程出发，逐步对速度变量取一阶矩，推导
+\[
+\partial_t(\rho\bm u)+\nabla\cdot(\rho\bm u\bm u+\bm P)=\rho\bm b.
+\]
+请明确说明每一项的积分分部、边界衰减假设和物理含义。
+\end{quote}
+
+如果仍然不理解，可以继续问：
+\begin{quote}
+把 \(\bm P=m\int \bm c\bm c f\dd\bm v\) 拆成各向同性压力和偏应力，说明它为什么不是简单标量。
+\end{quote}
+\end{askai}
+
 写成
 \[
 \bm P=p\bm I-\bm\tau,
@@ -267,6 +432,24 @@ n=\int f\dd\bm v,
 \mu\left[\nabla\bm u+(\nabla\bm u)^T\right]
 +\lambda(\nabla\cdot\bm u)\bm I.
 \]
+
+\begin{authornote}
+\textbf{读者此处可能会问：}
+“为什么推到动量方程后还没有结束？本构关系为什么不是从前面的矩操作自动得到的？”
+
+\textbf{建议作者补充：}
+低阶矩的演化方程通常含有更高阶矩，例如动量方程中的应力和能量方程中的热流。若只求解有限个宏观变量，就必须用这些变量及其梯度近似尚未求解的量。本构关系正是这种额外的物理假设，其形式和适用范围取决于介质及所研究的尺度。
+
+\textbf{需要建立的 conceptual bridge：}
+\[
+\text{moment equations}
+\longrightarrow
+\text{unclosed stresses and heat fluxes}
+\longrightarrow
+\text{constitutive closure}
+\]
+\end{authornote}
+
 
 不可压缩、常密度、常黏度情况下，
 \[
@@ -304,6 +487,10 @@ E=e+\frac12|\bm u|^2,
 
 \chapter{Maxwell 方程、线性化与微扰算子}
 
+\begin{chaptersummary}
+前两章说明了物质模型如何从粒子和分布函数压缩而来；本章把电磁场作为另一类连续场结构加入知识链。它不只是列出 Maxwell 方程，而是展示约束、守恒、耦合和线性化如何连接。后面的色散关系、稳定性分析和电磁计算都会依赖这里的“从非线性系统到线性扰动算子”的视角。最重要的思想是：线性化不是换题目，而是在基态附近提取可分析的局部算子。
+\end{chaptersummary}
+
 Maxwell 方程组为
 \[
 \nabla\cdot\bm E=\frac{\rho_c}{\varepsilon_0},
@@ -325,6 +512,23 @@ Maxwell 方程组为
 \frac{\partial\rho_c}{\partial t}
 +\nabla\cdot\bm J=0.
 \]
+
+\begin{askai}
+可以问：
+\begin{quote}
+从 Amp\`ere--Maxwell 方程
+\[
+\partial_t\bm E-c^2\nabla\times\bm B=-\bm J/\varepsilon_0
+\]
+出发，逐步取散度并使用 Gauss 定律，推导电荷守恒方程。请特别解释为什么 \(\nabla\cdot(\nabla\times\bm B)=0\) 是关键结构。
+\end{quote}
+
+如果仍然不理解，可以继续问：
+\begin{quote}
+给出一个离散算子例子，说明如果离散的 div-curl 结构不满足 \(D_hC_h=0\)，可能怎样制造非物理电荷。
+\end{quote}
+\end{askai}
+
 因此 Maxwell 方程的连续结构自动包含电荷守恒。数值离散若破坏这一结构，可能产生非物理电荷。
 
 带电连续介质中的 Lorentz 力为
@@ -337,6 +541,24 @@ Maxwell 方程组为
 \[
 \Nop(\bm U)=0.
 \]
+
+\begin{authornote}
+\textbf{读者此处可能会问：}
+“为什么这里突然把具体 Maxwell 方程抽象成 \(\Nop(\bm U)=0\)？这个抽象解决了什么问题？”
+
+\textbf{建议作者补充：}
+具体方程中的时间导数、空间导数和非线性耦合可以合记为一个作用在未知场上的算子。这样无需改变原问题，就能统一讨论解附近的微扰：算子的导数描述微小变化如何传递，也给 Newton 迭代提供每一步要近似求解的线性方程。
+
+\textbf{需要建立的 conceptual bridge：}
+\[
+\text{coupled field equations}
+\longrightarrow
+\Nop(\bm U)=0
+\longrightarrow
+\text{linearized operator}
+\]
+\end{authornote}
+
 在基态 \(\bm U_0\) 附近写
 \[
 \bm U=\bm U_0+\epsilon\bm u,
@@ -401,6 +623,22 @@ D^2\Nop[\bm U_0](\bm u,\bm u)
 +\Order(\epsilon^2).
 \]
 
+\begin{askai}
+可以问：
+\begin{quote}
+把有限维 Taylor 展开和 Fr\'echet 导数并排比较，逐步解释为什么非线性材料关系
+\[
+\bm D=\bm D(\bm E),\qquad \bm B=\bm B(\bm H)
+\]
+在基态附近会产生切线材料张量。请用一个各向异性材料的矩阵例子说明。
+\end{quote}
+
+如果仍然不理解，可以继续问：
+\begin{quote}
+如果 \(\bm D(\bm E)\) 是非线性的，为什么扰动方程里出现的是 \(\partial\bm D/\partial\bm E|_{\bm E_0}\) 而不是原来的 \(\bm D\)？
+\end{quote}
+\end{askai}
+
 定义切线材料张量
 \[
 \bm\varepsilon_{\mathrm{tan}}
@@ -454,6 +692,24 @@ f_s=f_{s0}+\epsilon f_{s1},
 \widehat{\bm u}
 \exp[\ii(\bm k\cdot\bm x-\omega t)],
 \]
+
+\begin{authornote}
+\textbf{读者此处可能会问：}
+“为什么分析扰动时应该想到平面波？这是不是额外假设了所有解都是波？”
+
+\textbf{建议作者补充：}
+在均匀背景附近线性化后，若得到的系数不随空间变化，Fourier 模态便不会因算子作用而相互混合，可以分别考察各波数的演化。对缓慢变化的背景，有时也可在局部冻结系数，将平面波作为近似探针；这给出的是局部信息，不能自动代表边界或全局非均匀问题。
+
+\textbf{需要建立的 conceptual bridge：}
+\[
+\text{linear perturbation equation}
+\longrightarrow
+\text{plane-wave ansatz}
+\longrightarrow
+\text{dispersion relation}
+\]
+\end{authornote}
+
 则
 \[
 \partial_t\mapsto-\ii\omega,
@@ -464,6 +720,27 @@ f_s=f_{s0}+\epsilon f_{s1},
 \[
 \bm M(\omega,\bm k)\widehat{\bm u}=0.
 \]
+
+\begin{askai}
+可以问：
+\begin{quote}
+从平面波代换
+\[
+\partial_t\mapsto-\ii\omega,\qquad \nabla\mapsto\ii\bm k
+\]
+开始，选一个简单线性 PDE 系统，逐步演示它如何变成
+\[
+\bm M(\omega,\bm k)\widehat{\bm u}=0.
+\]
+请解释为什么非零振幅要求 \(\det\bm M(\omega,\bm k)=0\)。
+\end{quote}
+
+如果仍然不理解，可以继续问：
+\begin{quote}
+用一维声波方程或真空 Maxwell 平面波做例子，完整求出对应的色散关系。
+\end{quote}
+\end{askai}
+
 存在非零解的条件
 \[
 \det\bm M(\omega,\bm k)=0
@@ -473,6 +750,10 @@ f_s=f_{s0}+\epsilon f_{s1},
 微扰法、线性稳定性分析和 Newton 法共享同一局部线性思想，但用途不同：微扰法按小参数逐阶构造解，稳定性分析考察扰动增长率，Newton 法则用 Jacobian 求非线性残差的修正量。
 
 \chapter{尺度分析与渐近展开}
+
+\begin{chaptersummary}
+在有了动理学、连续介质和电磁耦合模型之后，下一步问题是：面对多个尺度和参数，什么时候该保留某些项、忽略某些项。本章引入无量纲数与渐近展开，解释模型层级如何由尺度比决定。它承接前面的模型族，为后面的简化方程、数值误差分析和工程适用性判断做准备。核心思想是：极限模型不是原模型的随意删减，而是有条件的尺度排序。
+\end{chaptersummary}
 
 常见无量纲数包括
 \[
@@ -484,12 +765,42 @@ f_s=f_{s0}+\epsilon f_{s1},
 \]
 它们不是标签，而是不同物理机制的相对量级。模型选择本质上是决定哪些项在给定极限下保留。
 
+\begin{authornote}
+\textbf{读者此处可能会问：}
+“为什么连续介质方程之后要立刻谈无量纲数？这些数和模型选择有什么因果关系？”
+
+\textbf{建议作者补充：}
+不同物理量的数值大小依赖单位，不能直接比较。选定问题的特征长度、速度和时间后，无量纲化把方程各项的相对大小集中到无量纲参数中。参数的大小提示哪些机制可能主导，以及在哪些极限下可以建立简化模型；尺度的选取仍需结合具体问题。
+
+\textbf{需要建立的 conceptual bridge：}
+\[
+\text{continuum equations}
+\longrightarrow
+\text{dimensionless ratios}
+\longrightarrow
+\text{model regimes}
+\]
+\end{authornote}
+
 Taylor 展开与渐近展开需要严格区分。Taylor 展开通常由局部导数给出：
 \[
 f(x+h)
 =
 f(x)+hf'(x)+\frac{h^2}{2}f''(x)+\cdots.
 \]
+
+\begin{askai}
+可以问：
+\begin{quote}
+请比较 Taylor expansion 和 asymptotic expansion。给出一个渐近展开有用但级数不收敛的例子，并解释为什么“每次截断后余项更小”比“无限和收敛”更适合某些扰动问题。
+\end{quote}
+
+如果仍然不理解，可以继续问：
+\begin{quote}
+用一个简单函数展示最优截断：计算不同阶截断误差，并说明为什么项最小处附近应该停止。
+\end{quote}
+\end{askai}
+
 它特别适合分析离散算子与连续算子的局部差异。
 
 渐近展开更一般。设 \(\epsilon\to0\)，若尺度函数满足
@@ -565,12 +876,43 @@ n_i=n_e,
 \[
 \xi=\frac{x}{\epsilon}.
 \]
+
+\begin{authornote}
+\textbf{读者此处可能会问：}
+“为什么边界附近必须引入 \(\xi=x/\epsilon\)，而不是换成任意新的坐标？”
+
+\textbf{建议作者补充：}
+当小参数使最高阶导数项在主体区域看似可以忽略时，降阶后的方程可能无法满足全部边界条件。边界附近的解必须在较短距离内迅速变化，使原本系数很小的导数项重新与其他项达到同一量级。先以未知厚度估计各项并作主导平衡，再据此引入拉伸坐标，才能解析这一薄层。
+
+\textbf{需要建立的 conceptual bridge：}
+\[
+\text{singular perturbation}
+\longrightarrow
+\text{boundary-layer scale}
+\longrightarrow
+\xi=x/\epsilon
+\]
+\end{authornote}
+
 在该尺度下
 \[
 \frac{\partial}{\partial x}
 =
 \frac{1}{\epsilon}\frac{\partial}{\partial\xi},
 \]
+
+\begin{askai}
+可以问：
+\begin{quote}
+不要直接告诉我 stretched coordinate 是 \(x/\epsilon\)。先设 boundary-layer width 为 \(\delta(\epsilon)\)，通过 dominant balance 推导 \(\delta\) 应该如何随 \(\epsilon\) 缩放，再解释为什么令 \(\xi=x/\epsilon\)。
+\end{quote}
+
+如果仍然不理解，可以继续问：
+\begin{quote}
+把外部解、内部解和匹配区域分别画成一张概念图，并说明准中性条件在哪个区域有效。
+\end{quote}
+\end{askai}
+
 Poisson 方程恢复为
 \[
 -\frac{\partial^2\phi^{\mathrm{in}}}{\partial\xi^2}
@@ -610,12 +952,31 @@ f\sim g
 
 \chapter{一致性、稳定性与修正方程}
 
+\begin{chaptersummary}
+理论框架部分说明了模型如何产生；从这里开始进入数值离散。本章先选择最小模型来解释离散格式的三个基本问题：局部是否近似原方程、误差是否随时间增长、离散格式实际上在解什么修正后的方程。它为 Godunov 定理、波动色散和求解器章节准备误差语言。若只记住一个思想，应是：离散格式本身也是一个模型，它有自己的耗散、色散和稳定边界。
+\end{chaptersummary}
+
 考虑线性平流方程
 \[
 u_t+au_x=0,
 \qquad
 u(x,t)=u_0(x-at).
 \]
+
+\begin{authornote}
+\textbf{读者此处可能会问：}
+“前面讲的是复杂物理模型，为什么进入数值离散时突然只研究线性平流方程？”
+
+\textbf{建议作者补充：}
+复杂输运方程同时包含多种物理机制，难以辨认误差来自哪里。线性平流方程只保留以固定速度传播这一基本过程，因而可以单独考察离散格式如何改变传播、振幅和相位。它是分析数值机制的参照模型，其结论仍需结合非线性、变系数和边界等因素重新判断。
+
+\textbf{需要建立的 conceptual bridge：}
+\[
+\text{complicated transport physics}
+\longrightarrow
+\text{linear advection as minimal model}
+\]
+\end{authornote}
 
 前向时间差分满足
 \[
@@ -635,6 +996,36 @@ u_x+\Order(\Delta x^2).
 \[
 e_i^n=\widehat e^n\ee^{\ii kx_i},
 \]
+
+\begin{authornote}
+\textbf{读者此处可能会问：}
+“为什么任意误差可以用 Fourier 模态来分析？为什么研究单个模态就能判断整体误差传播？”
+
+\textbf{建议作者补充：}
+在线性常系数、平移不变的格式中，每个离散 Fourier 模态经过一步更新后仍具有相同波数，只改变其复振幅。因此可逐个研究放大因子，判断各模态是否增长。这种分析最直接适用于无限或周期均匀网格；有限边界、变系数和非线性可能引入额外耦合，需要另行分析。
+
+\textbf{需要建立的 conceptual bridge：}
+\[
+\text{arbitrary numerical error}
+\longrightarrow
+\text{Fourier modes}
+\longrightarrow
+\text{amplification factor}
+\]
+\end{authornote}
+
+\begin{askai}
+可以问：
+\begin{quote}
+从任意离散误差的 Fourier decomposition 开始，逐步解释为什么对于线性常系数差分格式，可以分别研究每个 Fourier mode 的 amplification factor。不要假设我已经理解 von Neumann stability analysis。
+\end{quote}
+
+如果仍然不理解，可以继续问：
+\begin{quote}
+对一阶上风格式完整代入 \(e_i^n=\widehat e^n e^{\ii kx_i}\)，推导 \(G(k)\)，再画出不同 CFL 数下的 \(|G(k)|\)。
+\end{quote}
+\end{askai}
+
 得到
 \[
 \widehat e^{n+1}=G(k)\widehat e^n.
@@ -653,6 +1044,23 @@ e_i^n=\widehat e^n\ee^{\ii kx_i},
 \nu=\frac{a\Delta t}{\Delta x}.
 \]
 其含义是数值依赖域必须覆盖物理依赖域。
+
+\begin{authornote}
+\textbf{读者此处可能会问：}
+“为什么 \(\nu=a\Delta t/\Delta x\) 会和依赖域有关？这个数为什么限制显式格式？”
+
+\textbf{建议作者补充：}
+偏微分方程的特征速度决定一个时空点的真实解可能依赖哪些初始位置；离散格式的模板及时间步长则决定数值解能接收到哪些网格信息。若网格细化时数值依赖域始终覆盖不了物理依赖域，格式便无法正确收敛。CFL 条件表达这种必要的传播范围约束，但单独满足它通常还不足以保证稳定。
+
+\textbf{需要建立的 conceptual bridge：}
+\[
+\text{amplification factor stability}
+\longrightarrow
+\text{CFL number}
+\longrightarrow
+\text{domain of dependence}
+\]
+\end{authornote}
 
 当 \(a>0\) 时，一阶上风格式为
 \[
@@ -675,9 +1083,30 @@ u_t+au_x
 \frac{a\Delta x}{2}(1-\nu)u_{xx}
 +\cdots.
 \]
+
+\begin{askai}
+可以问：
+\begin{quote}
+对一阶上风格式做 modified equation analysis。请从 Taylor 展开开始逐项推导
+\[
+u_t+au_x=\frac{a\Delta x}{2}(1-\nu)u_{xx}+\cdots
+\]
+并解释右侧扩散项如何对应数值耗散。
+\end{quote}
+
+如果仍然不理解，可以继续问：
+\begin{quote}
+写一个最小 Python 数值实验，比较中心格式和上风格式传播一个 Gaussian pulse 时的耗散差异。
+\end{quote}
+\end{askai}
+
 右侧等效扩散项解释了上风格式的数值耗散：它抑制高频误差，也抹平真实小尺度。
 
 \chapter{Godunov 定理与高分辨率格式}
+
+\begin{chaptersummary}
+上一章展示了简单格式的稳定性和数值耗散；本章进一步说明守恒律计算中无法同时拥有线性、高阶和无振荡。它承接有限差分误差分析，引出非线性重构、限制器和 Riemann 通量，为实际 CFD 格式选择建立基本限制。真正重要的不是背诵某个限制器，而是理解高分辨率格式是在结构性矛盾中做局部自适应折中。
+\end{chaptersummary}
 
 Godunov 定理是守恒律数值计算中的基本限制。对线性标量平流问题，任何满足以下条件的线性格式：
 
@@ -692,6 +1121,23 @@ Godunov 定理是守恒律数值计算中的基本限制。对线性标量平流
 直观地说，高阶线性重构需要使用正负交替的权重来提高局部逼近阶数，而单调性要求更新具有凸组合性质。两者一般不能同时成立。
 
 因此，不存在同时满足“线性、高阶、无振荡”的万能格式。Godunov 定理不是说高阶格式不可能，而是说必须放弃至少一个条件。现代高分辨率方法通常采取以下路线：
+
+\begin{authornote}
+\textbf{读者此处可能会问：}
+“为什么 Godunov 定理之后自然要引入非线性重构？非线性到底绕开了哪个限制？”
+
+\textbf{建议作者补充：}
+Godunov 定理指出，在线性单调格式的适当条件下，精度至多为一阶。高分辨率方法因此让重构或限制器依赖局部解：光滑区域保留较高阶近似，在陡峭区域调整斜率以抑制振荡。这使格式成为非线性的，从而不再落在定理所约束的线性格式类别中。
+
+\textbf{需要建立的 conceptual bridge：}
+\[
+\text{Godunov theorem}
+\longrightarrow
+\text{nonlinear reconstruction}
+\longrightarrow
+\text{high-resolution schemes}
+\]
+\end{authornote}
 
 \begin{itemize}
   \item 保留守恒性；
@@ -725,6 +1171,19 @@ U_{i+1/2}^{L}
 =
 U_i+\frac12\sigma_i,
 \]
+
+\begin{askai}
+可以问：
+\begin{quote}
+用一维有限体积的三个相邻 cell average 构造 MUSCL reconstruction。分别用 unlimited slope 和 minmod limiter 计算 \(U_{i+1/2}^L\)，说明限制器如何在光滑区保留二阶、在间断附近退回一阶。
+\end{quote}
+
+如果仍然不理解，可以继续问：
+\begin{quote}
+给一个含间断的数据例子，逐项计算 minmod、van Leer 和 Superbee 的斜率差异。
+\end{quote}
+\end{askai}
+
 其中斜率 \(\sigma_i\) 由限制器给出。典型限制器包括 minmod、van Leer 和 Superbee。限制器根据局部光滑性非线性地调整斜率，使格式在光滑区近似二阶，在激波或间断附近退化为一阶。
 
 TVD 方法要求离散总变差不增加：
@@ -747,6 +1206,10 @@ Godunov 定理揭示的是一个结构性折中：
 
 \chapter{色散关系与波动误差}
 
+\begin{chaptersummary}
+前面主要关注稳定性和间断；但声学、电磁波、弹性波等问题还特别敏感于相位传播。本章把连续色散关系和数值色散关系并列起来，说明稳定格式也可能传播出错误速度。它承接 Fourier 模态分析，为长时间波动计算和 Maxwell 类问题的谱正确性做准备。核心思想是：波动问题中，误差不仅会不会爆炸，还包括相位如何随距离累积。
+\end{chaptersummary}
+
 设连续波解为
 \[
 u=\widehat u\ee^{\ii(kx-\omega t)}.
@@ -766,6 +1229,19 @@ c_g=\frac{\dd\omega}{\dd k}=a.
 \[
 \omega_{\mathrm{num}}(k).
 \]
+
+\begin{askai}
+可以问：
+\begin{quote}
+选择一个具体差分格式，对一维线性平流方程推导数值频率 \(\omega_{\mathrm{num}}(k)\)。请分别指出 \(\operatorname{Re}\omega_{\mathrm{num}}\) 和 \(\operatorname{Im}\omega_{\mathrm{num}}\) 如何对应相位误差与耗散误差。
+\end{quote}
+
+如果仍然不理解，可以继续问：
+\begin{quote}
+比较两个格式在同一个波数 \(k\) 下的相速度误差，并估计传播很多波长后相位偏差会累积到多大。
+\end{quote}
+\end{askai}
+
 若
 \[
 \operatorname{Re}\omega_{\mathrm{num}}\neq ak,
@@ -779,6 +1255,10 @@ c_g=\frac{\dd\omega}{\dd k}=a.
 流体激波计算通常需要适量耗散，声学、电磁波和弹性波计算则更关注长距离传播中的相位误差。格式选择必须匹配目标物理。
 
 \chapter{有限差分、有限体积、有限元与谱方法}
+
+\begin{chaptersummary}
+前几章用简单差分格式解释了离散误差；本章把视野扩展到常见空间离散家族。它承接守恒、弱形式和波动精度等问题，说明不同方法并不是“谁更高级”，而是保留不同结构：导数近似、控制体守恒、弱形式投影或全局光滑逼近。后面的矩阵系统和网格章节都依赖这里的自由度与耦合方式。核心思想是：离散方法选择就是结构选择。
+\end{chaptersummary}
 
 有限差分法直接近似导数，规则网格上高效，适合高阶格式和 Fourier 分析，但复杂几何处理困难。
 
@@ -804,6 +1284,19 @@ c_g=\frac{\dd\omega}{\dd k}=a.
 =
 \int_\Omega vf\dd V+\text{边界项}.
 \]
+
+\begin{askai}
+可以问：
+\begin{quote}
+对一维 Poisson 方程做二阶中心差分和线性有限元离散，各写出 5 个内部网格点对应的矩阵，并比较 differential operator 的 locality 如何变成 matrix sparsity。
+\end{quote}
+
+如果仍然不理解，可以继续问：
+\begin{quote}
+用同一个 Poisson 例子解释 strong form、weak form、test function、basis function 和 stiffness matrix 之间的关系。
+\end{quote}
+\end{askai}
+
 展开
 \[
 u_h=\sum_jU_j\phi_j
@@ -820,6 +1313,10 @@ u_h=\sum_jU_j\phi_j
 
 \chapter{从离散算子到代数系统}
 
+\begin{chaptersummary}
+前一部分讨论的是如何把连续问题离散；本章进入“离散之后真正由计算机处理的对象”。它承接有限差分、有限体积和有限元产生的自由度关系，把 PDE 统一转写为线性系统或非线性残差系统。后面的 LU、Krylov、预条件和 AMG 都是在这个代数层面工作。核心思想是：矩阵不是纯粹的线性代数对象，它保留了离散算子的局部性、耦合范围和物理结构。
+\end{chaptersummary}
+
 偏微分方程离散后通常得到
 \[
 \bm A\bm x=\bm b
@@ -829,7 +1326,39 @@ u_h=\sum_jU_j\phi_j
 \bm R(\bm U)=0.
 \]
 
+\begin{authornote}
+\textbf{读者此处可能会问：}
+“为什么一个连续 PDE 离散后会变成有限维向量方程？自由度、残差和矩阵条目分别来自哪里？”
+
+\textbf{建议作者补充：}
+连续场在每一点都有取值，计算机只能保存有限个参数。离散化先用网格值或基函数系数表示近似场，再通过节点配点、控制体守恒或对测试函数积分等方式，要求方程在有限个意义下成立。于是连续问题转化为有限维代数方程；非线性或含时问题还需进一步线性化或时间离散。
+
+\textbf{需要建立的 conceptual bridge：}
+\[
+\text{continuous PDE}
+\longrightarrow
+\text{finite-dimensional DOFs}
+\longrightarrow
+\text{algebraic system}
+\]
+\end{authornote}
+
 局部微分算子通常产生稀疏矩阵，边界积分算子常产生稠密矩阵。矩阵结构直接反映物理耦合范围。
+
+\begin{authornote}
+\textbf{读者此处可能会问：}
+“为什么 differential operator 的局部性会变成 matrix sparsity？为什么积分方程又会变稠密？”
+
+\textbf{建议作者补充：}
+矩阵的一行记录一个离散方程依赖哪些自由度。局部微分算子配合局部基函数或有限差分模板时，该方程通常只涉及附近自由度，因此每行只有少量非零项。若采用全局基函数或积分算子，一个自由度可能与许多远处自由度耦合，矩阵就可能变稠密；稀疏性取决于算子与离散方式的共同选择。
+
+\textbf{需要建立的 conceptual bridge：}
+\[
+\text{operator locality}
+\longrightarrow
+\text{matrix sparsity or density}
+\]
+\end{authornote}
 
 对于非线性系统，Newton 法在第 \(k\) 步求解
 \[
@@ -841,7 +1370,23 @@ u_h=\sum_jU_j\phi_j
 \]
 大型非线性计算通常是外层 Newton 或伪时间迭代，加内层稀疏线性求解。
 
+\begin{askai}
+可以问：
+\begin{quote}
+用一个两变量非线性方程组和一个离散 PDE residual 各举一个例子，解释 Newton 法里的 \(\bm J(\bm U^k)\Delta\bm U=-\bm R(\bm U^k)\) 是如何产生的。请区分 nonlinear residual、Jacobian assembly 和 linear solve。
+\end{quote}
+
+如果仍然不理解，可以继续问：
+\begin{quote}
+说明为什么残差下降只代表代数系统被求解，不代表物理模型或网格已经正确。
+\end{quote}
+\end{askai}
+
 \chapter{LU 与 LU-SGS}
+
+\begin{chaptersummary}
+有了代数系统之后，最直接的问题是能否把它“解掉”。本章从直接 LU 分解出发，说明精确消元的成本为什么会在大规模三维 PDE 中迅速失控，并引出 LU-SGS 这类近似分解。它为后续迭代法和预条件做铺垫。若只记住一个思想，应是：求解器选择首先受矩阵规模、稀疏结构和填充成本支配，而不是公式外观支配。
+\end{chaptersummary}
 
 稠密直接法可将
 \[
@@ -878,6 +1423,10 @@ LU-SGS 将
 
 \chapter{Krylov 方法、Arnoldi、GMRES 与 BiCGSTAB}
 
+\begin{chaptersummary}
+上一章说明直接法在大规模问题中常常太贵；本章引入只依赖矩阵向量乘的 Krylov 迭代思想。它承接 \(\bm A\bm x=\bm b\) 的代数系统，把求解转化为在由残差生成的低维子空间中寻找近似解。后面的预条件和 AMG 都是为了改善这个过程。核心思想是：Krylov 方法不显式理解 PDE，却通过反复作用 \(\bm A\) 逐步探测矩阵的谱和误差方向。
+\end{chaptersummary}
+
 给定初始残差
 \[
 \bm r_0=\bm b-\bm A\bm x_0,
@@ -892,6 +1441,23 @@ Krylov 子空间为
 \}.
 \]
 
+\begin{authornote}
+\textbf{读者此处可能会问：}
+“为什么解 \(\bm A\bm x=\bm b\) 时会想到 \(\bm r_0,\bm A\bm r_0,\bm A^2\bm r_0,\dots\) 这个子空间？”
+
+\textbf{建议作者补充：}
+大规模稀疏系统的矩阵分解可能产生大量填充，而矩阵向量乘通常较容易实现。Krylov 方法从初始残差出发反复作用矩阵，在由这些向量张成的空间中寻找近似修正。随着子空间增长，方法可表达越来越丰富的矩阵多项式修正；收敛速度仍取决于矩阵性质、初始残差和所选算法。
+
+\textbf{需要建立的 conceptual bridge：}
+\[
+\bm A\bm x=\bm b
+\longrightarrow
+\text{matrix-vector products}
+\longrightarrow
+\Ksp_m(\bm A,\bm r_0)
+\]
+\end{authornote}
+
 Arnoldi 过程构造正交基
 \[
 \bm V_m=[\bm v_1,\dots,\bm v_m],
@@ -902,6 +1468,21 @@ Arnoldi 过程构造正交基
 =
 \bm V_{m+1}\overline{\bm H}_m.
 \]
+
+\begin{askai}
+可以问：
+\begin{quote}
+用一个 \(4\times4\) 非对称矩阵，从初始残差 \(\bm r_0\) 开始手算两步 Arnoldi 过程，写出 \(\bm V_m\) 和 \(\overline{\bm H}_m\)，并验证
+\[
+\bm A\bm V_m=\bm V_{m+1}\overline{\bm H}_m.
+\]
+\end{quote}
+
+如果仍然不理解，可以继续问：
+\begin{quote}
+解释 GMRES 为什么在 \(\bm x_0+\Ksp_m\) 中最小化残差二范数，而不是直接最小化误差二范数。
+\end{quote}
+\end{askai}
 
 GMRES 在
 \[
@@ -920,11 +1501,32 @@ BiCGSTAB 使用短递推，内存固定，单步成本较低，适用于非对�
 
 \chapter{预条件与 AMG}
 
+\begin{chaptersummary}
+Krylov 方法是否快，往往不由未知量个数单独决定，而由谱性质和误差模态决定。本章解释预条件为什么是大规模计算的核心步骤，并进一步说明多重网格如何利用不同尺度误差的衰减特性。它承接 Krylov 收敛问题，也回到 PDE 和网格结构。核心思想是：好的预条件器是在代数层面重塑问题，使迭代看到一个更容易的等价系统。
+\end{chaptersummary}
+
 条件数
 \[
 \kappa(\bm A)=\|\bm A\|\,\|\bm A^{-1}\|
 \]
 衡量扰动放大和迭代难度。
+
+\begin{authornote}
+\textbf{读者此处可能会问：}
+“为什么 Krylov 收敛突然转向条件数和谱性质？这和前面的残差最小化有什么关系？”
+
+\textbf{建议作者补充：}
+对可正交对角化的矩阵，可以把误差理解为不同特征方向的叠加；这些方向的尺度差异会影响迭代进展。预条件通过求解一个较容易的近似问题来改变原系统的有效结构，希望让迭代更快。对非对称或非正规矩阵，仅看特征值或条件数未必足以预测收敛。
+
+\textbf{需要建立的 conceptual bridge：}
+\[
+\text{Krylov convergence}
+\longrightarrow
+\text{spectrum and conditioning}
+\longrightarrow
+\text{preconditioning}
+\]
+\end{authornote}
 
 预条件器 \(\bm M\) 的目标是使
 \[
@@ -934,7 +1536,37 @@ BiCGSTAB 使用短递推，内存固定，单步成本较低，适用于非对�
 
 局部平滑器擅长消除高频误差，但低频误差衰减慢。多重网格把细网格低频误差转移到粗网格，在粗层上它表现为较高频误差，因此更容易消除。
 
+\begin{authornote}
+\textbf{读者此处可能会问：}
+“为什么平滑器只能快速消除高频误差？为什么把低频误差搬到粗网格后会变容易？”
+
+\textbf{建议作者补充：}
+对典型椭圆问题，局部松弛往往能较快削弱相对于细网格振荡的误差，却较难消除缓慢变化的误差。把残差限制到粗网格后，这些缓慢变化在粗网格尺度上更容易被处理；求得的修正再插值回细网格。多重网格通过不同尺度的互补工作加速收敛，其效果依赖平滑器和网格传递算子的选择。
+
+\textbf{需要建立的 conceptual bridge：}
+\[
+\text{relaxation / smoothing}
+\longrightarrow
+\text{frequency of error}
+\longrightarrow
+\text{multigrid}
+\]
+\end{authornote}
+
 AMG 不依赖显式几何层级，而根据矩阵的强连接关系构造粗空间。典型循环包括：
+
+\begin{askai}
+可以问：
+\begin{quote}
+用一维 Poisson 矩阵解释 multigrid 的 smoothing property。请构造一个高频误差和一个低频误差，展示 Jacobi 或 Gauss--Seidel 平滑器为什么更快消除高频误差。
+\end{quote}
+
+如果仍然不理解，可以继续问：
+\begin{quote}
+解释 AMG 中“强连接”如何替代几何距离，用一个小矩阵例子说明粗点选择的大致直觉。
+\end{quote}
+\end{askai}
+
 \begin{enumerate}
   \item 预平滑；
   \item 计算残差；
@@ -948,6 +1580,10 @@ AMG 对 Poisson、压力修正和扩散型系统尤其有效，也常作为 GMRE
 
 \chapter{MoM 与稠密积分方程}
 
+\begin{chaptersummary}
+前面主要面对局部微分算子产生的稀疏矩阵；本章展示计算电磁学中另一类典型对象：积分方程和稠密矩阵。它承接有限元投影和 Krylov 求解，但把矩阵结构从局部耦合转为长程耦合。后续快速多极子、FFT 加速和层次矩阵都由这个瓶颈引出。核心思想是：同样是离散成矩阵，微分算子和积分算子会给求解器带来完全不同的代价结构。
+\end{chaptersummary}
+
 计算电磁学中的矩量法通常从积分方程
 \[
 \Lop J=g
@@ -956,12 +1592,47 @@ AMG 对 Poisson、压力修正和扩散型系统尤其有效，也常作为 GMRE
 \[
 J=\sum_{n=1}^N I_nf_n,
 \]
+
+\begin{authornote}
+\textbf{读者此处可能会问：}
+“为什么计算电磁学这里突然从微分方程转向积分方程和电流展开？”
+
+\textbf{建议作者补充：}
+对某些线性散射或辐射问题，可以利用已知背景介质的 Green 函数，把区域内的场表示为边界上等效源或电流产生的场。这样未知量从体域场转到边界密度，并通过边界条件确定；维数可能降低，但 Green 函数的远程作用也使离散矩阵通常变为稠密。
+
+\textbf{需要建立的 conceptual bridge：}
+\[
+\text{field PDE}
+\longrightarrow
+\text{integral equation}
+\longrightarrow
+\text{current expansion}
+\]
+\end{authornote}
+
 并用测试函数 \(w_m\) 投影：
 \[
 \avg{w_m,\Lop J}
 =
 \avg{w_m,g}.
 \]
+
+\begin{askai}
+可以问：
+\begin{quote}
+用三段分片常数基函数离散一个简单一维积分方程
+\[
+\Lop J=g
+\]
+显式写出矩阵条目 \(\avg{w_m,\Lop f_n}\)，并解释为什么每个测试函数通常会和所有基函数耦合。
+\end{quote}
+
+如果仍然不理解，可以继续问：
+\begin{quote}
+比较微分方程离散矩阵和积分方程离散矩阵的非零结构，并说明快速多极子或层次矩阵想减少的是什么成本。
+\end{quote}
+\end{askai}
+
 得到
 \[
 \bm Z\bm I=\bm V.
@@ -974,11 +1645,36 @@ J=\sum_{n=1}^N I_nf_n,
 
 \chapter{网格是几何与代数之间的接口}
 
+\begin{chaptersummary}
+前面已经看到离散方法会生成矩阵，而矩阵结构又决定求解器行为；本章解释网格为何是这两者之间的接口。它承接离散算子和代数系统，强调几何表示、边界条件、局部尺度、稳定性限制和并行通信都会通过网格进入计算。后面的浸没边界、树网格、动网格和重叠网格都是对此的不同回答。核心思想是：网格不是前处理杂务，而是数值模型的一部分。
+\end{chaptersummary}
+
 网格决定几何表示误差、局部离散误差、稳定性限制、矩阵稀疏结构和并行通信量。工业计算中，网格处理往往比方程推导更消耗工程时间。
+
+\begin{authornote}
+\textbf{读者此处可能会问：}
+“为什么网格不仅影响几何外形，还会影响矩阵结构、稳定性限制和求解器行为？”
+
+\textbf{建议作者补充：}
+网格不仅给出采样位置，还规定单元之间如何交换信息。邻接关系决定离散耦合，单元形状和尺寸进入导数、积分与时间步长估计，边界表示影响边界条件施加；并行划分则决定跨进程通信。因此同一连续方程在不同网格上会产生结构和求解难度不同的代数系统。
+
+\textbf{需要建立的 conceptual bridge：}
+\[
+\text{mesh geometry}
+\longrightarrow
+\text{discrete coupling}
+\longrightarrow
+\text{matrix and solver behavior}
+\]
+\end{authornote}
 
 贴体网格使网格边界与物体边界一致。其边界条件施加自然，适合解析壁面边界层，但复杂几何和大运动会导致网格生成与质量控制困难。
 
 \chapter{浸没边界法}
+
+\begin{chaptersummary}
+上一章说明贴体网格自然但昂贵；本章讨论另一种选择：让复杂边界嵌入简单背景网格。它承接网格与边界条件的关系，把几何处理从网格生成转移到方程或离散算子的附加作用中。后面的树网格和组合网格策略会继续使用这种工程取舍思维。核心思想是：浸没边界法用边界表示和局部修正换取网格生成的简单性。
+\end{chaptersummary}
 
 浸没边界法把复杂物体放入简单背景网格，不要求网格贴合物体。在动量方程中加入边界作用：
 \[
@@ -990,13 +1686,51 @@ J=\sum_{n=1}^N I_nf_n,
 -\nabla p+\mu\nabla^2\bm u+\bm f_{\mathrm{IB}}.
 \]
 
+\begin{authornote}
+\textbf{读者此处可能会问：}
+“为什么不让网格贴合边界时，可以通过方程里的 \(\bm f_{\mathrm{IB}}\) 表达边界作用？”
+
+\textbf{建议作者补充：}
+贴体网格把物体表面直接表示为网格边界，边界条件可以在该边界上施加。浸没边界法允许几何表面穿过背景网格，于是需要借助附加力或修改附近离散方程，使数值解满足物体的影响。几何处理更灵活，但边界附近的精度和守恒性需要专门检验。
+
+\textbf{需要建立的 conceptual bridge：}
+\[
+\text{body-fitted boundary condition}
+\longrightarrow
+\text{immersed forcing}
+\longrightarrow
+\text{background-grid computation}
+\]
+\end{authornote}
+
 连续强迫法通过光滑核在拉格朗日边界与欧拉网格之间传递力；离散强迫法直接修改边界附近离散方程。
 
 其优点是网格规则、复杂运动处理方便；缺点是壁面附近精度、严格守恒和薄结构处理较困难。
 
 \chapter{四叉树、八叉树与自适应加密}
 
+\begin{chaptersummary}
+浸没边界法解决复杂几何贴合问题，但局部尺度变化仍然需要额外处理。本章引入树结构自适应网格，承接前面对误差、稳定性和稀疏结构的讨论，说明如何把分辨率投放到真正需要的位置。它为工程组合策略和并行负载均衡做准备。核心思想是：自适应加密不是让网格更漂亮，而是在误差、成本和数据结构之间动态分配资源。
+\end{chaptersummary}
+
 二维四叉树将一个单元递归分成四个子单元，三维八叉树分成八个子单元。其核心是只在激波、剪切层、涡、界面或高误差区域投入高分辨率。
+
+\begin{authornote}
+\textbf{读者此处可能会问：}
+“为什么局部加密会立刻带来 2:1 平衡、非匹配界面和守恒转移这些工程约束？”
+
+\textbf{建议作者补充：}
+局部加密改变的不只是分辨率：粗细单元之间会出现新的邻接关系，界面通量必须在不同尺度的面之间保持相容。若计算并行运行，随时间变化的加密区域还会改变各进程的工作量和数据分布，需要重新分配单元并更新通信关系。
+
+\textbf{需要建立的 conceptual bridge：}
+\[
+\text{local refinement}
+\longrightarrow
+\text{nonmatching interfaces}
+\longrightarrow
+\text{conservative transfer}
+\]
+\end{authornote}
 
 常见工程约束包括：
 \begin{itemize}
@@ -1008,6 +1742,10 @@ J=\sum_{n=1}^N I_nf_n,
 
 \chapter{动网格与几何守恒律}
 
+\begin{chaptersummary}
+前几章处理固定或局部加密网格；本章讨论计算域本身随时间运动的情况。它承接守恒形式和网格几何，说明网格速度会进入通量，并引出几何守恒律这一动网格计算的基本一致性要求。后面的重叠网格会处理更大幅度的相对运动。核心思想是：移动网格时，即使物理解为常数，离散几何也不能凭空制造变化。
+\end{chaptersummary}
+
 在任意拉格朗日--欧拉描述中，网格具有速度 \(\bm w\)。守恒方程写成
 \[
 \frac{\dd}{\dd t}\int_{\Omega(t)}U\dd V
@@ -1017,17 +1755,59 @@ J=\sum_{n=1}^N I_nf_n,
 =0.
 \]
 
+\begin{authornote}
+\textbf{读者此处可能会问：}
+“为什么网格一运动，通量就从 \(\bm F(U)\) 变成 \(\bm F(U)-U\bm w\)？”
+
+\textbf{建议作者补充：}
+控制体运动时，守恒量穿过边界的变化不仅来自物质相对固定空间的运动，也来自边界自身扫过的体积。积分守恒律因此涉及物理通量与网格速度共同构成的相对通量。几何守恒律要求离散体积变化与网格扫过量一致，否则连均匀解也可能产生人为变化。
+
+\textbf{需要建立的 conceptual bridge：}
+\[
+\text{fixed control volume}
+\longrightarrow
+\text{moving control volume}
+\longrightarrow
+\text{ALE flux}
+\]
+\end{authornote}
+
 动网格必须满足几何守恒律：若物理解为常数，仅仅移动网格不应制造虚假变化。
 
 网格运动可由弹簧类比、Laplace 平滑、线弹性、径向基函数或局部重构实现。运动过大时，需要重新划分网格。
 
 \chapter{重叠网格}
 
+\begin{chaptersummary}
+动网格适合较温和的变形，但多个部件大幅相对运动时，单一连续网格会变得困难。本章引入重叠网格，承接网格运动和几何处理问题，把整体域拆成多个可独立生成和移动的网格块。它为最终工程选择原则提供另一种组合工具。核心思想是：重叠网格用插值耦合和动态连通成本，换取复杂运动中的网格生成自由度。
+\end{chaptersummary}
+
 重叠网格将多个独立网格块叠加，例如背景网格、贴体部件网格和随动局部网格。网格之间通过供体单元向接收单元插值。
+
+\begin{authornote}
+\textbf{读者此处可能会问：}
+“为什么多个网格叠在一起仍能形成一个计算域？插值耦合会牺牲什么结构？”
+
+\textbf{建议作者补充：}
+重叠网格用多个易于生成或运动的子网格共同覆盖计算区域。为避免重复求解，需标记被遮盖的单元，并在网格交界处从 donor 单元向 receiver 提供插值数据。插值建立了子网格之间的耦合，但普通插值不一定使两侧通量精确平衡，因此全局守恒性需要额外设计或检查。
+
+\textbf{需要建立的 conceptual bridge：}
+\[
+\text{single conforming mesh}
+\longrightarrow
+\text{overlapping mesh blocks}
+\longrightarrow
+\text{interpolation coupling}
+\]
+\end{authornote}
 
 其优势是部件网格可独立生成，适合多个刚体的大范围相对运动。困难在于孔切、供体搜索、守恒插值和动态连通更新。
 
 \chapter{工程选择原则}
+
+\begin{chaptersummary}
+前面分别介绍了多种网格技术；本章把它们压缩成工程决策规则。它承接几何、运动、局部尺度和精度需求的分析，强调真实软件通常通过组合方法解决问题，而不是依赖单一技术。它为完整计算工作流做直接准备。核心思想是：方法选择应从问题约束出发，先问几何、运动、尺度和目标误差，再决定网格策略。
+\end{chaptersummary}
 
 若几何固定且壁面精度要求高，优先使用贴体网格。
 
@@ -1056,7 +1836,23 @@ J=\sum_{n=1}^N I_nf_n,
 \text{局部动网格}.
 \]
 
+\begin{askai}
+可以问：
+\begin{quote}
+给定一个带旋转叶片和远场声波传播的计算问题，请比较贴体网格、动网格、重叠网格和自适应远场网格各自解决什么子问题。请不要给单一答案，而是画出组合网格策略。
+\end{quote}
+
+如果仍然不理解，可以继续问：
+\begin{quote}
+把“几何固定性、运动幅度、边界层精度、局部尺度变化、并行通信”做成一个方法选择表。
+\end{quote}
+\end{askai}
+
 \chapter{完整计算工作流}
+
+\begin{chaptersummary}
+到这里，全书已经分别讨论了模型、离散、代数求解和网格。本章把这些层次重新串成一次可靠计算的流程，承接前面所有局部知识点，并强调每一步都有独立误差来源。它为结语中的总结构做准备。核心思想是：残差下降只说明某个离散代数问题被求解，不自动证明模型、网格、离散和物理解释都正确。
+\end{chaptersummary}
 
 一次可靠计算通常按以下链条进行：
 
@@ -1073,6 +1869,10 @@ J=\sum_{n=1}^N I_nf_n,
 残差下降只说明离散代数系统被求解，并不自动说明物理模型正确、网格充分或离散误差可接受。
 
 \chapter{结语}
+
+\begin{chaptersummary}
+本章不是增加新技术，而是把全书压缩链重新折叠成一张地图。它承接从粒子、分布函数、连续介质、渐近极限、离散格式、矩阵求解到工程网格的全部依赖关系，帮助读者带着统一问题意识离开：保留什么信息，丢弃什么信息，如何离散，如何求解，如何判断可信。若只记住一个思想，应是：计算力学的核心是信息选择与结构保持。
+\end{chaptersummary}
 
 本书的统一主线是
 \[

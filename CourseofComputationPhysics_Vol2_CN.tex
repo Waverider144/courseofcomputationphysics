@@ -9,6 +9,8 @@
 \usepackage{hyperref}
 \usepackage{fancyhdr}
 \usepackage{listings}
+\usepackage{needspace}
+\usepackage{placeins}
 \usepackage{tikz}
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.18}
@@ -48,11 +50,11 @@
 \newcommand{\mat}[1]{\begin{pmatrix}#1\end{pmatrix}}
 \definecolor{inkblue}{RGB}{35,65,108}
 \lstset{basicstyle=\ttfamily\small,frame=single,breaklines=true,columns=fullflexible,keepspaces=true}
-\newtcolorbox{chaptersummary}{breakable,colback=blue!3,colframe=blue!45!black,title={本章总结},fonttitle=\bfseries,boxrule=0.6pt,arc=2mm}
-\newtcolorbox{studentinput}{breakable,colback=red!2,colframe=red!55!black,title={这里需要你自己补充},fonttitle=\bfseries,boxrule=0.7pt,arc=2mm}
-\newtcolorbox{askai}{breakable,colback=violet!3,colframe=violet!55!black,title={你应该问 AI},fonttitle=\bfseries,boxrule=0.7pt,arc=2mm}
-\newtcolorbox{checkpoint}{breakable,colback=green!3,colframe=green!45!black,title={理解检查点},fonttitle=\bfseries,boxrule=0.6pt,arc=2mm}
-\newtcolorbox{engineernote}{breakable,colback=gray!5,colframe=gray!60!black,title={工程师视角},fonttitle=\bfseries,boxrule=0.6pt,arc=2mm}
+\newtcolorbox{chaptersummary}{colback=blue!3,colframe=blue!45!black,title={本章总结},fonttitle=\bfseries,boxrule=0.6pt,arc=2mm}
+\newtcolorbox{studentinput}{colback=red!2,colframe=red!55!black,title={这里需要你自己补充},fonttitle=\bfseries,boxrule=0.7pt,arc=2mm}
+\newtcolorbox{askai}{colback=violet!3,colframe=violet!55!black,title={你应该问 AI},fonttitle=\bfseries,boxrule=0.7pt,arc=2mm}
+\newtcolorbox{checkpoint}{colback=green!3,colframe=green!45!black,title={理解检查点},fonttitle=\bfseries,boxrule=0.6pt,arc=2mm}
+\newtcolorbox{engineernote}{colback=gray!5,colframe=gray!60!black,title={工程师视角},fonttitle=\bfseries,boxrule=0.6pt,arc=2mm}
 
 \begin{document}
 \frontmatter
@@ -1148,7 +1150,8 @@ $\dd\omega_h/\dd k-c$ 描述\emph{群速度偏差}。
 复杂电磁脉冲包含许多波数，若这些波数被赋予错误的相速度/群速度，
 长期传播就会出现非物理波形展宽、相位漂移。
 
-\paragraph{可复算的 Fourier--Bloch 单元符号。}
+\Needspace{9\baselineskip}
+\noindent\textbf{可复算的 Fourier--Bloch 单元符号。}\par
 \begin{askai}
 取一维周期均匀网格和 $p=1$ Legendre 基函数，从弱形式构造 $M,N,r,\ell$，再推导式 \eqref{eq:p1symbol}。求其两个特征分支，并解释如何在 $\theta\to0$ 时识别物理分支。
 
@@ -1242,6 +1245,7 @@ $1.5$ & $3.35003\times10^{-1}$ & $1.18404\times10^{-2}$ & $2.42693\times10^{-4}$
 也不是所有 DG 通量和网格的普遍误差界。}
 \label{fig:dgdisp}
 \end{figure}
+\FloatBarrier
 
 \noindent\textbf{如何解读？}
 在这一\emph{特定}均匀网格、常系数、精确积分、特征上风通量的例子中，
@@ -1352,7 +1356,7 @@ $D_hC_h=0$ & 离散散度作用在离散旋度上为零，依赖同一离散复�
 
 \paragraph{度规与单位}把 $c$ 和材料本构恢复后，$\bm E$、$\bm B$ 之间还涉及物理单位与本构关系。对非均匀介质，最自然的变量可能是 $\bm D,\bm H$；主部矩阵、能量内积和特征速度都会随本构变化。本稿的 $\pm1$ 传播速度只适用于所选单位制下的真空平直时空。
 
-\chapter{复算 DG 数值频散的最小 Python 代码}
+\chapter{DG 数值频散复算：Python 代码}
 \begin{chaptersummary}
 本附录把第 7 章的一维 DG 单元符号转化为可运行的特征值计算，用于复现物理分支的半离散相速度误差。改变波数与多项式阶数，可以检验分析结论并观察分支选择的影响。
 \end{chaptersummary}
@@ -1360,6 +1364,7 @@ $D_hC_h=0$ & 离散散度作用在离散旋度上为零，依赖同一离散复�
 和\emph{空间半离散}。它构造式 \eqref{eq:dgsymboleig} 并输出第 7 章的相速度误差表。
 代码分析与 Maxwell 横向特征场等价的标量行波；完整 Maxwell 场和 Gauss 约束不在这一实验范围内。
 
+\Needspace{30\baselineskip}
 \begin{lstlisting}[language=Python,caption={Legendre 模态 DG 的空间色散：物理特征值分析}]
 import numpy as np
 from numpy.polynomial.legendre import Legendre, leggauss

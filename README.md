@@ -1,45 +1,66 @@
 # Course of Computational Physics
 
-Initialized by Harvey Tan
+Initiated by Harvey Tan.
 
-## EN Version
+A compact computational-physics knowledge map for readers with a background in mathematics and numerical computation. The text connects model assumptions, PDE structure, discretization, and solver design. Chapter overviews explain dependencies; targeted prompts provide routes to derivations, examples, and numerical experiments while keeping the main exposition concise.
 
-- Volume 1: [LaTeX source](CourseofComputationPhysics_Vol1_EN.tex).
+## Read the Volumes
 
-As an engineer who regards Lev Landau as a role model, I have long felt that there is no Computational Physics textbook quite like the classic *Course of Theoretical Physics* by Landau and Lifshitz. Meanwhile, a friend of mine—who has a background in pure mathematics but is a novice in physics—expressed interest in the field and asked me for advice on getting started. That was the spark that ignited this project.
+| Volume | Language | PDF | LaTeX source |
+| --- | --- | --- | --- |
+| I: From Particles to Computational Meshes | Chinese | [Read](CourseofComputationPhysics_Vol1_CN.pdf) | [Source](CourseofComputationPhysics_Vol1_CN.tex) |
+| I: From Particles to Computational Meshes | English, earlier abridged draft | Not bundled | [Source](CourseofComputationPhysics_Vol1_EN.tex) |
+| II: From Lorentz Covariance to Hyperbolic Conservation Laws | Chinese | [Read](CourseofComputationPhysics_Vol2_CN.pdf) | [Source](CourseofComputationPhysics_Vol2_CN.tex) |
+| II: From Lorentz Covariance to Hyperbolic Conservation Laws | English | [Read](CourseofComputationPhysics_Vol2_EN.pdf) | [Source](CourseofComputationPhysics_Vol2_EN.tex) |
 
-My goal is to craft a modern textbook tailored for the AI era. In this vision, complex derivations and low-level details act like "APIs"—tools that need not be memorized—allowing learners to focus on mastering the field's underlying principles and main paradigms. Think of this book as a quick-start guide to help you "launch your own kernel."
+The two Volume II editions share chapter structure, equation labels, exercises, figures, and code. The earlier English Volume I draft is not yet synchronized with the revised Chinese edition.
 
-However, given my focus on CFD, CEM, and Plasma Physics, key areas such as first-principles calculations, nonlinear continuum mechanics, and explosion mechanics are beyond my current scope and remain unaddressed. I warmly welcome contributions and insights from experts across these diverse fields to help complete the picture.
+See the [editing report (Chinese)](EDITING_REPORT.md) for the revision scope, learning-prompt counts, and verification notes.
 
-## CN Version
+### Volume I
 
-中文版分为两卷，可分别使用 XeLaTeX 编译：
+The modeling chain runs from deterministic many-particle dynamics through probability distributions, marginalization, kinetic equations, moments, and continuum closure. It then connects asymptotic regimes to numerical transport, discretization, matrix structure, Krylov methods, preconditioning, multigrid, and mesh design.
 
-- 第一卷：从粒子到计算网格，建立从多粒子模型到离散方程和求解器的计算力学知识链。 [阅读 PDF](CourseofComputationPhysics_Vol1_CN.pdf) · [LaTeX 源码](CourseofComputationPhysics_Vol1_CN.tex)
-- 第二卷：从洛伦兹协变到双曲守恒律，以 Maxwell 方程为例，深入讨论几何结构、约束传播、双曲系统及 DG 离散。 [阅读 PDF](CourseofComputationPhysics_Vol2_CN.pdf) · [LaTeX 源码](CourseofComputationPhysics_Vol2_CN.tex)
+The time-integration section introduces ADER, continuous explicit Runge--Kutta (CERK), and conservative local time stepping (LTS). It distinguishes within-step prediction from shared-flux conservation and physical-time accuracy.
 
-两卷的学习提示分别提供概念衔接、自测和可交给 AI 展开的具体问题。第一卷作者补充框中的文字为可继续修订的草稿。
+### Volume II
 
-### 编译中文版
+Maxwell equations provide a common example linking differential forms and Lorentz covariance to evolution/constraint decomposition, symmetric hyperbolicity, energy estimates, finite-volume fluxes, compatible discrete operators, and high-order DG dispersion.
 
-安装包含 `ctex`、`tcolorbox` 和 `pgfplots` 等宏包的 TeX 发行版后，在项目目录运行：
+Chapter 5.5 connects the method of lines to RK and symplectic integration, ADER, CERK, LTS, and implicit--explicit (IMEX) methods. The conductive Maxwell example separates wave propagation from stiff Ohmic relaxation and identifies the stability, charge-compatibility, and energy checks needed for the split. Chapter 7 and its Python appendix provide a reproducible one-dimensional DG dispersion experiment.
+
+## Learning Structure
+
+- **Chapter overviews** locate each chapter in the dependency chain.
+- **Potential conceptual jumps** in Volume I identify questions and their core conceptual connections. Author supplements are editable drafts.
+- **Further detail and search terms** state what has been omitted and identify terminology for follow-up study.
+- **Ask AI** prompts specify a derivation, example, comparison, or computational check using the surrounding notation.
+- **Active recall and concept checks** in Volume II test understanding before implementation.
+
+The author supplies motivation, assumptions, and conceptual connections. AI-assisted work develops the intermediate steps and examples; results should be checked against the stated conventions and cited sources.
+
+## Build
+
+Use a TeX distribution with XeLaTeX, Chinese fonts supported by `ctex`, and the packages used in the sources, including `tcolorbox`, `pgfplots`, `listings`, `needspace`, `placeins`, and Latin Modern.
+
+With `latexmk`:
 
 ```sh
-xelatex CourseofComputationPhysics_Vol1_CN.tex
-xelatex CourseofComputationPhysics_Vol1_CN.tex
-xelatex CourseofComputationPhysics_Vol2_CN.tex
-xelatex CourseofComputationPhysics_Vol2_CN.tex
+latexmk -xelatex -outdir=build -interaction=nonstopmode -halt-on-error CourseofComputationPhysics_Vol1_CN.tex
+latexmk -xelatex -outdir=build -interaction=nonstopmode -halt-on-error CourseofComputationPhysics_Vol2_CN.tex
+latexmk -xelatex -outdir=build -interaction=nonstopmode -halt-on-error CourseofComputationPhysics_Vol2_EN.tex
 ```
 
-每卷运行两次以生成目录和交叉引用。
+Alternatively, run `xelatex -interaction=nonstopmode -halt-on-error <file>.tex` repeatedly until the table of contents and cross-references are stable, usually two or three passes. The commands above place build artifacts in `build/`; checked-in PDFs are available at the repository root.
 
-作为一名将列夫·朗道视为偶像的工程师，我长期以来一直觉得，在计算物理学领域，缺少一部能与朗道和栗弗席兹（Lifshitz）经典的《理论物理学教程》相媲美的教材。与此同时，我的一位有着纯数学背景、但在物理领域尚属新手的朋友对该领域产生了兴趣，并向我寻求入门建议。这便成为了启动该项目的契机。
+The DG dispersion code printed in Volume II requires Python 3 and NumPy. It evaluates a semidiscrete Fourier--Bloch symbol, not a full Maxwell field solver.
 
-我的目标是打造一部面向 AI 时代的现代计算物理教程。在这一构想中，复杂的数学推导与底层细节被视为类似“API”的存在——它们是供调用的工具，而非需要死记硬背的负担，从而让学习者能够专注于掌握该领域的核心原理与主流范式。你可以将本书视为一本快速入门指南，帮助你“发射属于你自己的Kernel”。
+## Background and Contributions
 
-不过，受限于我个人主要专注于计算流体力学、计算电磁学及等离子体物理，诸如第一性原理计算、非线性连续介质力学和爆炸力学等关键领域目前超出了我的知识范围，尚未纳入其中。我真诚地欢迎来自这些及更多不同领域的专家与同行贡献洞见、协同完善。
+The project began with a mathematically trained friend's request for a route into physics, alongside an ambition inspired by Landau and Lifshitz's *Course of Theoretical Physics*. Its present emphasis is computational fluid dynamics, computational electromagnetics, and plasma physics.
+
+Contributions may address derivations, numerical verification, terminology, translations, or additional domains such as first-principles methods, nonlinear continuum mechanics, and explosion mechanics. Please preserve the compact structure, make assumptions explicit, and provide references for new technical material.
 
 ## Acknowledgement
 
-Thanks to GPT, my Lifshitz, my best assistant, transforming my idea to reality
+Thanks to GPT for assistance in turning the author's ideas into a working manuscript.

@@ -1,0 +1,1606 @@
+% !TeX program = xelatex
+% !TeX encoding = UTF-8
+\documentclass[11pt,openany]{book}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[a4paper,left=27mm,right=25mm,top=27mm,bottom=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools,bm}
+\usepackage{booktabs,array,longtable,enumitem}
+\usepackage{graphicx,xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage{listings}
+\usepackage{needspace}
+\usepackage{placeins}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usetikzlibrary{positioning}
+\hypersetup{colorlinks=true,linkcolor=blue!45!black,urlcolor=blue!50!black,pdftitle={From Lorentz Covariance to Hyperbolic Conservation Laws},pdfauthor={}}
+\setlength{\parindent}{2em}
+\setlength{\parskip}{0.18em}
+\setlist[itemize]{itemsep=0.15em,topsep=0.25em}
+\setlist[enumerate]{itemsep=0.15em,topsep=0.25em}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,RO]{\small\nouppercase{\leftmark}}
+\fancyfoot[C]{\thepage}
+\setlength{\headheight}{15pt}
+\renewcommand{\headrulewidth}{0.4pt}
+\numberwithin{equation}{chapter}
+\newtheorem{theorem}{Theorem}[chapter]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\dd}{\mathrm d}
+\newcommand{\RR}{\mathbb R}
+\newcommand{\Om}{\Omega}
+\newcommand{\vol}{\mathrm{vol}}
+\newcommand{\grad}{\operatorname{grad}}
+\newcommand{\Div}{\operatorname{div}}
+\newcommand{\curl}{\operatorname{curl}}
+\newcommand{\Tr}{\operatorname{tr}}
+\newcommand{\starS}{\star_3}
+\newcommand{\norm}[1]{\left\lVert #1\right\rVert}
+\newcommand{\abs}[1]{\left\lvert #1\right\rvert}
+\newcommand{\ip}[2]{\left\langle #1,#2\right\rangle}
+\newcommand{\mat}[1]{\begin{pmatrix}#1\end{pmatrix}}
+\definecolor{inkblue}{RGB}{35,65,108}
+\lstset{basicstyle=\ttfamily\small,frame=single,breaklines=true,columns=fullflexible,keepspaces=true,upquote=true}
+\newtcolorbox{chaptersummary}{colback=blue!3,colframe=blue!45!black,title={Chapter Overview},fonttitle=\bfseries,boxrule=0.6pt,arc=2mm}
+\newtcolorbox{studentinput}{colback=red!2,colframe=red!55!black,title={Active Recall},fonttitle=\bfseries,boxrule=0.7pt,arc=2mm}
+\newtcolorbox{askai}{colback=violet!3,colframe=violet!55!black,title={Ask AI},fonttitle=\bfseries,boxrule=0.7pt,arc=2mm}
+\newtcolorbox{checkpoint}{colback=green!3,colframe=green!45!black,title={Concept Check},fonttitle=\bfseries,boxrule=0.6pt,arc=2mm}
+\newtcolorbox{engineernote}{colback=gray!5,colframe=gray!60!black,title={Implementation Perspective},fonttitle=\bfseries,boxrule=0.6pt,arc=2mm}
+
+\newcommand{\studyroute}[3]{%
+  \par\smallskip\noindent\textbf{Further detail.} #1\par
+  \begingroup\raggedright\noindent\textbf{Search terms:} #2.\par\endgroup
+  \noindent\textbf{AI prompt:} #3\par
+}
+\raggedbottom
+
+\begin{document}
+\frontmatter
+\begin{titlepage}
+  \centering
+  \vspace*{28mm}
+  {\Huge\bfseries From Lorentz Covariance to Hyperbolic Conservation Laws\par}
+  \vspace{10mm}
+  {\LARGE Maxwell Equations: Geometry, Initial-Value Problems, and Numerical Methods\par}
+  \vspace{23mm}
+  {\Large Course of Computational Physics, Volume II\par}
+  \vspace{8mm}
+  {\large Geometric Structure and Numerical Discretization\par}
+  \vfill
+  {\large November 2026\par}
+  \vspace{6mm}
+  {\small For readers with a background in mathematics and numerical computation\par}
+\end{titlepage}
+\chapter*{Preface}
+\addcontentsline{toc}{chapter}{Preface}
+Volume I connected particle and continuum models to partial differential equations, discretizations, and solvers. This volume uses Maxwell equations to examine the geometric structure of field equations and its consequences for computation.
+
+The sequence of topics is the four-dimensional electromagnetic field; the decomposition into evolution equations and constraints; symmetric hyperbolicity, energy estimates, and conservation form; and the preservation of divergence constraints under discretization.
+
+The prerequisites are multivariable calculus, linear algebra, ordinary differential equations, elementary PDEs, and vector analysis. Chapter 0 introduces differential forms, function spaces, and symplectic structure. Chapter 5.5 develops time integration; Chapter 7 connects weak formulations to Galerkin and DG methods.
+
+Three-dimensional Maxwell equations supply the physical input for the four-dimensional formulation. Lorentz covariance constrains the transformation of the equations; physical laws specify their dynamics.
+
+\paragraph{Conventions.}
+Unless stated otherwise, we use vacuum in flat spacetime with dimensionless units $c=\varepsilon_0=\mu_0=1$, metric signature $(-,+,+,+)$, coordinates $(t,x,y,z)$, spacetime orientation $\dd t\wedge\dd x\wedge\dd y\wedge\dd z$, and spatial orientation $\dd x\wedge\dd y\wedge\dd z$. Spatial vectors and one-forms are identified using the Euclidean metric. Classical derivations assume sufficient smoothness; weak solutions and discrete problems are treated later. Changing conventions changes some component and Hodge-star signs while leaving the physical equations equivalent.
+
+\tableofcontents
+
+\mainmatter
+\setcounter{chapter}{-1}
+\chapter{Mathematical Preliminaries: Geometry and PDEs}
+\label{ch:prelim}
+\begin{chaptersummary}
+Building on Volume I, this chapter introduces the language needed to study Maxwell structure. Differential forms organize the differential operators; function spaces and energy estimates describe initial-value problems; symplectic structure supports the analysis of long-time integration. These tools will connect constraint propagation, weak formulations, and discrete evolution.
+\end{chaptersummary}
+\studyroute{General proofs in exterior algebra, trace theory, and symplectic geometry are omitted; the definitions and operator relations used later are retained.}{differential forms; Hodge star; Sobolev traces; symplectic map}{Translate $\dd^2=0$ into vector identities and identify which steps use a metric and which use only the differential structure.}
+\section{Mathematical Objects and Analytical Goals}
+Beyond finding a solution of a given PDE, analysis asks which initial data are admissible, whether a solution exists and is unique, how it depends on the data, and whether constraints persist. Discretization adds the question of structural preservation. Differential forms, spacetime decomposition, function spaces, and conservation laws provide the language for these questions.
+
+\begin{center}
+\begin{tikzpicture}[>=stealth, node distance=8mm]
+\node[draw,rounded corners,align=center,minimum width=34mm] (v) {Vector analysis\\$\grad,\curl,\Div$};
+\node[draw,rounded corners,align=center,right=of v,minimum width=34mm] (f) {Differential forms\\$\dd,\wedge,\star$};
+\node[draw,rounded corners,align=center,right=of f,minimum width=34mm] (p) {Initial-value problems\\Hyperbolicity, energy};
+\draw[->] (v)--(f);\draw[->] (f)--(p);
+\end{tikzpicture}
+\end{center}
+
+\section{Multilinear Algebra and Antisymmetry}
+The three-dimensional cross product depends on dimension, metric, and orientation. Antisymmetric tensors provide a suitable language in four dimensions. A $k$-form is a multilinear function of $k$ vectors that changes sign when two arguments are exchanged.
+
+An example of a one-form is
+\begin{equation}
+\alpha=a_x\,\dd x+a_y\,\dd y+a_z\,\dd z.
+\end{equation}
+Its action on $v=v^i\partial_i$ is $\alpha(v)=a_iv^i$. An example of a two-form is
+\begin{equation}
+\beta=b_x\,\dd y\wedge\dd z+b_y\,\dd z\wedge\dd x+b_z\,\dd x\wedge\dd y.
+\end{equation}
+The wedge product satisfies $\dd x\wedge\dd y=-\dd y\wedge\dd x$ and $\dd x\wedge\dd x=0$. For $\alpha\in\Omega^p$ and $\beta\in\Omega^q$,
+\begin{equation}
+\alpha\wedge\beta=(-1)^{pq}\beta\wedge\alpha,\qquad
+\alpha\wedge\beta\in\Omega^{p+q}.
+\end{equation}
+At each point in $n$ dimensions, the space of $k$-forms has dimension $\binom nk$. In four dimensions there are six independent two-form components and four three-form components. The notation $\Omega^k$ denotes the vector space of smooth $k$-forms.
+
+\section{The Exterior Derivative}
+The exterior derivative is $\dd:\Omega^k\to\Omega^{k+1}$. In Euclidean three-dimensional space,
+\begin{align}
+\dd f&=\partial_x f\,\dd x+\partial_yf\,\dd y+\partial_zf\,\dd z,\\
+\dd(a_i\dd x^i)&=(\curl\bm a)_x\,\dd y\wedge\dd z+(\curl\bm a)_y\,\dd z\wedge\dd x
+ +(\curl\bm a)_z\,\dd x\wedge\dd y,\\
+\dd(b_x\dd y\wedge\dd z+\cdots)&=(\Div\bm b)\,\dd x\wedge\dd y\wedge\dd z.
+\end{align}
+These equalities use the Euclidean identifications discussed next: one-forms represent vector components and two-forms represent flux through oriented areas. The central identity is
+\begin{equation}\label{eq:d2zero}
+\boxed{\dd^2=0.}
+\end{equation}
+In vector notation this includes $\curl\grad f=0$ and $\Div\curl\bm a=0$. The exterior derivative also satisfies the graded Leibniz rule:
+\begin{equation}
+\dd(\alpha\wedge\beta)=\dd\alpha\wedge\beta+(-1)^p\alpha\wedge\dd\beta,
+\quad \alpha\in\Omega^p.
+\end{equation}
+\begin{remark}
+The identity $\dd^2=0$ follows from commuting mixed partial derivatives and antisymmetry. Its geometric definition requires neither lengths nor angles.
+\end{remark}
+
+\begin{studentinput}
+Explain how both $\curl\grad f=0$ and $\Div\curl\bm a=0$ follow from $\dd^2=0$. Why is this independent of any particular Maxwell solution? What may happen to magnetic divergence when $D_hC_h\ne0$?
+
+\textbf{Your answer:}\vspace{2cm}
+\end{studentinput}
+
+\section{The Hodge Star and the Metric}
+\begin{askai}
+Starting from $\dd x,\dd y,\dd z$ in Euclidean three-dimensional space, compute $\starS\dd x$ and $\starS(\dd y\wedge\dd z)$ step by step. Identify the roles of the metric and orientation.
+
+Follow-up: rescale the metric and determine how $\dd$ and the Hodge star change. Give a concrete example.
+\end{askai}
+The smooth structure defines the exterior derivative. A Hodge-star identification between one-forms and two-forms additionally uses a \emph{metric and orientation}. In an oriented metric space of dimension $n$,
+\begin{equation}
+\star:\Omega^k\to\Omega^{n-k},\qquad
+\alpha\wedge\star\beta=\ip{\alpha}{\beta}\,\vol_n.
+\end{equation}
+In Euclidean three-dimensional space,
+\begin{equation}
+\starS\dd x=\dd y\wedge\dd z,\quad
+\starS\dd y=\dd z\wedge\dd x,\quad
+\starS\dd z=\dd x\wedge\dd y,
+\end{equation}
+and $\starS^2=1$. Thus the one-form $E=E_i\dd x^i$ associated with $\bm E$ gives the flux two-form $\starS E$. The exterior derivative is metric-independent; the Hodge star depends on the metric and orientation. In Lorentzian spacetime it also reflects the negative temporal signature.
+
+\section{Integral Theorems and Topology}
+The generalized Stokes theorem unifies the fundamental theorem of calculus and the Green, Gauss, and Stokes formulas:
+\begin{equation}\label{eq:stokes}
+\int_\Omega\dd\alpha=\int_{\partial\Omega}\alpha.
+\end{equation}
+This gives the geometric basis of integral conservation laws. For positive-degree forms on a suitable contractible neighborhood, $\dd\alpha=0$ implies $\alpha=\dd\gamma$ by the Poincar\'e lemma. Nontrivial topology can obstruct such a representation globally. Accordingly, $F=\dd A$ below is a local statement unless global topological conditions are specified.
+
+\section{Time, Space, and Initial-Value Problems}
+Extending the ODE $\dot u=f(u)$ to a PDE gives a typical evolution problem
+\begin{equation}
+\partial_t u+\mathcal L_xu=f,\qquad u(0,x)=u_0(x).
+\end{equation}
+Here $t$ is the evolution parameter and $x$ denotes spatial coordinates. A \emph{spacetime $3+1$ decomposition}, or time foliation, selects time slices; separation of variables for analytical solutions serves a different purpose. With time selected, covariant equations separate into evolution equations containing time derivatives and constraints without them.
+
+\section{Function Spaces and Energy Estimates}
+\begin{studentinput}
+Consider a piecewise smooth electric field with an interface jump. Which tangential or normal jumps contribute to its distributional curl and divergence? Relate this to the separate roles of $H(\curl)$ and $H(\Div)$.
+
+\textbf{Your answer:}\vspace{2cm}
+\end{studentinput}
+Function spaces treat entire functions as elements, with norms describing size and regularity. For $\Omega\subset\RR^3$, define
+\begin{equation}
+\norm{u}_{L^2(\Omega)}^2=\int_\Omega |u(x)|^2\,\dd x,
+\quad
+\norm{u}_{H^1(\Omega)}^2=\norm{u}_{L^2}^2+\norm{\nabla u}_{L^2}^2.
+\end{equation}
+The space $L^2$ requires square integrability; $H^1$ also requires square-integrable first weak derivatives. A weak derivative is defined by transferring differentiation to a test function: if
+\begin{equation}
+\int_\Omega u\,\partial_i\varphi\,\dd x=-\int_\Omega v_i\varphi\,\dd x
+\quad\text{for all }\varphi\in C_c^\infty(\Omega),
+\end{equation}
+then $v_i$ is the weak derivative of $u$. Distributional differentiation also permits the analysis of piecewise smooth fields and jumps.
+
+Maxwell analysis additionally uses
+\begin{align}
+H(\curl;\Omega)&=\{\bm u\in L^2(\Omega)^3:\curl\bm u\in L^2(\Omega)^3\},\\
+H(\Div;\Omega)&=\{\bm u\in L^2(\Omega)^3:\Div\bm u\in L^2(\Omega)\},
+\end{align}
+where curl and divergence are distributional. \emph{The function space specifies the meaning in which a field and its derivatives exist.} Proofs of completeness and trace theorems are omitted; search for Sobolev graph spaces, tangential trace, and normal trace.
+
+\begin{definition}[Well-posedness]
+An initial-value problem is well posed in a specified setting if admissible data produce a solution that is unique and depends continuously on the initial data and sources in the chosen norms. Admissibility is determined by the function spaces and boundary conditions.
+\end{definition}
+The $L^2$ estimates below describe the stability structure of vacuum Maxwell evolution. Full well-posedness also depends on data regularity and boundary conditions.
+
+
+\section{Symplectic Structure and Hamiltonian Systems}\label{sec:pre-symp}
+\paragraph{Position and momentum.}
+For a finite-dimensional system with $m$ degrees of freedom, write $q\in\RR^m$ for generalized coordinates, $p\in\RR^m$ for conjugate momenta, and $z=(q,p)^\mathsf T\in\RR^{2m}$. Given $H(q,p)$, the canonical Hamilton equations are
+\begin{equation}\label{eq:canonicalham}
+\dot z=\mathbb J\nabla H(z),\qquad
+\mathbb J=\begin{pmatrix}0&I_m\\-I_m&0\end{pmatrix},
+\quad
+\dot q=\partial_pH,\quad \dot p=-\partial_qH.
+\end{equation}
+The undamped oscillator $H=(p^2+\omega^2q^2)/2$ gives $\dot q=p$, $\dot p=-\omega^2q$; its trajectories are ellipses in phase space.
+
+\paragraph{The symplectic form.}
+The canonical two-form
+\begin{equation}
+\omega=\sum_{i=1}^m\dd q_i\wedge\dd p_i
+\end{equation}
+describes oriented phase-space area. A smooth map $\Phi:z\mapsto\Phi(z)$ is \emph{symplectic} if
+\begin{equation}\label{eq:sympmap}
+(D\Phi)^\mathsf T\mathbb J(D\Phi)=\mathbb J.
+\end{equation}
+The exact flow of a canonical Hamiltonian system preserves this structure. A symplectic integrator makes its one-step map satisfy \eqref{eq:sympmap}. Preservation of the symplectic form, exact energy conservation, and constraint preservation are distinct properties; general nonlinear Hamiltonian systems require separate energy analysis.
+
+\paragraph{Long-time effects of time integration.}
+Explicit Euler applied to the oscillator gives
+\begin{equation}
+\begin{pmatrix}q^{n+1}\\p^{n+1}\end{pmatrix}
+=\begin{pmatrix}1&\Delta t\\-\omega^2\Delta t&1\end{pmatrix}
+\begin{pmatrix}q^n\\p^n\end{pmatrix},
+\end{equation}
+The determinant is $1+\omega^2\Delta t^2>1$, producing phase-area expansion and artificial long-time energy growth. One symplectic Euler variant is
+\begin{equation}\label{eq:sympeuler}
+ p^{n+1}=p^n-\Delta t\,\omega^2q^n,\qquad
+ q^{n+1}=q^n+\Delta t\,p^{n+1}.
+\end{equation}
+Its one-step map is symplectic and, under suitable step-size conditions, avoids the systematic energy growth of explicit Euler. Later sections use implicit midpoint and staggered integration for Maxwell systems. Symplectic manifolds and backward error analysis are omitted here; search for symplectic map and modified Hamiltonian to develop the connection to long-time energy behavior.
+
+\section{Exercises}
+\begin{enumerate}
+\item Verify that the $\dd x\wedge\dd y$ coefficient in $\dd(a\,\dd x+b\,\dd y)$ is $\partial_xb-\partial_ya$.
+\item Recover $\curl\grad f=0$ from $\dd^2f=0$.
+\item Explain why four-dimensional two-forms have six independent components and three-forms have four.
+\item Explain the role of the $L^2$ norm in electromagnetic energy.
+\item For $H=(p^2+\omega^2q^2)/2$, compute the explicit Euler determinant and relate it to area preservation.
+\end{enumerate}
+
+\chapter{Lorentz Covariance and Four-Dimensional Maxwell Equations}
+\label{ch:lorentz}
+\begin{chaptersummary}
+Differential forms and the Hodge star express the known three-dimensional Maxwell equations as relations between a spacetime field and current. Covariance specifies transformation rules, while the physical equations supply dynamics. The exterior-derivative identity also imposes charge conservation. This formulation is the starting point for separating evolution from constraints.
+\end{chaptersummary}
+\studyroute{Component calculations for Lorentz boosts and the variational derivation are omitted. Maxwell equations are taken as physical input.}{electromagnetic field tensor; Lorentz covariance; Maxwell action}{Using this volume's signature and orientation, calculate $F_{\mu\nu}$ after an $x$-directed boost and check the electric and magnetic components.}
+\section{Physical Input and Covariant Form}
+Start with the sourced vacuum Maxwell equations in three dimensions:
+\begin{equation}\label{eq:maxwell3}
+\begin{aligned}
+\partial_t\bm B+\curl\bm E&=0,&\Div\bm B&=0,\\
+\partial_t\bm E-\curl\bm B&=-\bm j,&\Div\bm E&=\rho.
+\end{aligned}
+\end{equation}
+Lorentz transformations mix time and space, and correspondingly mix electric and magnetic components. A four-dimensional tensor formulation describes the fields measured by different inertial observers within one geometric framework.
+
+\section{The Electromagnetic Two-Form}
+\begin{askai}
+With signature $(-,+,+,+)$ and $F=B-\dd t\wedge E$, write all six independent field components and explain their organization into one antisymmetric tensor.
+
+Follow-up: compare two covariant equations to show why covariance alone does not uniquely specify Maxwell dynamics.
+\end{askai}
+On $M=\RR^{1,3}$ let $\eta=\operatorname{diag}(-1,1,1,1)$. Define the spatial one-form $E=E_x\dd x+E_y\dd y+E_z\dd z$ and the spatial two-form
+\begin{equation}
+B=B_x\dd y\wedge\dd z+B_y\dd z\wedge\dd x+B_z\dd x\wedge\dd y.
+\end{equation}
+Combine them as
+\begin{equation}\label{eq:defF}
+\boxed{F=B+E\wedge\dd t=B-\dd t\wedge E\in\Omega^2(M).}
+\end{equation}
+The corresponding components are $F_{0i}=-E_i$ and $F_{ij}=\epsilon_{ijk}B_k$:
+\begin{equation}
+(F_{\mu\nu})=
+\begin{pmatrix}
+0&-E_x&-E_y&-E_z\\
+E_x&0&B_z&-B_y\\
+E_y&-B_z&0&B_x\\
+E_z&B_y&-B_x&0
+\end{pmatrix}.
+\end{equation}
+Under the coordinate transformation $x'=\Lambda x$, the geometric two-form $F$ is unchanged and its components transform tensorially:
+\begin{equation}
+F'_{\mu\nu}=\frac{\partial x^\alpha}{\partial x'^\mu}
+\frac{\partial x^\beta}{\partial x'^\nu}F_{\alpha\beta}.
+\end{equation}
+Different observers generally report different $\bm E$ and $\bm B$ while describing the same $F$. Boost calculations, gauge choices, and variation of the action are omitted here; search for Lorentz transformation of electromagnetic fields, gauge potential, and Maxwell action.
+
+\section{Spacetime Dimension and Form Degree}
+Using the spacetime Hodge star $\star$, write the four-current $j^\mu=(\rho,\bm j)$ as a three-form
+\begin{equation}\label{eq:defJ}
+J=\rho\,\vol_3-\dd t\wedge\starS j^\flat,
+\qquad \vol_3=\dd x\wedge\dd y\wedge\dd z.
+\end{equation}
+Here $j^\flat=j_i\dd x^i$ is the one-form of the \emph{spatial} current. Maxwell equations become
+\begin{equation}\label{eq:4maxwell}
+\boxed{\dd F=0,\qquad \dd\star F=J.}
+\end{equation}
+With these conventions, the equivalent tensor equations are
+\begin{equation}
+\partial_{[\lambda}F_{\mu\nu]}=0,
+\qquad \partial_\mu F^{\nu\mu}=j^\nu.
+\end{equation}
+A convention with $F_{0i}=+E_i$ changes the index order or right-hand-side sign in the second equation accordingly.
+
+Spacetime has dimension four, $F$ has degree two, and the Maxwell equations have degree three. The conservation identity below has degree four.
+
+\section{Nilpotency and Charge Conservation}
+\begin{checkpoint}
+Starting from $\dd\star F=J$, explain why $\dd J=0$ is a compatibility condition. Can smooth solutions exist for prescribed sources that violate charge continuity?
+\end{checkpoint}
+Apply $\dd$ once more to $\dd\star F=J$:
+\begin{equation}\label{eq:dJ}
+\dd J=\dd^2\star F=0.
+\end{equation}
+Here $\dd J\in\Omega^4(M)$. Substitution of \eqref{eq:defJ} gives
+\begin{equation}
+\dd J=(\partial_t\rho+\Div\bm j)\,
+\dd t\wedge\vol_3,
+\end{equation}
+hence
+\begin{equation}\label{eq:continuity}
+\boxed{\partial_t\rho+\Div\bm j=0.}
+\end{equation}
+Charge conservation is a \emph{compatibility condition} of four-dimensional Maxwell equations. Prescribed $\rho,\bm j$ in a sourced initial-value problem must satisfy it.
+
+\paragraph{Local potentials.}
+Since $\dd F=0$, locally $F=\dd A$, with $A=\bm A^\flat-\phi\dd t$. Thus $\bm B=\curl\bm A$ and $\bm E=-\partial_t\bm A-\grad\phi$. The gauge transformation $A\mapsto A+\dd\chi$ leaves $F$ unchanged. This connects to actions, wave equations, and gauge theory; the subsequent development uses field-strength variables.
+
+\section{Review and Exercises}
+Lorentz covariance motivates a unified spacetime field, differential forms express its structure, and Maxwell laws specify its dynamics.
+\begin{enumerate}
+\item Explain why $F$ has six independent components.
+\item Use $\dd^2=0$ to determine the restriction on $J$.
+\item If $\rho,\bm j$ violate continuity, can $\dd\star F=J$ have a smooth solution?
+\end{enumerate}
+
+\chapter{Spacetime \texorpdfstring{$3+1$}{3+1} Decomposition: Evolution and Constraints}
+\label{ch:31}
+\begin{chaptersummary}
+The spacetime equations unify the fields, while computation requires a time variable and initial data. Splitting the field and current relative to time slices identifies the components that evolve and those that constrain initial data. Component counting organizes the system; the next chapter proves constraint propagation.
+\end{chaptersummary}
+\studyroute{Basis-by-basis calculations of the Lorentzian Hodge star and general curved-spacetime foliations are omitted.}{3+1 decomposition; Lorentzian Hodge star; spacetime foliation}{Compute $\star F$ from $\alpha\wedge\star\beta=\langle\alpha,\beta\rangle\vol_4$ and check every evolution-equation sign.}
+\section{Choosing a Time Direction}
+Covariant notation exposes geometric invariants. Time integration and initial-value theory additionally require an initial hypersurface $\Sigma_0$ and a family of spacelike slices $\Sigma_t$. In flat spacetime take
+\begin{equation}
+M=\RR_t\times\Sigma,\qquad \Sigma=\RR^3.
+\end{equation}
+This decomposition constructs an \emph{evolution problem}; each inertial observer may choose their own time slices.
+
+\section{Splitting the Exterior Derivative}
+\begin{askai}
+Expand $\dd F$ for $F=B-\dd t\wedge E$ using the stated orientation and $\dd=\dd_\Sigma+\dd t\wedge\partial_t$. Identify signs from wedge-product interchange and time differentiation, and separate spatial three-forms from terms containing $\dd t$.
+
+Follow-up: translate both resulting equations into three-dimensional vector notation and check the signs.
+\end{askai}
+For a time-dependent spatial $k$-form $\alpha(t)$,
+\begin{equation}\label{eq:splitd}
+\dd\alpha=\dd_\Sigma\alpha+\dd t\wedge\partial_t\alpha.
+\end{equation}
+Antisymmetry and the product rule give, for any spatial form $\beta$,
+\begin{equation}
+\dd(\dd t\wedge\beta)=-\dd t\wedge\dd_\Sigma\beta.
+\end{equation}
+Substituting $F=B-\dd t\wedge E$ yields
+\begin{align}
+\dd F
+ &=\dd_\Sigma B+\dd t\wedge\partial_tB
+   +\dd t\wedge\dd_\Sigma E\\
+ &=\underbrace{\dd_\Sigma B}_{\text{spatial three-form}}
+  +\dd t\wedge\underbrace{(\partial_tB+\dd_\Sigma E)}_{\text{spatial two-form}}.
+\end{align}
+Therefore
+\begin{equation}\label{eq:splitFaraday}
+\boxed{\partial_tB+\dd_\Sigma E=0,\qquad \dd_\Sigma B=0.}
+\end{equation}
+The first equation is Faraday evolution with three scalar components; the second is the single magnetic Gauss constraint.
+
+\section{The Hodge Star and the Remaining Equations}
+The metric and orientation give
+\begin{equation}\label{eq:starF}
+\star F=\starS E+\dd t\wedge\starS B.
+\end{equation}
+Here $\starS B$ is a spatial one-form. Consequently,
+\begin{align}
+\dd\star F
+ &=\dd_\Sigma\starS E
+   +\dd t\wedge\bigl(\partial_t\starS E-\dd_\Sigma\starS B\bigr).
+\end{align}
+Substitute $J=\rho\vol_3-\dd t\wedge\starS j^\flat$ in $\dd\star F=J$ to obtain
+\begin{equation}\label{eq:splitAmpere}
+\boxed{
+\begin{aligned}
+\partial_t\starS E-\dd_\Sigma\starS B&=-\starS j^\flat,\\
+\dd_\Sigma\starS E&=\rho\vol_3.
+\end{aligned}}
+\end{equation}
+Identifying spatial one-forms with vectors recovers the Amp\`ere--Maxwell evolution equation and electric Gauss constraint in \eqref{eq:maxwell3}.
+
+\section{The \texorpdfstring{$3+1$}{3+1} Components of a Three-Form}
+At each spacetime point, a three-form decomposes uniquely as
+\begin{equation}\label{eq:3formsplit}
+\Omega^3(M)\simeq
+\bigl(\dd t\wedge\Omega^2(\Sigma)\bigr)\oplus\Omega^3(\Sigma).
+\end{equation}
+This is a \emph{pointwise vector-space decomposition} relative to the time slices; the components may still depend on time. Their dimensions satisfy
+\begin{equation}
+\binom43=\binom32+\binom33=3+1.
+\end{equation}
+Each three-form Maxwell equation therefore supplies three evolution components and one constraint, giving \textbf{six evolution components and two constraints} in total.
+
+\begin{center}
+\begin{tikzpicture}[>=stealth,scale=1,every node/.style={font=\small}]
+\node[draw,rounded corners,minimum width=33mm,minimum height=9mm] (a) at (0.75,0) {$\dd F=0$};
+\node[draw,rounded corners,minimum width=33mm,minimum height=9mm] (b) at (8,0) {$\dd\star F=J$};
+\node[draw,rounded corners,align=center,minimum width=30mm] (c) at (-1,-1.6) {Evolution (3)\\$\partial_t B+\dd_\Sigma E=0$};
+\node[draw,rounded corners,align=center,minimum width=27mm] (d) at (2.5,-1.6) {Constraint (1)\\$\dd_\Sigma B=0$};
+\node[draw,rounded corners,align=center,minimum width=36mm] (e) at (6,-1.6) {Evolution (3)\\Amp\`ere--Maxwell};
+\node[draw,rounded corners,align=center,minimum width=27mm] (f) at (10,-1.6) {Constraint (1)\\Electric Gauss law};
+\draw[->] (a)--(c);\draw[->] (a)--(d);\draw[->] (b)--(e);\draw[->] (b)--(f);
+\end{tikzpicture}
+\end{center}
+
+\section{Dependencies between Evolution and Constraints}
+\begin{enumerate}
+\item \textbf{Constraints restrict the initial data.} Both Gauss laws apply to the same electromagnetic variables.
+\item \textbf{Time slicing specifies evolution.} The covariant equations become an initial-value problem relative to the chosen observer.
+\item \textbf{Constraint propagation uses differential identities.} Its proof requires $\dd^2=0$ and source continuity.
+\end{enumerate}
+
+\section{Exercises}
+\begin{enumerate}
+\item Use $F=B+E\wedge\dd t$ to check every sign in \eqref{eq:splitFaraday}.
+\item Count the temporal and spatial components of $\Omega^2$ in two space dimensions and one time dimension.
+\item Explain why $\rho$ occurs in the constraint of $\dd\star F=J$, whereas $\bm j$ occurs in evolution.
+\end{enumerate}
+
+\chapter{Constraint Propagation and Admissible Initial Data}
+\label{ch:constraint}
+\begin{chaptersummary}
+After separating evolution and Gauss constraints, we ask whether admissible initial fields remain admissible. Curl--divergence compatibility and charge continuity give the answer. The same structure supplies a criterion for constructing discrete operators and measuring divergence error.
+\end{chaptersummary}
+\studyroute{Boundary well-posedness and global topology are omitted; the focus is local constraint propagation for smooth solutions.}{constraint propagation; de Rham complex; discrete continuity equation}{Construct matrices with and without $D_hC_h=0$ and compare magnetic divergence after one update.}
+\section{Constraint Errors}
+Return to three-dimensional vector notation and take the curl equations as the evolution system:
+\begin{equation}\label{eq:evol}
+\partial_t\bm B=-\curl\bm E,
+\qquad
+\partial_t\bm E=\curl\bm B-\bm j.
+\end{equation}
+Define
+\begin{equation}
+C_B=\Div\bm B,\qquad C_E=\Div\bm E-\rho.
+\end{equation}
+Admissible initial fields satisfy $C_B=C_E=0$.
+
+\section{Classical Constraint Propagation}
+\begin{proposition}[Constraint propagation]\label{prop:propagate}
+Suppose $\bm E,\bm B,\rho,\bm j$ are sufficiently smooth, satisfy \eqref{eq:evol}, and obey $\partial_t\rho+\Div\bm j=0$. Then
+\begin{equation}
+\partial_tC_B=0,\qquad \partial_tC_E=0.
+\end{equation}
+In particular, $C_B=C_E=0$ at $t=0$ implies the same throughout the interval of smooth existence.
+\end{proposition}
+\begin{proof}
+Take the divergence of magnetic evolution and use $\Div\curl=0$:
+\begin{equation}
+\partial_t C_B=-\Div\curl\bm E=0.
+\end{equation}
+For electric evolution, use charge continuity:
+\begin{align}
+\partial_tC_E
+&=\Div(\curl\bm B-\bm j)-\partial_t\rho\\
+&=-\Div\bm j-\partial_t\rho=0.
+\end{align}
+\end{proof}
+
+\section{Geometric Interpretation}
+\begin{studentinput}
+Assume $\Div\bm B_0=0$. Derive the time derivative of this constraint from magnetic evolution and identify the use of $\dd^2=0$. What additional source condition is needed for electric Gauss propagation?
+
+\textbf{Your answer:}\vspace{2cm}
+\end{studentinput}
+Proposition \ref{prop:propagate} rests on the de Rham complex
+\begin{equation}\label{eq:derham}
+\Omega^0\xrightarrow{\dd}\Omega^1\xrightarrow{\dd}\Omega^2\xrightarrow{\dd}\Omega^3,
+\qquad \dd\circ\dd=0.
+\end{equation}
+Applying $\dd_\Sigma$ to $\partial_tB+\dd_\Sigma E=0$ gives
+\begin{equation}
+\partial_t(\dd_\Sigma B)=-\dd_\Sigma^2E=0.
+\end{equation}
+The electric argument also requires $\dd J=0$. \textbf{Constraint propagation is the temporal expression of the spacetime differential structure.}
+
+\section{Initial and Boundary Compatibility}
+Initial fields $\bm E(0)=\bm E_0,\bm B(0)=\bm B_0$ must satisfy
+\begin{equation}\label{eq:initConstraints}
+\Div\bm B_0=0,
+\qquad \Div\bm E_0=\rho(0,\cdot).
+\end{equation}
+On the whole space, suitable decay or finite-energy conditions are also needed. Bounded domains require boundary data compatible with evolution. For example, the total charge and outward electric flux must satisfy integral Gauss law. Boundary conditions must also match energy flux and incoming characteristics.
+
+\section{Discrete Complexes and Constraint Propagation}
+\begin{engineernote}
+Oriented vertices, edges, faces, and cells define incidence matrices $G,C,D$. For compatible incidence relations, $CG=0$ and $DC=0$ are topological identities. Geometry and material properties enter mass matrices or discrete Hodge-type operators. Implementation must also respect variable placement and boundary treatment.
+\end{engineernote}
+
+\begin{askai}
+Number the vertices, edges, and faces of an oriented tetrahedron. Construct vertex--edge, edge--face, and face--cell incidence matrices $G,C,D$ and verify $CG=0$ and $DC=0$, explaining each sign.
+
+Follow-up: reverse one edge orientation. Which rows or columns change, and why do the identities survive?
+\end{askai}
+Numerical derivatives are represented by discrete operators. If discrete divergence $D_h$ and curl $C_h$ fail to satisfy
+\begin{equation}\label{eq:discretecomplex}
+D_hC_h=0,
+\end{equation}
+the evolution may generate magnetic divergence. Electric constraint propagation also requires charge and current updates satisfying continuity with the \emph{same discrete operators}. Chapters 6 and 7 use this criterion to discuss constraint-preserving discretization.
+
+\section{Exercises}
+\begin{enumerate}
+\item Set $\rho=0,\bm j=0$ and choose smooth initial data with $\Div\bm B_0\neq0$. Show that evolution alone does not remove this constraint error.
+\item Integrate $\Div\bm E=\rho$ over a bounded volume $V$ and identify the compatibility between initial data and boundary flux.
+\item Derive a discrete magnetic constraint propagation formula from $D_hC_h=0$.
+\end{enumerate}
+
+\chapter{Symmetric Hyperbolic Systems: Characteristics and Energy}
+\label{ch:hyperbolic}
+\begin{chaptersummary}
+Constraints determine admissible initial fields; this chapter studies their propagation. A symmetric hyperbolic formulation identifies wave speeds through eigenvalues and controls dependence on data through energy estimates. These results support conservation laws, numerical fluxes, and time-step analysis. Well-posedness additionally involves existence and boundary conditions.
+\end{chaptersummary}
+\studyroute{Existence proofs and a full classification of characteristic boundary conditions are omitted.}{symmetric hyperbolic systems; energy estimate; maximally dissipative boundary conditions}{Split $A(\bm n)$ into incoming, outgoing, and zero-speed subspaces and identify how boundary data enter the energy flux.}
+\section{The First-Order Matrix System}
+Let
+\begin{equation}
+U=\mat{\bm E\\\bm B}\in\RR^6,
+\qquad S=\mat{-\bm j\\\bm0}.
+\end{equation}
+Define the $3\times3$ skew-symmetric matrix $C(\bm n)$ by
+\begin{equation}
+C(\bm n)\bm v=\bm n\times\bm v,
+\qquad C(\bm n)^\mathsf T=-C(\bm n).
+\end{equation}
+Set
+\begin{equation}\label{eq:An}
+A(\bm n)=
+\begin{pmatrix}
+0&-C(\bm n)\\
+C(\bm n)&0
+\end{pmatrix}.
+\end{equation}
+Then $A(\bm n)^\mathsf T=A(\bm n)$, and with $A^i=A(\bm e_i)$,
+\begin{equation}\label{eq:matrixhyper}
+\boxed{\partial_tU+\sum_{i=1}^3A^i\partial_iU=S.}
+\end{equation}
+A first-order system is \emph{symmetric hyperbolic} if its principal matrices admit a common positive-definite symmetrizer. Here they are already symmetric, so the symmetrizer is $I_6$.
+
+\section{Propagation in an Arbitrary Direction}
+\begin{askai}
+For $\bm n=(1,0,0)$, find the eigenvalues and eigenvectors of $A(\bm n)$. Separate transverse waves from zero-speed longitudinal components, then extend the result to an arbitrary unit direction by rotation.
+
+Follow-up: derive the energy estimate for vacuum with periodic boundaries, identifying the cancellation of boundary flux.
+\end{askai}
+For a unit normal $\bm n$, the normal principal matrix is $A(\bm n)$. Decompose $\bm E,\bm B$ into longitudinal and transverse parts. Using
+\begin{equation}
+C(\bm n)^2\bm v=\bm n(\bm n\cdot\bm v)-\bm v,
+\end{equation}
+gives the eigenvalues of $A(\bm n)$:
+\begin{equation}\label{eq:eigenvalues}
+\boxed{-1,-1,0,0,1,1.}
+\end{equation}
+The transverse wave speeds are $\pm1$, each of multiplicity two. The two zero eigenvalues correspond to longitudinal components, whose values are restricted by Gauss laws. Restoring dimensional units replaces $\pm1$ by $\pm c$.
+
+\section{Electromagnetic Energy Estimates}
+Take the dot products of $\partial_t\bm E=\curl\bm B-\bm j$ and $\partial_t\bm B=-\curl\bm E$ with $\bm E,\bm B$, respectively. The identity
+\begin{equation}
+\Div(\bm E\times\bm B)=\bm B\cdot\curl\bm E-\bm E\cdot\curl\bm B,
+\end{equation}
+yields the local energy balance
+\begin{equation}\label{eq:poynting}
+\boxed{\partial_t\left(\tfrac12|\bm E|^2+\tfrac12|\bm B|^2\right)
++\Div(\bm E\times\bm B)=-\bm j\cdot\bm E.}
+\end{equation}
+Integrating over $\Omega$ gives
+\begin{equation}\label{eq:energyintegral}
+\frac{\dd}{\dd t}\frac12\int_\Omega(|\bm E|^2+|\bm B|^2)\,\dd x
+=-\int_{\partial\Omega}(\bm E\times\bm B)\cdot\bm n\,\dd S
+-\int_\Omega\bm j\cdot\bm E\,\dd x.
+\end{equation}
+The boundary flux vanishes for sufficiently decaying fields on the whole space or for periodic boundaries. When $\bm j=0$, the $L^2$ energy is conserved. External-source work can be bounded with the Cauchy--Schwarz inequality.
+
+\begin{proposition}[Stability estimate on the whole space]
+For a smooth, sufficiently decaying solution $U$ of \eqref{eq:matrixhyper},
+\begin{equation}\label{eq:energyestimate}
+\norm{U(t)}_{L^2}\leq\norm{U(0)}_{L^2}+\int_0^t\norm{S(s)}_{L^2}\,\dd s.
+\end{equation}
+\end{proposition}
+\begin{proof}
+Symmetry and integration by parts give $\tfrac12\frac{\dd}{\dd t}\norm U_{L^2}^2=\ip{U}{S}_{L^2}$. Divide by $\norm U_{L^2}$ where it is positive and integrate. A regularization $\sqrt{\norm U^2+\varepsilon^2}$ handles possible zeros.
+\end{proof}
+\begin{remark}
+This estimate controls stability and uniqueness. Existence may be established by constant-coefficient Fourier analysis, semigroup methods, or symmetric hyperbolic theory. On bounded domains, appropriate boundary conditions must control the energy flux.
+\end{remark}
+
+\section{One-Dimensional Transverse Characteristics}
+For vacuum fields depending only on $x,t$, consider $E_y,B_z$. The equations reduce to
+\begin{equation}\label{eq:1dwave}
+\partial_tE_y+\partial_xB_z=0,
+\qquad \partial_tB_z+\partial_xE_y=0.
+\end{equation}
+Define $w_+=E_y+B_z$ and $w_-=E_y-B_z$. Then
+\begin{equation}
+\partial_tw_++\partial_xw_+=0,
+\qquad
+\partial_tw_- -\partial_xw_-=0.
+\end{equation}
+Hence
+\begin{equation}
+w_+(x,t)=w_+(x-t,0),\qquad
+w_-(x,t)=w_-(x+t,0).
+\end{equation}
+This displays finite-speed propagation along characteristics.
+
+\section{Exercises}
+\begin{enumerate}
+\item Verify that $A(\bm n)$ is symmetric.
+\item Compute its six eigenvalues directly for $\bm n=\bm e_x$.
+\item Determine the propagation direction for initial $E_y=B_z=f(x)$ and for $E_y=-B_z=f(x)$.
+\item Distinguish an energy condition at infinity from incoming characteristic data on a finite boundary.
+\end{enumerate}
+
+\chapter{Conservation Laws and Weak Solutions}
+\label{ch:conservation}
+\begin{chaptersummary}
+The preceding chapter described propagation. Writing evolution in flux form now permits integral solutions with reduced regularity. Control-volume balances and jump conditions connect continuous equations to interface information exchange, preparing finite-volume and DG fluxes. Conservation form and energy balance describe related but distinct properties.
+\end{chaptersummary}
+\studyroute{General distribution theory and nonlinear entropy-solution theory are omitted; test functions, flux balances, and jump relations are retained.}{weak solution; Rankine--Hugoniot condition; entropy pair}{Substitute a piecewise constant traveling wave into the distributional conservation law and derive $s[U]=A(\bm n)[U]$.}
+\section{Conservation Form}
+Since $A^i$ is constant, define the flux in direction $i$ by
+\begin{equation}\label{eq:flux}
+\mathcal F^i(U)=A^iU
+=\mat{-\bm e_i\times\bm B\\ \bm e_i\times\bm E}.
+\end{equation}
+Then
+\begin{equation}\label{eq:conservation}
+\boxed{\partial_tU+\sum_{i=1}^3\partial_i\mathcal F^i(U)=S.}
+\end{equation}
+Conservation form means that evolution has a divergence-of-flux structure. Sources produce balance laws for the field components; Gauss constraints remain a separate requirement.
+
+\section{Control-Volume Balance}
+Integrating over a fixed control volume $K$ and applying Gauss theorem gives
+\begin{equation}\label{eq:finitevolumeintegral}
+\frac{\dd}{\dd t}\int_K U\,\dd x
++\int_{\partial K}\mathcal F(U)\cdot\bm n\,\dd S
+=\int_KS\,\dd x.
+\end{equation}
+Here $\mathcal F(U)\cdot\bm n:=\sum_i n_i\mathcal F^i(U)$ is a six-component state flux. This is the continuous basis of a finite-volume update: the cell average changes through outward face fluxes and volume sources.
+
+\section{Weak Form and Jump Conditions}
+\begin{studentinput}
+For $\partial_tU+\partial_x\mathcal F(U)=0$, take a solution constant on each side of $x=st$. Use a control volume crossing the interface to derive $s[U]=[\mathcal F]$ and interpret its restriction on the propagation speed.
+
+\textbf{Your answer:}\vspace{2cm}
+\end{studentinput}
+For low-regularity solutions, impose the equations in integral form. Multiply \eqref{eq:conservation} by $\varphi\in C_c^\infty((0,T)\times\Omega;\RR^6)$ and integrate by parts:
+\begin{equation}\label{eq:weakinternal}
+\int_0^T\!\int_\Omega
+\left(U\cdot\partial_t\varphi+
+\sum_i\mathcal F^i(U)\cdot\partial_i\varphi+S\cdot\varphi\right)\dd x\,\dd t=0.
+\end{equation}
+If the test function may reach $t=0$ and vanishes at $t=T$, the initial term appears:
+\begin{equation}\label{eq:weakinit}
+\int_0^T\!\int_\Omega
+\left(U\cdot\partial_t\varphi+
+\sum_i\mathcal F^i(U)\cdot\partial_i\varphi+S\cdot\varphi\right)\dd x\,\dd t
++\int_\Omega U_0\cdot\varphi(0,x)\,\dd x=0,
+\end{equation}
+The spatial support stays away from the boundary. Both expressions use the sign convention obtained by multiplying the integrated-by-parts equation by $-1$.
+
+Across a moving jump with normal $\bm n$ and speed $s$, in the absence of singular sources the Rankine--Hugoniot condition is
+\begin{equation}\label{eq:RH}
+s[U]=[\mathcal F(U)\cdot\bm n]=A(\bm n)[U],
+\end{equation}
+where $[U]=U_R-U_L$. A nonzero jump propagates at a characteristic speed. Linear Maxwell equations lack the nonlinear shock-generation mechanism of Euler flow, but jump propagation and characteristic decomposition still determine numerical fluxes.
+
+\section{Conservation Form and Energy Balance}
+The six components of $U$ satisfy the vector balance law, while $\tfrac12|U|^2$ satisfies the energy balance \eqref{eq:poynting}. In PDE analysis this gives a convex entropy and associated flux:
+\begin{equation}
+\eta(U)=\tfrac12 U^\mathsf TU,\qquad
+q^i(U)=\tfrac12 U^\mathsf TA^iU=(\bm E\times\bm B)_i.
+\end{equation}
+This is the mathematical entropy of the symmetric system, distinct from thermodynamic entropy. It is used for stability analysis and numerical-flux design.
+
+\section{Exercises}
+\begin{enumerate}
+\item Verify that the first three components of $\mathcal F^x(U)$ equal $-\bm e_x\times\bm B$.
+\item Derive the Rankine--Hugoniot condition for \eqref{eq:1dwave} and check speeds $\pm1$.
+\item Use matrix symmetry to verify the expression for $q^i(U)$.
+\end{enumerate}
+
+
+% The bridge chapter preserves the original numbering of Chapters 6 and 7.
+\begingroup
+\chapter*{Chapter 5.5: From PDEs to Algorithms}
+\phantomsection
+\addcontentsline{toc}{chapter}{Chapter 5.5: From PDEs to Algorithms}
+\markboth{Chapter 5.5. From PDEs to Algorithms}{Chapter 5.5. From PDEs to Algorithms}
+\setcounter{section}{0}
+\renewcommand{\thesection}{5.5.\arabic{section}}
+\renewcommand{\thesubsection}{5.5.\arabic{section}.\arabic{subsection}}
+\renewcommand{\theHsection}{bridge.\arabic{section}}
+\setcounter{equation}{0}
+\renewcommand{\theequation}{5.5.\arabic{equation}}
+\renewcommand{\theHequation}{bridge.\arabic{equation}}
+\label{ch:bridge}
+
+\begin{chaptersummary}
+Conservation laws and weak forms still describe continuous problems. Algorithm design requires spatial degrees of freedom, interface fluxes, and time integration. Their combination determines stability and long-time behavior. This framework connects finite volumes, divergence preservation, and high-order DG.
+\end{chaptersummary}
+\studyroute{Complete coefficient tables and order-condition proofs are omitted. The ADER, CERK, LTS, and IMEX sections provide algorithmic structures and minimal examples.}{method of lines; ADER predictor; continuous RK; conservative LTS; additive Runge--Kutta}{Distinguish spatial residuals, within-step prediction, time scheduling, and stiffness splitting, listing the data needed by each.}
+
+\noindent\textbf{Scope.}
+A computational method must specify how a finite set of variables represents the field, how cells exchange interface information, and how the state advances from $t_n$ to $t_{n+1}$. This chapter gives the common framework; Chapter 6 develops finite volumes, and Chapter 7 develops Galerkin--DG from Sobolev weak formulations.
+
+\section{The Method of Lines}
+For $\partial_t U+\nabla\cdot\mathcal F(U)=S$, a spatial discretization such as finite differences, finite volumes, finite elements, DG, or discrete differential forms replaces $U(t,x)$ by coefficients $u_h(t)\in\RR^N$, typically giving
+\begin{equation}\label{eq:mol}
+M_h\dot u_h=R_h(u_h,t),\qquad
+\dot u_h=L_h(u_h,t):=M_h^{-1}R_h(u_h,t).
+\end{equation}
+Here $M_h$ is the mass matrix and $R_h$ contains volume terms, interface fluxes, boundary conditions, and sources. This is the \emph{method of lines}. Other formulations discretize space and time together.
+
+\begin{center}
+\begin{tikzpicture}[>=stealth,node distance=6mm,
+ every node/.style={font=\small},
+ stage/.style={draw,rounded corners,align=center,text width=3.2cm,minimum height=13mm}]
+\node[stage] (pde) {PDE and weak form\\$\partial_t U+\nabla\cdot\mathcal F(U)=S$};
+\node[stage,right=of pde] (space) {Space and fluxes\\$M_h\dot u_h=R_h(u_h)$};
+\node[stage,right=of space] (time) {Time integration\\$u_h^{n+1}=\Psi_{\Delta t}(u_h^n)$};
+\draw[->,thick] (pde)--(space);
+\draw[->,thick] (space)--(time);
+\end{tikzpicture}
+\end{center}
+
+\paragraph{Numerical flux.}
+Neighboring cells may provide different traces $U^-,U^+$. A shared numerical flux $\widehat{\mathcal F}(U^-,U^+;n)$ couples them. It must satisfy consistency and conservation under normal reversal:
+\begin{equation}
+\widehat{\mathcal F}(U,U;n)=\mathcal F(U)\cdot n,
+\end{equation}
+and
+\begin{equation}
+\widehat{\mathcal F}(U^-,U^+;n)
+=-\widehat{\mathcal F}(U^+,U^-;-n).
+\end{equation}
+A central flux averages both sides; an upwind flux adds direction-dependent dissipation. \textbf{Flux design defines the spatial operator; time integration advances the resulting semidiscrete system.}
+
+\section{Time Integration: Accuracy, Stability, and Cost}
+\begin{checkpoint}
+For $\dot u=L_hu$, why can explicit Euler be unstable even if the spatial operator conserves energy? Use a purely imaginary eigenvalue to examine the amplification factor and explain the relation between step size and stability region.
+\end{checkpoint}
+For $\dot u=L_h(u)$, explicit Euler is
+$u^{n+1}=u^n+\Delta t\,L_h(u^n)$;
+Classical fourth-order Runge--Kutta (RK4) gives fourth-order time accuracy with four right-hand-side evaluations. For a scalar semidiscrete mode $\dot y=\lambda_h y$, a time method has amplification factor
+$y^{n+1}=R(z)y^n$,$z=\Delta t\lambda_h$:
+\begin{align}
+R_{\mathrm{FE}}(z)&=1+z,\\
+R_{\mathrm{RK4}}(z)&=1+z+\frac{z^2}{2}+\frac{z^3}{6}+\frac{z^4}{24}.
+\end{align}
+The spectrum of the spatial operator must be compatible with the stability region of the time integrator.
+For example, explicit Euler gives $|1+\mathrm i\alpha|>1$ for $\alpha\ne0$,
+so it amplifies a purely oscillatory mode at any fixed positive step size.
+
+\paragraph{The CFL condition and its dependencies.}
+Explicit hyperbolic solvers generally require
+\begin{equation}\label{eq:cflgeneral}
+\Delta t\lesssim \frac{h}{c\,C(p,\text{mesh},\text{flux},\text{time integrator})},
+\end{equation}
+where $c$ is the characteristic speed and $p$ the polynomial degree. The spectrum of the local DG differentiation operator widens with $p$, so higher spatial order usually imposes a smaller explicit stable step.
+Implicit methods can relax linear stability restrictions; accuracy, solve cost, and constraint compatibility also enter the choice of step size.
+
+\section{Symplectic Methods for Maxwell Evolution}\label{sec:bridge-symp}
+\begin{askai}
+For a harmonic oscillator, derive the one-step matrices of explicit Euler and implicit midpoint. Calculate their effects on the symplectic form and quadratic energy, then compare the numerical and exact frequencies.
+
+Follow-up: for a general nonlinear Hamiltonian system, why does symplecticity alone not imply exact energy conservation at every step?
+\end{askai}
+With no sources or losses and suitable boundary conditions, Maxwell equations have a Hamiltonian/Poisson structure.
+Suppose a \emph{compatible spatial discretization} produces the finite-dimensional system
+\begin{equation}\label{eq:discrete-hamiltonian}
+\dot u_h=P_h\nabla H_h(u_h),\qquad
+P_h^\mathsf T=-P_h,\quad
+H_h(u_h)=\tfrac12u_h^\mathsf TK_hu_h,
+\quad K_h=K_h^\mathsf T>0,
+\end{equation}
+Antisymmetry then gives $\dot H_h=0$. In a noncanonical Maxwell formulation,
+$P_h$ may be \emph{degenerate}, with divergence constraints represented by Casimirs or invariants.
+Canonical coordinates should then be considered on symplectic leaves or in suitable constrained variables.
+Standard symplectic methods apply after restriction to a nondegenerate symplectic leaf,
+or after a potential formulation and constraint treatment yield a canonical Hamiltonian system.
+
+\paragraph{Implicit midpoint.}
+For $\dot u_h=A_hu_h$, take
+\begin{equation}\label{eq:midpoint}
+\frac{u_h^{n+1}-u_h^n}{\Delta t}
+=A_h\frac{u_h^{n+1}+u_h^n}{2}.
+\end{equation}
+If a positive-definite energy matrix $Q_h$ satisfies
+$A_h^\mathsf TQ_h+Q_hA_h=0$, left multiplication of
+\eqref{eq:midpoint} by $(u_h^{n+1}+u_h^n)^\mathsf TQ_h/2$ gives
+\begin{equation}\label{eq:midpoint-energy}
+\frac12(u_h^{n+1})^\mathsf TQ_hu_h^{n+1}
+=\frac12(u_h^n)^\mathsf TQ_hu_h^n.
+\end{equation}
+This is exact quadratic energy preservation for a \textbf{linear, lossless system with a compatible discrete energy inner product}.
+Midpoint is also symplectic for canonical Hamiltonian systems.
+Equation \eqref{eq:midpoint-energy} uses linear skew-adjointness; nonlinearity, material losses, PML, or external work require the corresponding discrete energy balance.
+
+\paragraph{St\"ormer--Verlet, leapfrog, and Yee--FDTD.}
+An oscillator admits the staggered update
+\begin{align}\label{eq:leapfrogosc}
+p^{n+1/2}&=p^{n-1/2}-\Delta t\,\omega^2q^n,\\
+q^{n+1}&=q^n+\Delta t\,p^{n+1/2}.
+\end{align}
+For a canonical oscillator, this splitting is symplectic.
+Yee time staggering places $E$ and $B$ at adjacent half time levels, with the precise placement depending on convention.
+Its linear update is closely related to staggered Hamiltonian integration under source-free, constant-coefficient conditions, compatible spatial discretization, and suitable boundary treatment.
+Canonical symplecticity depends on the material model, boundaries, and modifications of the scheme; Chapter 6 focuses on its discrete divergence identity.
+
+\paragraph{Symplecticity and numerical dispersion.}
+For a pure oscillation $\dot y=\mathrm i\omega y$, midpoint has amplification factor
+\begin{equation}
+R_{\rm MP}=\frac{1+\mathrm i\omega\Delta t/2}{1-\mathrm i\omega\Delta t/2},
+\qquad |R_{\rm MP}|=1,
+\end{equation}
+Its numerical angular frequency is
+\begin{equation}\label{eq:midpointdisp}
+\omega_{\Delta t}=\frac2{\Delta t}
+\arctan\!\left(\frac{\omega\Delta t}{2}\right)
+\ne\omega\quad(\Delta t>0,\;\omega\ne0).
+\end{equation}
+Thus \emph{amplitude preservation} and \emph{phase accuracy} require separate assessment.
+Long-time electromagnetic simulation requires both geometric/energy stability and control of total space--time dispersion.
+Chapter 7 examines the \emph{spatial} dispersion of high-order DG.
+
+\section{ADER: Local Space--Time Prediction and Correction}\label{sec:ader}
+Equation \eqref{eq:mol} supplies a spatial residual; a high-order update also requires information about evolution within the step.
+ADER (Arbitrary high-order DERivatives) constructs this information by a time expansion or a local space--time predictor.
+For constant-coefficient advection $\partial_tu+a\partial_xu=0$, the classical Taylor construction uses
+\begin{equation}\label{eq:ader-taylor}
+\partial_t^m u=(-a)^m\partial_x^m u,\qquad
+q_K(x,t_n+\tau)=\sum_{m=0}^{r}
+\frac{\tau^m}{m!}(-a)^m\partial_x^m u_h(x,t_n).
+\end{equation}
+This is a linear example of the Cauchy--Kovalevskaya procedure. For general systems, modern ADER methods can instead obtain $q_K(\bm x,t)$ from an element-local space--time weak problem.
+The predicted states enter numerical fluxes in a corrector that couples neighboring elements.
+For a source-free finite-volume update,
+\begin{equation}\label{eq:ader-corrector}
+|K|(\bar U_K^{n+1}-\bar U_K^n)
+=-\sum_{f\subset\partial K}\int_{t_n}^{t_{n+1}}\int_f
+\widehat{\mathcal F}(q_K,q_{K_f};\bm n_f)\,\dd S\,\dd t.
+\end{equation}
+A DG update also includes basis-weighted volume terms. The predictor uses local information; conservation follows from shared interface fluxes.
+Predictor order, quadrature order, and spatial accuracy jointly determine the fully discrete order.
+An explicit hyperbolic corrector still requires an appropriate CFL condition. For local prediction and time adaptivity, see
+\href{https://doi.org/10.1016/j.cma.2014.07.019}{Dumbser (2014)}.
+
+\section{CERK: Continuous Approximation Within a Time Step}\label{sec:cerk}
+Continuous explicit Runge--Kutta (CERK) methods use stage derivatives to construct an approximation over the entire time step.
+For an autonomous system $\dot u=L_h(u)$, write
+\begin{equation}\label{eq:cerk}
+\begin{aligned}
+k_i&=L_h\left(u^n+\Delta t\sum_{j<i}a_{ij}k_j\right),\\
+u_h(t_n+\theta\Delta t)&\approx u^n+
+\Delta t\sum_{i=1}^{s}b_i(\theta)k_i,\qquad 0\leq\theta\leq1.
+\end{aligned}
+\end{equation}
+Here $b_i(0)=0$ and $b_i(1)=b_i$; nonautonomous problems also require evaluation at stage times.
+The continuous extension has its own order conditions. For second-order Heun,
+\begin{equation}\label{eq:cerk-heun}
+k_1=L_h(u^n),\quad k_2=L_h(u^n+\Delta t k_1),\qquad
+b_1(\theta)=\theta-\tfrac12\theta^2,\quad
+b_2(\theta)=\tfrac12\theta^2.
+\end{equation}
+For smooth solutions, this polynomial gives a second-order continuous approximation; $\theta=1$ recovers the Heun update.
+Higher-order CERK coefficients must satisfy continuous order conditions; see
+\href{https://doi.org/10.1137/0913084}{Owren--Zennaro (1992)}.
+Continuous extensions support output and temporal coupling.
+For an element-local predictor, the stages must also be organized around a local problem, with neighboring information entering through correction fluxes; see
+\href{https://congress2.cimne.com/eccomas/proceedings/cfd2010/papers/01008.pdf}{Altmann--Gassner--Munz (2010)}.
+
+\section{LTS: Time Levels and Shared Fluxes}\label{sec:lts}
+Mesh size, material wave speed, and polynomial degree lead to different stable step sizes across elements.
+Local time stepping (LTS) assigns $\Delta t_K$ accordingly and synchronizes at common time levels.
+For example, let a coarse element use $\Delta T$ and a fine element $\Delta T/2$.
+With a fixed face normal, the shared flux integral must satisfy
+\begin{equation}\label{eq:lts-flux}
+\Phi_f[t_n,t_n+\Delta T]
+=\Phi_f[t_n,t_n+\Delta T/2]
++\Phi_f[t_n+\Delta T/2,t_n+\Delta T],
+\end{equation}
+Here $\Phi_f[a,b]=\int_a^b\int_f\widehat{\mathcal F}\,\dd S\,\dd t$.
+An implementation accumulates the same subinterval fluxes and applies them with opposite signs to neighboring elements.
+ADER or CERK can supply predicted interface states at quadrature times; time levels, data availability, quadrature order, and synchronization remain part of the LTS design.
+Physical-time LTS must preserve both temporal accuracy and interface conservation.
+For Maxwell equations, charge updates and edge circulations also require temporal compatibility to preserve the corresponding Gauss constraints.
+
+\begin{askai}
+\textbf{Omitted details and search terms:} continuous RK order conditions, local predictor, conservative LTS. Higher-order coefficient tables and scheduling implementations are omitted.
+
+For two adjacent one-dimensional advection cells with a $2:1$ time-step ratio, use \eqref{eq:cerk-heun} for within-step values.
+List the order of flux integration, fine-step updates, and coarse-step synchronization.
+Prove that the shared flux cancels in the combined cell balance.
+
+Follow-up: freeze the coarse-side state at $u^n$ and compare temporal orders in a step-halving experiment.
+\end{askai}
+
+\section{IMEX: Splitting Propagation and Stiff Sources}\label{sec:imex}
+ADER, CERK, and LTS address temporal approximation and local step-size differences.
+Stiffness introduces another scale when material response or collision times are much shorter than the evolution time of interest.
+Implicit--explicit (IMEX) methods split the right-hand side as
+\begin{equation}\label{eq:imex-split}
+\dot u_h=F_h(u_h)+G_h(u_h),
+\end{equation}
+Here $F_h$ is treated explicitly and $G_h$ implicitly. The split is guided by spectral scales and solve cost:
+for example, explicit curl propagation and implicit rapid local decay.
+An autonomous additive RK scheme takes the form
+\begin{equation}\label{eq:imex-rk}
+\begin{aligned}
+Y_i&=u^n+\Delta t\sum_{j<i}\widetilde a_{ij}F_h(Y_j)
+           +\Delta t\sum_{j\le i}a_{ij}G_h(Y_j),\\
+u^{n+1}&=u^n+\Delta t\sum_i\widetilde b_iF_h(Y_i)
+              +\Delta t\sum_i b_iG_h(Y_i).
+\end{aligned}
+\end{equation}
+The matrix $\widetilde A$ is strictly lower triangular, and $A$ may be diagonally implicit.
+The two tableaux must satisfy additive order conditions; see
+\href{https://doi.org/10.1016/S0168-9274(97)00056-1}{Ascher--Ruuth--Spiteri (1997)}.
+If $G_h$ contains only local material variables and the mass matrix is block-local, stage solves can remain within these blocks.
+An implicit part containing spatial differential coupling requires the corresponding global linear or nonlinear solve.
+
+\paragraph{Conductive Maxwell example.}
+Restore positive constants $\varepsilon,\mu$ and introduce Ohmic current $\bm j=\sigma\bm E$, with $\sigma\geq0$.
+Then
+\begin{equation}\label{eq:conductive-maxwell}
+\varepsilon\partial_t\bm E=\curl\bm H-\sigma\bm E,\qquad
+\mu\partial_t\bm H=-\curl\bm E.
+\end{equation}
+The electric relaxation time is $\tau_\sigma=\varepsilon/\sigma$ for $\sigma>0$.
+For the pure-decay mode $\dot E=-E/\tau_\sigma$, explicit Euler requires $\Delta t\leq2\tau_\sigma$ for stability.
+First-order IMEX Euler illustrates the basic split:
+\begin{equation}\label{eq:imex-euler-maxwell}
+\begin{aligned}
+(\varepsilon+\sigma\Delta t)\bm E^{n+1}
+ &=\varepsilon\bm E^n+\Delta t\,\curl_h\bm H^n,\\
+\mu\bm H^{n+1}&=\mu\bm H^n-\Delta t\,\curl_h\bm E^n.
+\end{aligned}
+\end{equation}
+Here coefficient multiplication is pointwise or blockwise; a general finite-element formulation uses material mass matrices.
+The pure-decay amplification factor becomes $(1+\Delta t/\tau_\sigma)^{-1}$.
+Propagation remains subject to the explicit stability region: when $\sigma=0$ and the spatial spectrum is purely imaginary,
+this first-order example reduces to explicit Euler, which is unsuitable for lossless waves.
+A practical wave solver needs an explicit tableau with suitable imaginary-axis stability and an assessment of the full IMEX amplification matrix.
+
+With no boundary energy flux, the continuous model satisfies
+\begin{equation}\label{eq:conductive-energy}
+\frac{\dd}{\dd t}\frac12\int_\Omega
+(\varepsilon|\bm E|^2+\mu|\bm H|^2)\,\dd x
+=-\int_\Omega\sigma|\bm E|^2\,\dd x.
+\end{equation}
+Discrete verification should therefore target an energy balance that includes physical dissipation.
+The electric Gauss constraint also requires the charge update to use current with the same time weights as the electric-field equation;
+for \eqref{eq:imex-euler-maxwell}, this means compatible use of $\sigma\bm E^{n+1}$.
+An unresolved relaxation limit additionally requires analysis of the limiting model, asymptotic preservation, and order under stiffness.
+
+\begin{askai}
+\textbf{Omitted details and search terms:} IMEX Runge--Kutta, additive order conditions, stiff accuracy, asymptotic preserving.
+Higher-order coefficient construction and stiff-limit proofs are omitted.
+
+For a one-dimensional transverse Fourier mode of \eqref{eq:conductive-maxwell}, construct the $2\times2$ amplification matrix.
+Compare explicit Euler and \eqref{eq:imex-euler-maxwell} in spectral radius, energy, and phase error for different $\sigma\Delta t/\varepsilon$.
+Distinguish removal of the decay step-size restriction from stable propagation.
+
+Follow-up: select an explicit set of IMEX coefficients from the literature, cite its source, and test its observed order by temporal refinement.
+\end{askai}
+
+\section{A Solver Design Checklist}
+\begin{enumerate}
+\item Identify the quantities to preserve: charge continuity, both Gauss constraints, discrete energy, or long-time phase accuracy.
+\item Choose spatial degrees of freedom and fluxes: cell averages, edge/face unknowns, or continuous/discontinuous local polynomials.
+\item Choose time integration by stability region, cost, temporal order, and required structure-preserving properties.
+\item Verify spatial convergence, temporal convergence, numerical divergence, energy balance, and phase/amplitude errors separately.
+\item For LTS, record updates per time level and interface flux balance. For IMEX, check propagation CFL, stiff decay, and stage-solve cost separately.
+\end{enumerate}
+\section{Exercises}
+\begin{enumerate}
+\item Derive the explicit Euler growth factor for $\dot y=\mathrm i\omega y$ and explain its unsuitability for purely oscillatory modes.
+\item Prove the discrete quadratic energy identity of implicit midpoint under the conditions of \eqref{eq:midpoint-energy}.
+\item Expand $\omega_{\Delta t}$ in \eqref{eq:midpointdisp} through its first three nonzero Taylor terms to identify dispersion introduced by time integration.
+\end{enumerate}
+\endgroup
+
+\chapter{Numerical Solution: Hyperbolic Fluxes and Divergence Constraints}
+\label{ch:numerics}
+\begin{chaptersummary}
+The preceding chapter separated spatial fluxes from time integration. This chapter applies them to Maxwell-type hyperbolic equations and examines how continuous divergence constraints evolve on a mesh. Finite-volume fluxes exchange information between cells; Yee-type staggering preserves the magnetic constraint through compatible discrete curl and divergence operators. Solver design must address both requirements.
+\end{chaptersummary}
+\studyroute{Full three-dimensional FDTD implementations of materials, boundaries, and current deposition are omitted.}{Yee scheme; constrained transport; charge-conserving current deposition; GLM}{Construct the edge--face--cell incidence matrices of a cube and show how shared edge electric fields preserve total magnetic flux.}
+\section{Semidiscrete Finite Volumes}
+Partition the domain into control volumes $K$ and define the cell average
+\begin{equation}
+\bar U_K(t)=\frac1{|K|}\int_K U(t,x)\,\dd x.
+\end{equation}
+For each cell face $f\subset\partial K$, choose a consistent numerical normal flux $\widehat{\mathcal F}(U^-,U^+;\bm n_f)$ to obtain
+\begin{equation}\label{eq:semidiscrete}
+\frac{\dd\bar U_K}{\dd t}=
+-\frac1{|K|}\sum_{f\subset\partial K}|f|\,
+\widehat{\mathcal F}(U_K^-,U_{K_f}^+;\bm n_f)+\bar S_K.
+\end{equation}
+Neighboring cells share a numerical face flux, with opposite signs for opposite normals.
+Internal fluxes therefore cancel in the global sum, expressing local finite-volume conservation.
+
+\section{Two Implementable Numerical Fluxes}
+The vacuum Maxwell normal Jacobian is $A(\bm n)$, with maximum absolute characteristic speed 1.
+A simple choice is the Rusanov (local Lax--Friedrichs) flux:
+\begin{equation}\label{eq:rusanov}
+\widehat{\mathcal F}_{\mathrm{Rus}}(U_L,U_R;\bm n)
+=\tfrac12 A(\bm n)(U_L+U_R)-\tfrac12 a(U_R-U_L),\qquad a\geq1.
+\end{equation}
+Linearity and symmetry of $A(\bm n)$ also allow the characteristic upwind flux
+\begin{equation}\label{eq:upwind}
+\widehat{\mathcal F}_{\mathrm{up}}(U_L,U_R;\bm n)
+=\tfrac12 A(\bm n)(U_L+U_R)
+-\tfrac12\abs{A(\bm n)}(U_R-U_L),
+\end{equation}
+where $\abs A=R\,\operatorname{diag}(|\lambda_k|)R^\mathsf T$ and $R$ is an orthogonal eigenvector matrix.
+Rusanov also damps zero-eigenvalue directions, whereas exact characteristic upwinding does not.
+
+\section{A Minimal Reproducible One-Dimensional Experiment}
+Consider \eqref{eq:1dwave} on the periodic interval $x\in[0,L)$.
+Set $V=(E_y,B_z)^\mathsf T$ and $f(V)=(B_z,E_y)^\mathsf T$.
+On a uniform grid of width $\Delta x$, use
+\begin{equation}\label{eq:1dfv}
+V_i^{n+1}=V_i^n-\frac{\Delta t}{\Delta x}
+\bigl(\widehat f_{i+1/2}^n-\widehat f_{i-1/2}^n\bigr),
+\end{equation}
+For $a=1$, the Rusanov flux is
+\begin{equation}
+\widehat f_{i+1/2}=\tfrac12\bigl(f(V_i)+f(V_{i+1})\bigr)-\tfrac12(V_{i+1}-V_i).
+\end{equation}
+Take $E_y(x,0)=B_z(x,0)=\exp[-(x-x_0)^2/\sigma^2]$, with periodic extension for periodic boundaries.
+The exact solution is
+\begin{equation}
+E_y(x,t)=B_z(x,t)=\exp[-(x-t-x_0)^2/\sigma^2]
+\quad\text{(on the real line, or periodically extended)}.
+\end{equation}
+Compare $L^1$ or $L^2$ errors across grids and vary the CFL number $\nu=\Delta t/\Delta x$.
+For this first-order explicit example, stability requires $\nu\leq1$.
+Multidimensional, higher-order, and other temporal discretizations require a stability bound for their own operator and time integrator.
+
+\begin{lstlisting}[caption={Rusanov finite-volume update on a one-dimensional periodic grid (pseudocode)}]
+Given cell averages V[i] = (Ey[i], Bz[i]), i = 0,...,N-1
+Choose dx = L/N, dt with dt/dx <= 1
+For each time step:
+    For every interface i+1/2 (periodic indexing):
+        VL = V[i];  VR = V[(i+1) mod N]
+        Fhalf[i] = 0.5*(flux(VL)+flux(VR)) - 0.5*(VR-VL)
+    For every cell i:
+        Vnew[i] = V[i] - (dt/dx)*(Fhalf[i]-Fhalf[(i-1) mod N])
+    V = Vnew
+where flux(Ey,Bz) = (Bz,Ey)
+\end{lstlisting}
+
+\section{Flux Conservation and Discrete Divergence Constraints}
+A general cell-centered finite-volume discretization of the six-component state $U$ provides control-volume flux balance.
+Preserving $\Div_h\bm B=0$ additionally requires compatible curl and divergence operators.
+The two structures are:
+\begin{center}
+\begin{tabular}{p{0.41\linewidth}p{0.43\linewidth}}
+\toprule
+Flux conservation & Divergence-constraint preservation\\
+\midrule
+Shared face fluxes cancel between adjacent cells & Discrete operators satisfy $D_hC_h=0$\\
+Control-volume integration and flux pairing & Topological incidence relations (edges--faces--cells)\\
+\bottomrule
+\end{tabular}
+\end{center}
+A Maxwell solver should verify face-flux balance and divergence-constraint propagation separately.
+
+\section{The Geometry of Yee Grids and Constrained Transport}
+\begin{askai}
+For an explicitly oriented cube, sum the six outward magnetic face fluxes and insert the edge electric-field line integrals from each face update.
+List the two contributions of every edge and verify that the time derivative of the total magnetic flux is zero.
+
+Follow-up: where does cancellation fail if neighboring faces use different electric fields on their shared edge?
+\end{askai}
+On a Cartesian staggered grid, store magnetic flux $B_f$ on mesh \emph{faces} and electric circulation $E_e$ on mesh \emph{edges}.
+The discrete integral Faraday law on each oriented face is
+\begin{equation}\label{eq:CT}
+\frac{\dd B_f}{\dd t}=-\sum_{e\subset\partial f}\operatorname{sgn}(f,e)E_e.
+\end{equation}
+Here $B_f$ is the integrated magnetic flux, not a point value, and $E_e$ is an electric-field line integral; $\operatorname{sgn}(f,e)$ is determined by orientation.
+Sum the outward magnetic fluxes over the boundary of a cell.
+Every edge in the \emph{boundary of the boundary} occurs twice with opposite signs, hence
+\begin{equation}\label{eq:dd0discrete}
+\frac{\dd}{\dd t}\sum_{f\subset\partial K}\operatorname{sgn}(K,f)B_f=0.
+\end{equation}
+This is the grid identity $D_hC_h=0$.
+Consistent orientation and shared edge fields therefore preserve the magnetic divergence constraint to roundoff.
+
+\begin{remark}
+Yee--FDTD staggers both space and time; the argument above isolates its \emph{spatial topology} and magnetic-constraint mechanism.
+The electric Gauss constraint requires compatible current deposition or a discrete continuity equation.
+A full implementation also handles boundaries, material interfaces, stability, and initial half-step data.
+\end{remark}
+
+\section{Divergence Cleaning}
+A cell-centered finite-volume scheme can introduce auxiliary variables that turn divergence errors into propagating, damped modes, as in GLM cleaning.
+This accommodates an existing flux framework but modifies the evolution system.
+It differs from constrained transport, which preserves $D_hC_h=0$ through a discrete complex.
+Auxiliary equations, cleaning speeds, and boundary closure are omitted here; search for hyperbolic divergence cleaning and GLM Maxwell systems, and request a complete energy and boundary analysis.
+
+\section{A Numerical Practice Sequence}
+\begin{enumerate}
+\item \textbf{One dimension:} implement \eqref{eq:1dfv} and verify traveling waves, wave speed, CFL dependence, and grid convergence.
+\item \textbf{Two dimensions:} extend to $U\in\RR^6$ with normal numerical fluxes and measure $\norm{\Div_h\bm B}$ over time.
+\item \textbf{Structure preservation:} update magnetic flux on an edge--face staggered mesh and compare discrete divergence with a cell-centered scheme.
+\item \textbf{Sources:} separately verify compatibility between discrete continuity and the electric Gauss constraint.
+\end{enumerate}
+
+
+\chapter[Weak Forms, Galerkin Methods, and DG Dispersion]{Beyond the Weak Form: Sobolev Spaces, Galerkin Methods, and High-Order DG Dispersion}\label{ch:dg}
+\begin{chaptersummary}
+The preceding chapter used finite volumes to study fluxes and constraints.
+This chapter constructs Galerkin and DG discretizations from weak forms and function spaces.
+Local polynomials and numerical traces produce a semidiscrete system whose energy and wave errors also depend on fluxes and time integration.
+A reproducible one-dimensional example connects spatial order, dispersion, and computational cost.
+\end{chaptersummary}
+\studyroute{Edge-element basis functions and commuting projections are omitted; the focus is the DG weak form, energy, and one-dimensional dispersion.}{N\'ed\'elec elements; commuting projection; DG energy estimate; Fourier--Bloch symbol}{Use lowest-order edge-circulation degrees of freedom to explain tangential continuity, then compute the physical branch of a $p=1$ DG cell symbol.}
+\section{From Weak Forms to Approximation Spaces}
+The weak formulation \eqref{eq:weakinternal} in Chapter 5 admits solutions that are not differentiable everywhere.
+We now choose function spaces and finite-dimensional approximations.
+Proofs of completeness, trace theorems, and embeddings are omitted; search for Sobolev trace theorem and Galerkin approximation.
+On a simple domain $\Omega$, $L^2(\Omega)$ provides a square-integrable energy norm,
+while $H^1(\Omega)$ requires first weak derivatives in $L^2$.
+The curl structure of Maxwell equations is naturally associated with $H(\curl;\Omega)$;
+normal traces of electric/magnetic fluxes relate to $H(\Div;\Omega)$.
+Neither space can generally be replaced by $H^1$.
+
+Let $\mathcal T_h=\{K\}$ be a spatial mesh.
+\emph{Continuous Galerkin/FEM} requires neighboring cells to be compatible in a specified trace sense:
+N\'ed\'elec edge elements enforce tangential continuity in $H(\curl)$, and Raviart--Thomas elements enforce normal continuity in $H(\Div)$.
+Beyond interpolation accuracy, these choices support compatibility with the differential complex
+\begin{equation}\label{eq:derhamfem}
+H^1\xrightarrow{\grad}H(\curl)
+\xrightarrow{\curl}H(\Div)\xrightarrow{\Div}L^2
+\end{equation}
+The corresponding operator complex should also hold in appropriate discrete spaces.
+\emph{Discontinuous Galerkin} (DG) takes a different approach:
+each cell stores an independent high-order polynomial, and cells couple through a \emph{single-valued numerical flux}.
+
+\section{The Curl Weak Form of Maxwell Equations}\label{sec:maxwellweak}
+\begin{studentinput}
+Across a material interface with $\epsilon^-\ne\epsilon^+$ and no free surface charge, the normal electric displacement is continuous.
+What restriction on the normal electric field would follow if all electric-field components were also required to be continuous?
+How does this distinguish $H^1$ continuity from the tangential continuity of $H(\curl)$?
+
+\textbf{Your answer:}\vspace{2cm}
+\end{studentinput}
+
+\begin{engineernote}
+Compatible discretizations select degrees of freedom according to the traces required by the equations:
+edge circulations encode tangential information, and face fluxes encode normal information.
+Standard nodal DG uses broken spaces, with interelement continuity handled through numerical traces or fluxes.
+Fluxes therefore affect both interface coupling and discrete structure.
+\end{engineernote}
+For smooth, constant-coefficient vacuum fields with a prescribed current $\bm j$,
+take test fields $\bm v,\bm w\in H(\curl;\Omega)$.
+Multiply $\partial_t\bm E=\curl\bm B-\bm j$ and
+$\partial_t\bm B=-\curl\bm E$ by the respective test fields and integrate.
+The curl integration-by-parts identity
+\begin{equation}
+\int_\Omega(\curl\bm a)\cdot\bm v\,\dd x
+=\int_\Omega\bm a\cdot\curl\bm v\,\dd x
++\int_{\partial\Omega}(\bm n\times\bm a)\cdot\bm v\,\dd S,
+\end{equation}
+gives
+\begin{align}\label{eq:maxwellweakcurl}
+(\partial_t\bm E,\bm v)_\Omega
+-(\bm B,\curl\bm v)_\Omega
+-\langle\bm n\times\bm B,\bm v\rangle_{\partial\Omega}
+&=-(\bm j,\bm v)_\Omega,\\
+(\partial_t\bm B,\bm w)_\Omega
++(\bm E,\curl\bm w)_\Omega
++\langle\bm n\times\bm E,\bm w\rangle_{\partial\Omega}
+&=0.
+\end{align}
+For smooth fields, this is an integration-by-parts reformulation of the PDE.
+For lower regularity, the boundary pairing is interpreted through \emph{tangential traces and their dual spaces}.
+DG applies these equations elementwise and couples interior/exterior tangential fields through \emph{numerical tangential fluxes}.
+This is the electromagnetic version of the preceding chapter's interface flux.
+To make the matrices and dispersion relation directly computable, we first use a one-dimensional symmetric hyperbolic system equivalent to the transverse Maxwell characteristic fields.
+
+\section{Broken Sobolev Spaces and the Local Weak Form}\label{sec:broken}
+In one dimension, define the broken space
+\begin{equation}
+H^1(\mathcal T_h)=\{v:\;v|_K\in H^1(K),\ K\in\mathcal T_h\},
+\quad
+V_h^p=\{v:\;v|_K\in\mathbb P_p(K)\},
+\end{equation}
+where $\mathbb P_p(K)$ denotes polynomials of degree at most $p$.
+The left and right interface traces $v^-,v^+$ may differ.
+Define $\{v\}=(v^-+v^+)/2$ and $[v]=v^+-v^-$ with this one-dimensional orientation.
+In multiple dimensions, outward normals vary by cell, so scalar jump signs require the corresponding orientation convention.
+
+Consider the constant-coefficient symmetric system
+\begin{equation}\label{eq:dgmodel}
+\partial_tU+A\partial_xU=0,\qquad A=A^\mathsf T,
+\end{equation}
+This is both a model problem and the directional Maxwell system of Chapter 4.
+Let $K_j$ be a cell with endpoints $x_{j-1/2}$ and $x_{j+1/2}$.
+For $v_h\in(V_h^p)^m$, integration by parts gives
+\begin{equation}\label{eq:dgweak}
+\int_{K_j}(\partial_tU_h)\cdot v_h\,\dd x
+-\int_{K_j}(AU_h)\cdot\partial_xv_h\,\dd x
++\widehat f_{j+1/2}\cdot v_h(x_{j+1/2}^-)
+-\widehat f_{j-1/2}\cdot v_h(x_{j-1/2}^+)=0.
+\end{equation}
+The positive normal direction is fixed to the right.
+The \emph{same} numerical value $\widehat f$ is used on both sides of an internal interface.
+Choose local basis functions $\{\phi_\ell\}_{\ell=0}^p$ and expand
+$U_h|_{K_j}=\sum_\ell u_{j\ell}(t)\phi_\ell(x)$,
+This yields local mass and stiffness matrices and the assembled system
+$M_h\dot u_h=R_h(u_h)$.
+With local orthogonal Legendre polynomials, the mass matrix is diagonal on affine one-dimensional cells with constant coefficients.
+
+\section{Central Fluxes, Upwind Fluxes, and Discrete Energy}\label{sec:dg-energy}
+\begin{askai}
+For the periodic system $\partial_tU+A\partial_xU=0$ with constant symmetric $A$,
+insert central and upwind fluxes into \eqref{eq:dgweak} and derive \eqref{eq:dgenergy} interface by interface.
+Use exactly the convention $[U]=U^+-U^-$.
+
+Follow-up: why does semidiscrete energy stability still require separate checks of the fully discrete time integrator and Maxwell divergence constraints?
+\end{askai}
+For \eqref{eq:dgmodel}, two standard interface fluxes are
+\begin{align}\label{eq:dg-fluxes}
+\widehat f_{\rm cen}&=A\{U_h\},\\
+\widehat f_{\rm up}&=A\{U_h\}-\frac12|A|[U_h],
+\end{align}
+where $|A|=R\operatorname{diag}(|\lambda_\alpha|)R^\mathsf T$ and
+$A=R\operatorname{diag}(\lambda_\alpha)R^\mathsf T$.
+Assume periodic boundaries, exact integration, and constant symmetric $A$.
+Set $v_h=U_h$ in \eqref{eq:dgweak} and sum over cells.
+The cell-volume term satisfies
+$\int_K (AU_h)\cdot\partial_xU_h\,\dd x
+=\tfrac12[U_h^\mathsf TAU_h]_{\partial K}$;
+Summing interface contributions gives
+\begin{equation}\label{eq:dgenergy}
+\frac{\dd}{\dd t}\left(\frac12\sum_K\norm{U_h}_{L^2(K)}^2\right)
+=-\frac12\sum_{f\in\mathcal F_h^{\rm int}}
+[U_h]_f^\mathsf T|A|[U_h]_f\leq0
+\quad\text{(upwind flux)}.
+\end{equation}
+For central flux, the right-hand side is zero.
+High-order DG stability depends on fluxes, quadrature, boundaries, and time integration.
+Upwind dissipation commonly suppresses unwanted grid-scale modes.
+For multidimensional Maxwell equations, the facewise $A(n)$ enters the energy estimate,
+physical boundary fluxes must be included, and divergence constraints require a separate check.
+
+\section{Numerical Dispersion of High-Order DG}\label{sec:dg-dispersion}
+\begin{checkpoint}
+Compare amplitude dissipation, phase-speed error, and group-speed error.
+Why can central flux conserve semidiscrete energy while introducing nonzero phase error?
+Why does an energy estimate alone not guarantee a correct discrete Maxwell spectrum?
+\end{checkpoint}
+Wave accuracy requires assessment of both amplitude and phase.
+For a continuous traveling wave $u(x,t)=\exp[\mathrm i(kx-\omega t)]$, the one-dimensional vacuum characteristic relation is $\omega=ck$.
+Suppose the physical mode of a spatial discretization satisfies
+\begin{equation}\label{eq:semidispersion}
+\lambda_h(k)=-\alpha_h(k)-\mathrm i\omega_h(k),
+\quad
+c_{\rm ph,h}=\frac{\omega_h}{k},\quad
+c_{\rm gr,h}=\frac{\dd\omega_h}{\dd k},
+\end{equation}
+Then $\alpha_h\geq0$ describes \emph{numerical dissipation},
+$\omega_h/k-c$ the \emph{phase-speed error (dispersion)}, and
+$\dd\omega_h/\dd k-c$ the \emph{group-speed error}.
+An electromagnetic pulse contains many wavenumbers.
+Incorrect phase and group speeds across these components cause artificial pulse spreading and phase drift over long propagation distances.
+
+\Needspace{9\baselineskip}
+\noindent\textbf{A reproducible Fourier--Bloch cell symbol.}\par
+\begin{askai}
+On a uniform periodic grid with a $p=1$ Legendre basis, construct $M,N,r,\ell$ from the weak form and derive \eqref{eq:p1symbol}.
+Compute the two eigenvalue branches and identify the physical branch as $\theta\to0$.
+
+Follow-up: use the appendix code to reproduce the phase-speed errors at $\theta=0.5,1.0,1.5$ and compare with the table.
+\end{askai}
+Take the right-going scalar characteristic equation $\partial_tu+\partial_xu=0$
+on uniform periodic cells of width $h$.
+Expand $u_h$ in Legendre polynomials $P_\ell(\xi)$ on the reference interval $\xi\in[-1,1]$,
+using \emph{exact integration and upwind flux}. Set
+$\theta=kh$,$z=e^{-\mathrm i\theta}$,
+Use Bloch form for the cell coefficients:
+$u_{j,\ell}(t)=\widehat u_\ell(t)e^{\mathrm ij\theta}$.
+For $i,j=0,\ldots,p$, define
+\begin{equation}\label{eq:dgsymbol}
+M_{ij}=\frac2{2i+1}\delta_{ij},\qquad
+N_{ij}=\int_{-1}^1P_j(\xi)P_i'(\xi)\,\dd\xi,
+\qquad
+r_j=1,\quad\ell_i=(-1)^i.
+\end{equation}
+The weak form gives the coefficient-vector equation
+\begin{equation}\label{eq:dgsymboleig}
+\frac{\dd\widehat{\bm u}}{\dd t}
+=\frac1h\mathcal L_p(\theta)\widehat{\bm u},\qquad
+\boxed{\mathcal L_p(\theta)=2M^{-1}\left(N-r r^\mathsf T
++z\,\ell r^\mathsf T\right).}
+\end{equation}
+The matrix has $p+1$ eigenvalue branches.
+The branch continuously approaching $-\mathrm i\theta$ as $\theta\to0$ is the \emph{physical branch};
+the others are internal nonphysical/high-frequency branches.
+Dispersion curves require continuous tracking of the selected branch in wavenumber.
+
+\paragraph{Two limiting examples.}
+For $p=0$,
+\begin{equation}
+\mathcal L_0(\theta)=e^{-\mathrm i\theta}-1,
+\qquad
+\omega_h=\frac{\sin\theta}{h},\quad
+\alpha_h=\frac{1-\cos\theta}{h}.
+\end{equation}
+The phase-speed ratio is therefore $c_{\rm ph,h}/c=\sin\theta/\theta$, which departs substantially from 1 as wavenumber increases.
+For $p=1$, the Legendre basis gives
+\begin{equation}\label{eq:p1symbol}
+\mathcal L_1(\theta)=
+\begin{pmatrix}z-1&z-1\\3(1-z)&-3(1+z)\end{pmatrix}.
+\end{equation}
+Computing the physical eigenvalues of these two matrices and the $p=2$ matrix gives the following table.
+Each entry is $|\omega_h/k-1|$ and includes \emph{only semidiscrete spatial error},
+with $h=1$ and dimensionless wavenumber $\theta=kh$.
+
+\begin{center}
+\begin{tabular}{cccc}
+\toprule
+$\theta=kh$ & $p=0$ & $p=1$ & $p=2$\\
+\midrule
+$0.5$ & $4.11489\times10^{-2}$ & $2.17952\times10^{-4}$ & $3.68086\times10^{-7}$\\
+$1.0$ & $1.58529\times10^{-1}$ & $2.96135\times10^{-3}$ & $2.27506\times10^{-5}$\\
+$1.5$ & $3.35003\times10^{-1}$ & $1.18404\times10^{-2}$ & $2.42693\times10^{-4}$\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}
+\begin{semilogyaxis}[
+ width=0.90\textwidth,height=6.6cm,
+ xmin=0.2,xmax=1.55,ymin=1e-9,ymax=1,
+ xlabel={$\theta=kh$},ylabel={Relative phase-speed error $|c_{\mathrm{ph},h}/c-1|$},
+ grid=major,grid style={gray!25},
+ legend pos=north west,
+ tick label style={font=\footnotesize},
+ label style={font=\small},
+ legend style={font=\small,fill=white,draw=gray!45},
+ ]
+\addplot[blue!70!black,thick,mark=square*] coordinates {
+ (0.25,0.010384163) (0.5,0.041148923) (0.75,0.09114832)
+ (1,0.158529015) (1.25,0.240812305) (1.5,0.335003342)};
+\addlegendentry{$p=0$}
+\addplot[orange!80!black,thick,mark=triangle*] coordinates {
+ (0.25,1.42467155e-5) (0.5,0.000217952365) (0.75,0.00102789518)
+ (1,0.00296135335) (1.25,0.00647412633) (1.5,0.0118404387)};
+\addlegendentry{$p=1$}
+\addplot[teal!80!black,thick,mark=*] coordinates {
+ (0.25,5.79772053e-9) (0.5,3.68085612e-7) (0.75,4.13434552e-6)
+ (1,2.27506265e-5) (1.25,8.43451092e-5) (1.5,0.000242693401)};
+\addlegendentry{$p=2$}
+\end{semilogyaxis}
+\end{tikzpicture}
+\caption{Semidiscrete physical-mode dispersion error for one-dimensional constant-coefficient upwind DG (logarithmic vertical scale).
+Data are computed pointwise from \eqref{eq:dgsymboleig}, using the mesh, quadrature, and flux specified here; only spatial semidiscretization error is included.}
+\label{fig:dgdisp}
+\end{figure}
+\FloatBarrier
+
+\noindent\textbf{Error trends.}
+For this uniform-grid, constant-coefficient example with exact integration and characteristic upwind flux,
+increasing the local polynomial degree from zero to one and two substantially reduces the \emph{physical-mode} phase-speed error (Figure~\ref{fig:dgdisp}).
+For small $kh$, the relative dispersion errors behave as $O((kh)^2)$, $O((kh)^4)$, and $O((kh)^6)$, respectively.
+Complex meshes, material jumps, underintegration, and other fluxes alter the dispersion curves.
+Increasing $p$ also increases local unknowns and quadrature cost and tightens the explicit step-size bound.
+Comparison at equal \emph{total degrees of freedom or computational cost} requires a separate benchmark.
+
+\section{Combining Spatial and Temporal Errors}
+Let the physical spatial eigenvalue be $\lambda_h=-\alpha_h-\mathrm i\omega_h$
+and the time-integrator amplification factor be $R(\Delta t\lambda_h)$.
+The fully discrete frequency is then
+\begin{equation}\label{eq:fullfrequencies}
+\alpha_{h,\Delta t}=-\frac1{\Delta t}\log|R(\Delta t\lambda_h)|,
+\qquad
+\omega_{h,\Delta t}=-\frac1{\Delta t}\arg R(\Delta t\lambda_h),
+\end{equation}
+Choose a continuous phase branch to avoid $2\pi$ aliasing.
+Even with high-order DG in space, low temporal order or a large $\Delta t$ can make $\omega_{h,\Delta t}$ inaccurate.
+Equation \eqref{eq:midpointdisp} gives a concrete time-dispersion example.
+A common pairing is high-order DG with RK integration of matching accuracy.
+When long-time structure preservation is the priority, integration can instead be designed around the discrete Hamiltonian/Poisson structure.
+\emph{Low dispersion}, \emph{low dissipation}, and \emph{discrete energy/symplectic behavior} are related but distinct criteria.
+
+\section{Spaces and Constraints for Maxwell DG}
+Maxwell DG typically uses element-local polynomials for electric and magnetic components,
+with central or characteristic upwind fluxes based on $A(n)$ coupling the faces.
+It supports high-order curved geometry, unstructured meshes, and local $hp$ refinement.
+An elementwise $[\mathbb P_p]^6$ space also requires constraint treatment for magnetic divergence and the sourced electric Gauss law.
+Options include discrete-complex-compatible spaces, constraint-preserving fluxes, locally divergence-free bases, cleaning variables, and other specialized designs.
+Physical boundary and material-interface stability must be analyzed with the chosen flux.
+
+\section{Numerical Experiments on High-Order Dispersion}
+\begin{enumerate}
+\item For $p=0,1,2,3$, construct $M,N,r,\ell$ from \eqref{eq:dgsymbol}.
+At $\theta=0.1,0.2,\ldots,1.5$, compute the eigenvalues of $\mathcal L_p(\theta)$ and track the physical mode continuously connected to $-\mathrm i\theta$.
+\item Plot $c_{\rm ph,h}/c$ and $\alpha_hh$ against $kh$.
+Compare phase errors across $p$, keeping the nonphysical branches separate.
+\item With RK4 or implicit midpoint, use \eqref{eq:fullfrequencies} to plot fully discrete dispersion at several $\Delta t/h$ and identify when time error dominates.
+\item Return to a three-dimensional Gaussian pulse and compare long-time phase, energy, and $\Div_h\bm B$.
+When mesh or degree varies, also report total degrees of freedom and measured computational cost.
+\end{enumerate}
+\section{Exercises}
+\begin{enumerate}
+\item Starting from \eqref{eq:dgweak}, prove that $p=0$ upwind DG equals first-order upwind finite volumes.
+\item Derive the characteristic polynomial of \eqref{eq:p1symbol} and identify its physical branch as $\theta\to0$.
+\item Derive exact periodic DG semidiscrete energy conservation for central flux and explain the effect of adding upwind dissipation.
+\item For $p=2$ on a fixed mesh, discuss how replacing RK4 with explicit Euler affects purely oscillatory modes.
+\end{enumerate}
+
+\chapter*{Conclusion: From Geometry to Computation}
+\addcontentsline{toc}{chapter}{Conclusion: From Geometry to Computation}
+The argument of this volume follows the chain
+\begin{equation*}
+\boxed{
+\begin{gathered}
+\text{Lorentz covariance and the unified field strength }F\\
+\Downarrow\\
+\dd F=0,\qquad \dd\star F=J\\
+\Downarrow\quad\text{choose a time foliation}\\
+\text{6 evolution components + 2 constraint components}\\
+\Downarrow\quad\dd^2=0\\
+\text{Constraint propagation and source continuity}\\
+\Downarrow\\
+\text{Symmetric hyperbolicity / energy estimates / conservation form}\\
+\Downarrow\\
+\text{Numerical fluxes, geometric time integration, DG, and constraints}
+\end{gathered}}
+\end{equation*}
+
+The central connection is that \emph{geometry determines compatibility, hyperbolicity determines information propagation, and discrete structure determines whether computation retains these properties}.
+Maxwell equations thereby connect geometric field theory with computational PDEs.
+
+\appendix
+\chapter{Notation and Conventions}
+\begin{chaptersummary}
+This appendix collects space--time, differential-form, and discrete-operator notation for reference when moving between four-dimensional expressions, spatial decompositions, and implementations.
+Metric, orientation, and unit conventions should be checked together.
+\end{chaptersummary}
+\studyroute{This appendix summarizes the conventions used above; general constitutive laws and conversions between signatures can be developed separately.}{metric signature; electromagnetic constitutive relations; Hodge dual}{Keep this volume's orientation and explain how restoring $\varepsilon,\mu,c$ changes the energy inner product and wave speed.}
+\begin{longtable}{p{0.26\textwidth}p{0.66\textwidth}}
+\toprule
+Symbol & Convention and interpretation\\
+\midrule
+\endfirsthead
+\toprule
+Symbol & Convention and interpretation\\
+\midrule
+\endhead
+$\eta$ & Minkowski metric with signature $(-,+,+,+)$; $c=1$.\\
+$\Omega^k(M)$ & Space--time $k$-forms; $\Omega^k(\Sigma)$ denotes spatial $k$-forms.\\
+$\dd,\dd_\Sigma$ & Space--time and spatial exterior derivatives.\\
+$\star,\starS$ & Four-dimensional Lorentzian and three-dimensional Euclidean Hodge stars.\\
+$E$ & Spatial electric one-form: $E_i\dd x^i$.\\
+$B$ & Spatial magnetic-flux two-form: $B_x\dd y\wedge\dd z+\cdots$.\\
+$F$ & $F=B-\dd t\wedge E$, hence $F_{0i}=-E_i$.\\
+$J$ & Current three-form: $J=\rho\vol_3-\dd t\wedge\starS j^\flat$.\\
+$\star F$ & $\starS E+\dd t\wedge\starS B$.\\
+$C(\bm n)$ & $C(\bm n)\bm v=\bm n\times\bm v$.\\
+$A(\bm n)$ & Symmetric $6\times6$ principal matrix with eigenvalues $\pm1,0$.\\
+$D_hC_h=0$ & Discrete divergence of discrete curl vanishes within a compatible complex.\\
+\bottomrule
+\end{longtable}
+
+\paragraph{Three meanings of a star or dual.}
+The Hodge star is distinct from complex conjugation and the matrix adjoint $A^*$.
+The squares of the four-dimensional Lorentzian and three-dimensional Euclidean Hodge stars generally have different signs;
+the three-dimensional identity $\star^2=1$ cannot be transferred directly to four dimensions.
+
+\paragraph{Metric and units.}
+Restoring $c$ and material constitutive laws also restores the physical units relating $\bm E$ and $\bm B$.
+In heterogeneous media, $\bm D,\bm H$ may be more natural variables.
+The principal matrices, energy inner product, and characteristic speeds change with the constitutive model.
+The speeds $\pm1$ in this volume apply to flat vacuum space--time in the chosen units.
+
+\chapter{Reproducing DG Dispersion: Python Code}
+\begin{chaptersummary}
+This appendix turns the one-dimensional DG cell symbol of Chapter 7 into an executable eigenvalue calculation that reproduces the physical-branch semidiscrete phase-speed error.
+Varying wavenumber and polynomial degree tests the analysis and illustrates the effect of branch selection.
+\end{chaptersummary}
+\studyroute{The code evaluates the cell symbol; full DG field-solver assembly and time stepping are omitted.}{Legendre modal DG; physical eigenvalue branch; dispersion analysis}{Reproduce the tabulated errors, then track eigenvalues continuously in wavenumber and compare with nearest-eigenvalue selection.}
+The code requires only NumPy.
+It assumes one-dimensional constant coefficients, a uniform periodic grid, exact Legendre integration, upwind flux, and spatial semidiscretization.
+It constructs \eqref{eq:dgsymboleig} and prints the Chapter 7 phase-speed error table.
+The scalar traveling wave is equivalent to a transverse Maxwell characteristic field;
+this experiment does not include the full Maxwell field or Gauss constraints.
+
+\Needspace{30\baselineskip}
+\begin{lstlisting}[language=Python,caption={Spatial dispersion of Legendre modal DG: physical-eigenvalue analysis}]
+import numpy as np
+from numpy.polynomial.legendre import Legendre, leggauss
+
+def physical_mode(p, theta):
+    x, w = leggauss(max(10, 2*p + 4))
+    B  = np.array([Legendre.basis(j)(x) for j in range(p+1)])
+    dB = np.array([Legendre.basis(i).deriv()(x) for i in range(p+1)])
+    N = (dB * w) @ B.T   # N[i,j] = integral P_j * P_i'
+    ii = np.arange(p+1)
+    mass = 2.0 / (2*ii + 1)
+    r = np.ones(p+1)
+    ell = (-1.0)**ii
+    z = np.exp(-1j*theta)
+    L = (2.0 / mass[:, None]) * (
+        N - np.outer(r, r) + z*np.outer(ell, r))
+    eigenvalues = np.linalg.eigvals(L)
+    # Valid for this moderate theta range: nearest to exact -i*theta.
+    return eigenvalues[np.argmin(abs(eigenvalues + 1j*theta))]
+
+for theta in (0.5, 1.0, 1.5):
+    errors = []
+    for p in (0, 1, 2):
+        lam = physical_mode(p, theta)
+        error_phase = abs(-lam.imag/theta - 1.0)
+        errors.append(error_phase)
+    print(theta, *(f'{err:.6e}' for err in errors))
+\end{lstlisting}
+Near the edge of the periodic Brillouin zone, physical and other branches can approach one another.
+Use continuous branch tracking in wavenumber rather than always selecting the eigenvalue nearest $-\mathrm i\theta$.
+
+\chapter{Further Reading}
+\begin{chaptersummary}
+This appendix organizes further reading by electromagnetism, differential forms, PDEs, finite volumes, geometric integration, and DG.
+It provides entry points for developing topics compressed in the main text.
+Check the conventions when comparing formulas across references.
+\end{chaptersummary}
+\studyroute{The references provide topic-based entry points; use the preceding chapter keywords to locate specific proofs.}{computational electromagnetism; geometric integration; discontinuous Galerkin}{Arrange a reading sequence for the desired proof or algorithm and map each reference's notation to this volume's conventions.}
+When comparing formulas, align metric signatures, electromagnetic tensor components, and Hodge-star conventions.
+\begin{enumerate}
+\raggedright
+\item D. J. Griffiths, \emph{Introduction to Electrodynamics}. Three-dimensional Maxwell equations and electromagnetic waves.
+\item B. F. Schutz, \emph{A First Course in General Relativity}. Four-dimensional tensors and introductory space--time geometry.
+\item H. Flanders, \emph{Differential Forms with Applications to the Physical Sciences}. A route from vector analysis to exterior differential forms.
+\item L. C. Evans, \emph{Partial Differential Equations}. Weak solutions, function spaces, and energy methods.
+\item R. J. LeVeque, \emph{Finite Volume Methods for Hyperbolic Problems}. Conservation laws, numerical fluxes, and wave propagation.
+\item A. Bossavit, \emph{Computational Electromagnetism: Variational Formulations, Complementarity, Edge Elements}. Geometric discretization in electromagnetic computation.
+\item E. Hairer, C. Lubich, G. Wanner, \emph{Geometric Numerical Integration: Structure-Preserving Algorithms for Ordinary Differential Equations}. Symplectic methods, long-time energy behavior, and numerical dispersion.
+\item J. S. Hesthaven and T. Warburton, \emph{Nodal Discontinuous Galerkin Methods: Algorithms, Analysis, and Applications}. DG semidiscretization and high-order local bases.
+\item P. Monk, \emph{Finite Element Methods for Maxwell's Equations}. $H(\curl)$ and compatible finite-element Maxwell discretizations.
+\item M. Ainsworth, \emph{Dispersive and dissipative behaviour of high order discontinuous Galerkin finite element methods}, Journal of Computational Physics, 198 (2004), 106--130. DG numerical dispersion and dissipation.
+\item D. S\'arm\'any, M. A. Botchev, and J. J. W. van der Vegt, \emph{Dispersion and Dissipation Error in High-Order Runge--Kutta Discontinuous Galerkin Discretisations of the Maxwell Equations}, Journal of Scientific Computing, 33 (2007), 47--74. Combined spatial and temporal dispersion.
+\item K. S. Yee, \emph{Numerical Solution of Initial Boundary Value Problems Involving Maxwell's Equations in Isotropic Media}, IEEE Transactions on Antennas and Propagation, 1966. The original staggered electromagnetic grid formulation.
+\item M. Dumbser (2014), \href{https://doi.org/10.1016/j.cma.2014.07.019}{\emph{Arbitrary-Lagrangian-Eulerian ADER-WENO Finite Volume Schemes with Time-Accurate Local Time Stepping for Hyperbolic Conservation Laws}}.
+\item B. Owren and M. Zennaro (1992), \href{https://doi.org/10.1137/0913084}{\emph{Derivation of Efficient, Continuous, Explicit Runge--Kutta Methods}}.
+\item C. Altmann, G. Gassner, and C.-D. Munz (2010), \href{https://congress2.cimne.com/eccomas/proceedings/cfd2010/papers/01008.pdf}{\emph{An Explicit Space-Time Adaptive Discontinuous Galerkin Scheme}}, ECCOMAS CFD.
+\item U. M. Ascher, S. J. Ruuth, and R. J. Spiteri (1997), \href{https://doi.org/10.1016/S0168-9274(97)00056-1}{\emph{Implicit-explicit Runge--Kutta methods for time-dependent partial differential equations}}, Applied Numerical Mathematics, 25, 151--167.
+\end{enumerate}
+
+\end{document}

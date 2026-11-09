@@ -49,12 +49,19 @@
 \newcommand{\ip}[2]{\left\langle #1,#2\right\rangle}
 \newcommand{\mat}[1]{\begin{pmatrix}#1\end{pmatrix}}
 \definecolor{inkblue}{RGB}{35,65,108}
-\lstset{basicstyle=\ttfamily\small,frame=single,breaklines=true,columns=fullflexible,keepspaces=true}
+\lstset{basicstyle=\ttfamily\small,frame=single,breaklines=true,columns=fullflexible,keepspaces=true,upquote=true}
 \newtcolorbox{chaptersummary}{colback=blue!3,colframe=blue!45!black,title={本章总结},fonttitle=\bfseries,boxrule=0.6pt,arc=2mm}
 \newtcolorbox{studentinput}{colback=red!2,colframe=red!55!black,title={这里需要你自己补充},fonttitle=\bfseries,boxrule=0.7pt,arc=2mm}
 \newtcolorbox{askai}{colback=violet!3,colframe=violet!55!black,title={你应该问 AI},fonttitle=\bfseries,boxrule=0.7pt,arc=2mm}
 \newtcolorbox{checkpoint}{colback=green!3,colframe=green!45!black,title={理解检查点},fonttitle=\bfseries,boxrule=0.6pt,arc=2mm}
 \newtcolorbox{engineernote}{colback=gray!5,colframe=gray!60!black,title={工程师视角},fonttitle=\bfseries,boxrule=0.6pt,arc=2mm}
+
+\newcommand{\studyroute}[3]{%
+  \par\smallskip\noindent\textbf{展开与检索。}#1\par
+  \noindent\textbf{关键词：}#2。\par
+  \noindent\textbf{AI 展开：}#3\par
+}
+\raggedbottom
 
 \begin{document}
 \frontmatter
@@ -69,11 +76,11 @@
   \vspace{8mm}
   {\large 几何结构、初值问题与数值离散\par}
   \vfill
-  {\large 2026 年 10 月\par}
+  {\large 2026 年 11 月\par}
   \vspace{6mm}
   {\small 面向具有数学与数值计算基础的读者\par}
 \end{titlepage}
-\chapter*{前言：这份讲义试图回答什么问题}
+\chapter*{前言}
 \addcontentsline{toc}{chapter}{前言}
 第一卷从粒子和连续介质出发，建立了偏微分方程、离散化与求解器之间的联系。本卷以 Maxwell 方程为贯穿实例，进一步研究场方程的几何结构及其对数值计算的影响。
 
@@ -94,7 +101,8 @@
 \begin{chaptersummary}
 第一卷介绍了连续方程与离散求解，本章补充研究 Maxwell 结构所需的语言：微分形式组织微分算子，函数空间与能量估计描述初值问题，辛结构用于讨论长期时间推进。这些工具将在后续章节分别连接约束传播、弱形式和离散演化。核心是区分方程的几何结构、解的正则性和数值演化结构。
 \end{chaptersummary}
-\section{对象、目标与最低限度的语言}
+\studyroute{这里略去外代数、迹定理与辛几何的一般证明，保留后文使用的定义和算子关系。}{differential forms; Hodge star; Sobolev traces; symplectic map}{把 $\dd^2=0$ 翻译成向量恒等式，再说明哪些步骤使用度规、哪些仅使用微分结构。}
+\section{数学对象与分析目标}
 数学物理方法通常教我们求一个给定 PDE 的解；现代 PDE 理论还关心：什么是合适的初值？解是否存在、唯一、稳定？方程中有没有必须始终满足的约束？数值离散是否保留其结构？为讨论这些问题，我们依次补充\emph{微分形式}、\emph{时空分解}、\emph{函数空间}和\emph{守恒律}的基础语言。
 
 \begin{center}
@@ -155,9 +163,9 @@ $\dd^2=0$ 可由混合偏导可交换加上反对称性推出。对于更一般�
 \begin{askai}
 请从三维欧氏空间的 $\dd x,\dd y,\dd z$ 出发，逐步计算 $\starS\dd x$ 和 $\starS(\dd y\wedge\dd z)$，并指出取向与度规各在哪一步发挥作用。
 
-继续问：将度规缩放后，外微分 $\dd$ 与 Hodge 星各会如何变化？请给出一个具体例子。
+进一步展开：将度规缩放后，外微分 $\dd$ 与 Hodge 星各会如何变化？请给出一个具体例子。
 \end{askai}
-外微分只关心微分与取向；要把一形式识别成二形式，还需要\emph{度规}。在有度规和取向的 $n$ 维空间上，Hodge 星将 $k$ 形式映为 $(n-k)$ 形式：
+外微分由光滑结构定义；借助 Hodge 星将一形式对应到二形式，还需要\emph{度规与取向}。在有度规和取向的 $n$ 维空间上，Hodge 星将 $k$ 形式映为 $(n-k)$ 形式：
 \begin{equation}
 \star:\Omega^k\to\Omega^{n-k},\qquad
 \alpha\wedge\star\beta=\ip{\alpha}{\beta}\,\vol_n.
@@ -168,14 +176,14 @@ $\dd^2=0$ 可由混合偏导可交换加上反对称性推出。对于更一般�
 \starS\dd y=\dd z\wedge\dd x,\quad
 \starS\dd z=\dd x\wedge\dd y,
 \end{equation}
-且 $\starS^2=1$。因而 $\bm E$ 的一形式 $E=E_i\dd x^i$ 可通过 $\starS E$ 变成面积通量二形式。必须区分：$\dd$ 不依赖度规，而 $\star$ 依赖度规。在 Lorentz 时空，后者还反映时间方向的负号。
+且 $\starS^2=1$。因而 $\bm E$ 的一形式 $E=E_i\dd x^i$ 可通过 $\starS E$ 变成面积通量二形式。$\dd$ 与度规无关，$\star$ 则由度规和取向定义。在 Lorentz 时空，后者还反映时间方向的负号。
 
 \section{积分定理与拓扑的简短提醒}
 广义 Stokes 定理把基本的微积分定理、Green 公式、Gauss 公式、Stokes 公式统一为
 \begin{equation}\label{eq:stokes}
 \int_\Omega\dd\alpha=\int_{\partial\Omega}\alpha.
 \end{equation}
-这也是守恒律积分形式的几何来源。局部地，若 $\dd\alpha=0$，则通常能写成 $\alpha=\dd\gamma$（Poincar\'e 引理，要求局部区域足够简单）；但在带孔区域，整体闭形式不一定是恰当形式。后文写 $F=\dd A$ 时，除非给出拓扑条件，只把它理解为局部陈述。
+这也是守恒律积分形式的几何来源。对次数为正的微分形式，在可缩邻域内，$\dd\alpha=0$ 蕴含 $\alpha=\dd\gamma$（Poincar\'e 引理）；非平凡拓扑可能阻碍这一表示在全局成立。后文的 $F=\dd A$ 因而是局部陈述，全局表示需要相应拓扑条件。
 
 \section{时间、空间与初值问题}
 从 ODE 的 $\dot u=f(u)$ 推广到 PDE，典型演化问题写成
@@ -184,13 +192,13 @@ $\dd^2=0$ 可由混合偏导可交换加上反对称性推出。对于更一般�
 \end{equation}
 这里 $t$ 是演化时间，$x$ 是空间变量；这种选择称为\textbf{时空 $3+1$ 分解}或\emph{时间分叶}，与求解析解时的分离变量法不同。选定时间后，协变方程可分为含时间导数的演化式与不含时间导数的约束式。
 
-\section{函数空间与能量估计：只准备后文要用的部分}
+\section{函数空间与能量估计}
 \begin{studentinput}
 设分片光滑的电场跨界面有跳跃。哪些切向或法向跳跃会分别影响其分布意义下的旋度和散度？结合后文说明为何要分别使用 $H(\curl)$ 与 $H(\Div)$。
 
 \textbf{你的答案：}\vspace{2cm}
 \end{studentinput}
-函数不再只是一个数，而是一个无限维空间的元素。对 $\Omega\subset\RR^3$，定义
+函数空间以整个函数为元素，用范数描述其大小与正则性。对 $\Omega\subset\RR^3$，定义
 \begin{equation}
 \norm{u}_{L^2(\Omega)}^2=\int_\Omega |u(x)|^2\,\dd x,
 \quad
@@ -208,7 +216,7 @@ Maxwell 方程通常还涉及
 H(\curl;\Omega)&=\{\bm u\in L^2(\Omega)^3:\curl\bm u\in L^2(\Omega)^3\},\\
 H(\Div;\Omega)&=\{\bm u\in L^2(\Omega)^3:\Div\bm u\in L^2(\Omega)\},
 \end{align}
-其中旋度、散度按分布意义理解。这里不证明这些空间的完备性和迹定理；读者只须理解：\emph{选择函数空间，就是确定解和微分运算究竟在哪种意义下存在。}
+其中旋度、散度按分布意义理解。\emph{函数空间确定场与微分算子存在的意义。}完备性、切向迹与法向迹定理的证明在此略去，可检索 Sobolev graph spaces、tangential trace 和 normal trace。
 
 \begin{definition}[适定性的工作定义]
 一个初值问题若对允许的初值有解、解唯一，且在选定范数下连续依赖初值（与源项），就称在该设置下适定。何谓“允许”，由边界条件和所选函数空间决定。
@@ -216,7 +224,7 @@ H(\Div;\Omega)&=\{\bm u\in L^2(\Omega)^3:\Div\bm u\in L^2(\Omega)\},
 后文的 $L^2$ 能量估计揭示真空 Maxwell 演化的稳定性结构；完整适定性还依赖初值正则性和边界条件。
 
 
-\section{辛结构与 Hamilton 系统：保结构积分的最低准备}\label{sec:pre-symp}
+\section{辛结构与 Hamilton 系统}\label{sec:pre-symp}
 \paragraph{从位置与动量出发。}
 对于自由度为 $m$ 的有限维系统，记广义坐标 $q\in\RR^m$、共轭动量
 $p\in\RR^m$，合成 $z=(q,p)^\mathsf T\in\RR^{2m}$。给定 Hamilton 函数
@@ -259,10 +267,9 @@ $\Phi:z\mapsto\Phi(z)$ 称为\emph{保辛}，如果
  q^{n+1}=q^n+\Delta t\,p^{n+1}.
 \end{equation}
 它的一步映射保辛，在满足适当步长条件时不会产生上述 Euler 型的系统性能量膨胀。
-后文会给出适合 Maxwell 半离散系统的隐式中点法与交错时间推进；这里无需学习辛流形的
-一般理论，只须记住 Hamilton 方程、式 \eqref{eq:sympmap} 以及“保辛不等于保能”。
+后文将以隐式中点法与交错推进讨论 Maxwell 半离散系统。此处略去辛流形与后向误差分析；检索 symplectic map、modified Hamiltonian 可继续研究保辛性与长期能量行为的联系。
 
-\section{本章小练习}
+\section{练习}
 \begin{enumerate}
 \item 验证 $\dd(a\,\dd x+b\,\dd y)$ 的 $\dd x\wedge\dd y$ 系数为 $\partial_xb-\partial_ya$。
 \item 从 $\dd^2f=0$ 恢复 $\curl\grad f=0$。
@@ -271,12 +278,13 @@ $\Phi:z\mapsto\Phi(z)$ 称为\emph{保辛}，如果
 \item 对振子 $H=(p^2+\omega^2q^2)/2$，验证显式 Euler 一步矩阵行列式大于 $1$，解释这与面积保持的关系。
 \end{enumerate}
 
-\chapter{从 Lorentz 协变性到四维 Maxwell 方程（压缩版）}
+\chapter{从 Lorentz 协变性到四维 Maxwell 方程}
 \label{ch:lorentz}
 \begin{chaptersummary}
 有了微分形式和 Hodge 星，本章将已知的三维 Maxwell 方程写成四维场强与电流之间的关系。协变性约束表达方式，物理方程提供动力学内容；外微分恒等式进一步给出电荷守恒的相容性。这个四维表达为下一章区分演化与约束提供共同起点。
 \end{chaptersummary}
-\section{工程上的出发点：协变是筛选标准，不是动力学公理}
+\studyroute{这里略去 Lorentz boost 的分量推导及作用量变分，采用已知 Maxwell 方程作为物理输入。}{electromagnetic field tensor; Lorentz covariance; Maxwell action}{按本卷号差与取向，显式计算沿 $x$ 方向 boost 后的 $F_{\mu\nu}$，并核对电磁分量。}
+\section{物理输入与协变表达}
 假定我们已熟悉真空中带源的三维 Maxwell 方程：
 \begin{equation}\label{eq:maxwell3}
 \begin{aligned}
@@ -284,13 +292,13 @@ $\Phi:z\mapsto\Phi(z)$ 称为\emph{保辛}，如果
 \partial_t\bm E-\curl\bm B&=-\bm j,&\Div\bm E&=\rho.
 \end{aligned}
 \end{equation}
-它们的电磁波以同一速度传播，因此不应把 $\bm E,\bm B$ 看作所有惯性参考系里均独立变换的两个三维向量。Lorentz 变换混合时间与空间坐标，也相应混合电场与磁场分量。我们要做的是把已知方程\emph{重新组织}为能清楚展示这种变换规律的形式。
+Lorentz 变换混合时间与空间坐标，同时混合电场与磁场分量。将已知方程组织成四维张量表达，可以统一描述不同惯性观察者测得的电磁场。
 
 \section{电磁场强度二形式}
 \begin{askai}
 请按照本卷的度规号差 $(-,+,+,+)$ 与 $F=B-\dd t\wedge E$ 约定，逐项写出场强二形式的六个独立分量，并解释电场与磁场如何出现在同一个反对称张量中。
 
-继续问：为何仅要求 Lorentz 协变性不能唯一确定 Maxwell 动力学？请比较两个协变方程的例子。
+进一步展开：为何仅要求 Lorentz 协变性不能唯一确定 Maxwell 动力学？请比较两个协变方程的例子。
 \end{askai}
 在 $M=\RR^{1,3}$ 上令 $\eta=\operatorname{diag}(-1,1,1,1)$。定义空间一形式 $E=E_x\dd x+E_y\dd y+E_z\dd z$ 与空间二形式
 \begin{equation}
@@ -315,7 +323,7 @@ Lorentz 变换 $x'=\Lambda x$ 下，$F$ 作为几何二形式不变，其分量�
 F'_{\mu\nu}=\frac{\partial x^\alpha}{\partial x'^\mu}
 \frac{\partial x^\beta}{\partial x'^\nu}F_{\alpha\beta}.
 \end{equation}
-因此不同观察者给出的 $\bm E$ 和 $\bm B$ 一般不同，但所描述的是同一 $F$。本课程不展开加速参考系、四势的规范选择或从作用量变分推出场方程。
+因此不同观察者给出的 $\bm E$ 和 $\bm B$ 一般不同，但所描述的是同一 $F$。这里略去 boost 下的分量计算、规范选择与作用量变分；可按 Lorentz transformation of electromagnetic fields、gauge potential 和 Maxwell action 检索。
 
 \section{四维表达与三种不同的“次数”}
 取时空 Hodge 星 $\star$，将四维电流 $j^\mu=(\rho,\bm j)$ 写成三形式
@@ -353,13 +361,13 @@ J=\rho\,\vol_3-\dd t\wedge\starS j^\flat,
 \begin{equation}\label{eq:continuity}
 \boxed{\partial_t\rho+\Div\bm j=0.}
 \end{equation}
-因此电荷守恒并非独立于四维 Maxwell 方程的任意附加式，而是它的一个\emph{相容性条件}。反过来，求带源 Maxwell 初值问题时，给定的 $\rho,\bm j$ 必须满足该条件。
+电荷守恒是四维 Maxwell 方程的\emph{相容性条件}。反过来，求带源 Maxwell 初值问题时，给定的 $\rho,\bm j$ 必须满足该条件。
 
 \paragraph{局部势表示（选读）}
-由于 $\dd F=0$，局部可令 $F=\dd A$，其中 $A=\bm A^\flat-\phi\dd t$。于是 $\bm B=\curl\bm A$、$\bm E=-\partial_t\bm A-\grad\phi$。规范变换 $A\mapsto A+\dd\chi$ 不改变 $F$。这条路线以后可通向作用量、电磁波方程与规范理论；本讲义不依赖它。
+由于 $\dd F=0$，局部可令 $F=\dd A$，其中 $A=\bm A^\flat-\phi\dd t$。于是 $\bm B=\curl\bm A$、$\bm E=-\partial_t\bm A-\grad\phi$。规范变换 $A\mapsto A+\dd\chi$ 不改变 $F$。势表示连接作用量、电磁波方程与规范理论；后文继续采用场强变量。
 
 \section{本章小结与练习}
-\noindent\textbf{小结：}Lorentz 协变性说明为何寻找统一的四维电磁场；微分形式为这种统一提供恰当的语言；动力学内容仍来自 Maxwell 物理方程，不能单独由对称性推出。
+\noindent\textbf{小结：}Lorentz 协变性说明为何寻找统一的四维电磁场；微分形式为这种统一提供恰当的语言；Maxwell 物理规律提供动力学内容。
 \begin{enumerate}
 \item 说明 $F$ 为什么恰有 6 个独立分量。
 \item 用 $\dd^2=0$ 解释为什么 $J$ 不能任意给定。
@@ -371,18 +379,19 @@ J=\rho\,\vol_3-\dd t\wedge\starS j^\flat,
 \begin{chaptersummary}
 四维方程统一了电磁场，但计算需要选定时间并推进初值。本章把场强和电流按时间方向与空间切片分解，辨认哪些分量含时间导数、哪些限制初始数据。分量计数展示方程如何组织；约束能否随时间保持则留给下一章证明。
 \end{chaptersummary}
+\studyroute{这里略去 Lorentz Hodge 星的逐基计算和一般曲时空分叶。}{3+1 decomposition; Lorentzian Hodge star; spacetime foliation}{从 $\alpha\wedge\star\beta=\langle\alpha,\beta\rangle\vol_4$ 出发计算 $\star F$，逐项核对演化式中的符号。}
 \section{为什么需要选定时间方向}
 四维协变表达尤其适合理解几何不变量，但计算机上的时间推进或 PDE 初值理论需要指定一个初始空间超曲面 $\Sigma_0$ 和一族等时超曲面 $\Sigma_t$。在平直时空先取
 \begin{equation}
 M=\RR_t\times\Sigma,\qquad \Sigma=\RR^3.
 \end{equation}
-这里的分解用于\emph{构造演化问题}，不意味着自然界存在优先参考系。不同惯性观察者仍可使用自己的时间切片。
+这一分解用于\emph{构造演化问题}；不同惯性观察者可分别选择自己的时间切片。
 
 \section{时空外微分的拆分}
 \begin{askai}
 从 $F=B-\dd t\wedge E$ 出发，按本卷取向和 $\dd=\dd_\Sigma+\dd t\wedge\partial_t$ 的约定逐项展开 $\dd F$。请指出每个符号来自外积交换还是时间求导，并分别识别空间三形式与含 $\dd t$ 的部分。
 
-继续问：把得到的两条形式方程翻译成三维向量方程，逐项核对符号。
+进一步展开：把得到的两条形式方程翻译成三维向量方程，逐项核对符号。
 \end{askai}
 对依赖时间的空间 $k$ 形式 $\alpha(t)$，有
 \begin{equation}\label{eq:splitd}
@@ -441,21 +450,21 @@ M=\RR_t\times\Sigma,\qquad \Sigma=\RR^3.
 
 \begin{center}
 \begin{tikzpicture}[>=stealth,scale=1,every node/.style={font=\small}]
-\node[draw,rounded corners,minimum width=33mm,minimum height=9mm] (a) at (0,0) {$\dd F=0$};
-\node[draw,rounded corners,minimum width=33mm,minimum height=9mm] (b) at (6,0) {$\dd\star F=J$};
+\node[draw,rounded corners,minimum width=33mm,minimum height=9mm] (a) at (0.75,0) {$\dd F=0$};
+\node[draw,rounded corners,minimum width=33mm,minimum height=9mm] (b) at (8,0) {$\dd\star F=J$};
 \node[draw,rounded corners,align=center,minimum width=30mm] (c) at (-1,-1.6) {3 个演化分量\\$\partial_t B+\dd_\Sigma E=0$};
-\node[draw,rounded corners,align=center,minimum width=27mm] (d) at (1.8,-1.6) {1 个约束分量\\$\dd_\Sigma B=0$};
-\node[draw,rounded corners,align=center,minimum width=36mm] (e) at (5,-1.6) {3 个演化分量\\Amp\`ere--Maxwell};
-\node[draw,rounded corners,align=center,minimum width=27mm] (f) at (8.3,-1.6) {1 个约束分量\\Gauss 电定律};
+\node[draw,rounded corners,align=center,minimum width=27mm] (d) at (2.5,-1.6) {1 个约束分量\\$\dd_\Sigma B=0$};
+\node[draw,rounded corners,align=center,minimum width=36mm] (e) at (6,-1.6) {3 个演化分量\\Amp\`ere--Maxwell};
+\node[draw,rounded corners,align=center,minimum width=27mm] (f) at (10,-1.6) {1 个约束分量\\Gauss 电定律};
 \draw[->] (a)--(c);\draw[->] (a)--(d);\draw[->] (b)--(e);\draw[->] (b)--(f);
 \end{tikzpicture}
 \end{center}
 
-\section{对工程读者至关重要的辨析}
+\section{演化与约束的依赖关系}
 \begin{enumerate}
-\item \textbf{约束不是额外加上的第七、第八条演化方程。}它们限制允许的初始场。
-\item \textbf{分解不破坏协变性。}只是在讨论计算和初值问题时，选择了适于推进的时间变量。
-\item \textbf{不能直接由分量计数推出约束传播。}约束在时间推进时保持，还必须用 $\dd^2=0$ 以及源的连续性方程证明。
+\item \textbf{约束限定初值集合。}两个 Gauss 方程约束同一组电磁场变量。
+\item \textbf{时间切片指定演化方向。}协变方程可相对于所选观察者写成初值问题。
+\item \textbf{约束传播依赖微分恒等式。}其证明使用 $\dd^2=0$ 和源的连续性方程。
 \end{enumerate}
 
 \section{练习}
@@ -470,6 +479,7 @@ M=\RR_t\times\Sigma,\qquad \Sigma=\RR^3.
 \begin{chaptersummary}
 上一章分离出演化方程和 Gauss 约束，本章追问：满足约束的初值在演化中是否仍然满足约束？答案来自旋度与散度的复形关系及电荷连续性。这个连续层面的相容性也为后面构造离散算子和检查散度误差提供标准。
 \end{chaptersummary}
+\studyroute{这里略去边界适定性与全局拓扑分析，集中证明光滑解的局部约束传播。}{constraint propagation; de Rham complex; discrete continuity equation}{给出满足和不满足 $D_hC_h=0$ 的矩阵例子，比较磁散度在一步更新后的变化。}
 \section{约束误差的定义}
 从此回到最便于工程计算的三维向量写法。只把旋度方程作为演化系统：
 \begin{equation}\label{eq:evol}
@@ -521,15 +531,15 @@ $C_B=C_E=0$ 才代表一个物理允许的初始场。
 \end{equation}
 电约束同理，但还需要 $\dd J=0$。\textbf{约束传播是四维几何结构的时间投影。}
 
-\section{初值问题不能忽略的条件}
-给定 $\bm E(0)=\bm E_0,\bm B(0)=\bm B_0$ 时，初值并不是 6 个完全任意的标量函数；必须有
+\section{初值与边界的相容条件}
+给定 $\bm E(0)=\bm E_0,\bm B(0)=\bm B_0$ 时，初值须满足
 \begin{equation}\label{eq:initConstraints}
 \Div\bm B_0=0,
 \qquad \Div\bm E_0=\rho(0,\cdot).
 \end{equation}
-在全空间上，还需适宜的无穷远衰减或有限能量假设；在有界区域上，需附加与演化兼容的边界条件。比如封闭区域总电荷与电通量之间必须满足积分 Gauss 定律。\emph{局部约束传播并不替代边界条件分析。}
+在全空间上，还需适宜的无穷远衰减或有限能量假设；在有界区域上，需附加与演化兼容的边界条件。比如封闭区域总电荷与电通量之间必须满足积分 Gauss 定律。边界条件还需与能量通量及入射特征相容。
 
-\section{连续成立，不代表离散自动成立}
+\section{离散复形与约束传播}
 \begin{engineernote}
 网格的点、边、面、体及其取向给出关联矩阵 $G,C,D$。在相容的关联关系中，$CG=0$、$DC=0$ 是拓扑恒等式；几何和材料信息则进入质量矩阵或离散 Hodge 型算子。实际代码还需检查场变量所在的网格及边界处理。
 \end{engineernote}
@@ -537,13 +547,13 @@ $C_B=C_E=0$ 才代表一个物理允许的初始场。
 \begin{askai}
 请为一个取向明确的四面体编号顶点、边和面，写出顶点--边关联矩阵 $G$、边--面关联矩阵 $C$ 和面--体关联矩阵 $D$，逐项验证 $CG=0$ 和 $DC=0$，解释每个符号。
 
-继续问：反转一条边的取向后，哪些矩阵行或列改变？恒等式为什么仍成立？
+进一步展开：反转一条边的取向后，哪些矩阵行或列改变？恒等式为什么仍成立？
 \end{askai}
 真实数值计算的导数由离散矩阵代替。若离散散度 $D_h$ 与离散旋度 $C_h$ 未满足
 \begin{equation}\label{eq:discretecomplex}
 D_hC_h=0,
 \end{equation}
-则即使初值的离散散度为零，时间推进也会逐渐产生数值磁荷。电约束还需要电流/电荷更新满足\emph{相同离散算子}下的连续性方程。最后一章将利用这一观察设计保结构格式。
+则离散演化可能产生非零磁散度。电约束还需要电流/电荷更新满足\emph{相同离散算子}下的连续性方程。第 6 章和第 7 章将据此讨论保约束离散。
 
 \section{练习}
 \begin{enumerate}
@@ -557,6 +567,7 @@ D_hC_h=0,
 \begin{chaptersummary}
 约束确定了允许的初始场；本章转向这些场如何传播。将 Maxwell 演化方程写成对称双曲系统后，特征值给出传播速度，能量估计控制解对数据的依赖。它们为守恒律、数值通量和时间步长分析提供依据，同时须结合边界与存在性讨论适定性。
 \end{chaptersummary}
+\studyroute{这里略去存在性定理的证明以及入射特征边界条件的完整分类。}{symmetric hyperbolic systems; energy estimate; maximally dissipative boundary conditions}{对 $A(\bm n)$ 分解入射、出射与零速子空间，说明边界数据如何进入能量通量。}
 \section{把 Maxwell 演化式写成一阶矩阵系统}
 令
 \begin{equation}
@@ -586,7 +597,7 @@ C(\bm n)&0
 \begin{askai}
 取传播方向 $\bm n=(1,0,0)$，从本章的 Maxwell 主部矩阵 $A(\bm n)$ 出发求特征值与特征向量，区分横向传播分量和零速纵向分量；再说明旋转坐标如何推广到任意单位方向。
 
-继续问：在真空、周期边界下，对该系统逐步推导能量估计，并标明边界通量在哪里消失。
+进一步展开：在真空、周期边界下，对该系统逐步推导能量估计，并标明边界通量在哪里消失。
 \end{askai}
 取单位向量 $\bm n$，其法向主部由 $A(\bm n)$ 决定。将 $\bm E,\bm B$ 拆成沿 $\bm n$ 的纵向分量与垂直 $\bm n$ 的横向分量。利用
 \begin{equation}
@@ -596,7 +607,7 @@ C(\bm n)^2\bm v=\bm n(\bm n\cdot\bm v)-\bm v,
 \begin{equation}\label{eq:eigenvalues}
 \boxed{-1,-1,0,0,1,1.}
 \end{equation}
-$\pm1$ 是横向电磁波的传播速度，重复次数各为 2；两个零特征值对应纵向分量。这不意味着所有纵向场都属于物理解：约束仍须单独施加。由于真空单位选取 $c=1$，实际量纲下传播速度为 $\pm c$。
+$\pm1$ 是横向电磁波的传播速度，重复次数各为 2；两个零特征值对应纵向分量。纵向分量的取值受 Gauss 约束限制。由于真空单位选取 $c=1$，实际量纲下传播速度为 $\pm c$。
 
 \section{电磁能量估计}
 将 $\partial_t\bm E=\curl\bm B-\bm j$ 与 $\partial_t\bm B=-\curl\bm E$ 分别点乘 $\bm E,\bm B$，利用向量恒等式
@@ -629,7 +640,7 @@ $\pm1$ 是横向电磁波的传播速度，重复次数各为 2；两个零特�
 能量估计为稳定性与唯一性提供控制。存在性可通过常系数 Fourier 方法、半群方法或对称双曲系统理论建立；有界区域还需选择适当的边界条件并控制能量通量。
 \end{remark}
 
-\section{一维化：看见真正传播的变量}
+\section{一维横向特征变量}
 考虑只依赖 $x,t$ 的真空场，取横向分量 $E_y,B_z$。方程退化为
 \begin{equation}\label{eq:1dwave}
 \partial_tE_y+\partial_xB_z=0,
@@ -646,7 +657,7 @@ $\pm1$ 是横向电磁波的传播速度，重复次数各为 2；两个零特�
 w_+(x,t)=w_+(x-t,0),\qquad
 w_-(x,t)=w_-(x+t,0).
 \end{equation}
-这给出了双曲性的具体含义：信号沿有限速度的特征线传播，而不是立刻影响全空间。
+该分解展示双曲系统中信号沿有限速度特征线传播的性质。
 
 \section{练习}
 \begin{enumerate}
@@ -661,6 +672,7 @@ w_-(x,t)=w_-(x+t,0).
 \begin{chaptersummary}
 上一章的双曲结构揭示了波的传播；本章将演化方程写成通量形式，并用积分意义处理可能不光滑的解。控制体平衡与跳跃条件把连续方程连接到界面信息交换，为有限体积和 DG 数值通量做准备。守恒型与能量平衡是相关但不同的性质。
 \end{chaptersummary}
+\studyroute{这里略去分布理论及一般非线性熵解理论，保留测试函数、通量平衡和跳跃关系。}{weak solution; Rankine--Hugoniot condition; entropy pair}{将分段常数行波代入分布意义的守恒律，推导 $s[U]=A(\bm n)[U]$。}
 \section{守恒型表达}
 由于 $A^i$ 为常矩阵，定义第 $i$ 个空间方向的通量
 \begin{equation}\label{eq:flux}
@@ -688,7 +700,7 @@ w_-(x,t)=w_-(x+t,0).
 
 \textbf{你的答案：}\vspace{2cm}
 \end{studentinput}
-对可能不光滑的解，不能逐点使用全部偏导。令 $\varphi\in C_c^\infty((0,T)\times\Omega;\RR^6)$，把 \eqref{eq:conservation} 乘以测试函数并积分分部：
+对低正则性解，使用积分意义下的方程。令 $\varphi\in C_c^\infty((0,T)\times\Omega;\RR^6)$，把 \eqref{eq:conservation} 乘以测试函数并积分分部：
 \begin{equation}\label{eq:weakinternal}
 \int_0^T\!\int_\Omega
 \left(U\cdot\partial_t\varphi+
@@ -709,7 +721,7 @@ s[U]=[\mathcal F(U)\cdot\bm n]=A(\bm n)[U],
 \end{equation}
 其中 $[U]=U_R-U_L$。因而非零跳跃只能沿对应特征速度传播。Maxwell 的线性系统没有 Euler 方程那样的非线性激波生成机制，但跃变传播和波分解仍然是数值通量的基础。
 
-\section{守恒律与能量守恒不是一回事}
+\section{守恒型与能量平衡}
 $U$ 的六个分量满足矢量守恒型表达，而 $\tfrac12|U|^2$ 满足另一条\emph{能量平衡律} \eqref{eq:poynting}。后者在数值分析中可视为一个凸熵（entropy）及其通量：
 \begin{equation}
 \eta(U)=\tfrac12 U^\mathsf TU,\qquad
@@ -743,6 +755,7 @@ q^i(U)=\tfrac12 U^\mathsf TA^iU=(\bm E\times\bm B)_i.
 \begin{chaptersummary}
 守恒律和弱形式仍是连续问题。本章明确通向算法的三个选择：空间自由度、界面数值通量和时间推进，并说明稳定性与长期结构取决于它们的配合。这一框架连接后续的有限体积、散度保持与高阶 DG；单独选择某一个方法并不能决定完整算法的全部性质。
 \end{chaptersummary}
+\studyroute{这里略去高阶方法的全部系数表与阶条件证明；新增 ADER、CERK、LTS 和 IMEX 小节给出计算结构与最小算例。}{method of lines; ADER predictor; continuous RK; conservative LTS; additive Runge--Kutta}{区分空间残差、步内预测、时间调度和刚性分拆，列出这些步骤各自需要的数据。}
 
 \noindent\textbf{这一章的任务。}
 从守恒型和弱形式构造计算程序，需要明确三个选择：
@@ -750,7 +763,7 @@ q^i(U)=\tfrac12 U^\mathsf TA^iU=(\bm E\times\bm B)_i.
 三者相互关联。本章介绍共同框架，第 6 章讨论有限体积，
 第 7 章介绍从 Sobolev 弱形式出发的 Galerkin--DG 路线。
 
-\section{方法线：先空间、再时间；或反过来}
+\section{线法与空间半离散}
 以 $\partial_t U+\nabla\cdot\mathcal F(U)=S$ 为例，
 空间离散（有限差分、有限体积、有限元、DG、离散微分形式等）把连续未知场 $U(t,x)$
 变成有限维系数 $u_h(t)\in\RR^N$，通常得到
@@ -804,22 +817,22 @@ R_{\mathrm{RK4}}(z)&=1+z+\frac{z^2}{2}+\frac{z^3}{6}+\frac{z^4}{24}.
 \end{align}
 必须在离散算子谱与时间方法稳定域之间检查相容性。
 例如，纯虚谱上的显式 Euler 满足 $|1+\mathrm i\alpha|>1$（$\alpha\ne0$），
-即使空间离散原本严格守能，也不能指望它能稳定推进无耗散电磁振荡。
+因此显式 Euler 在这一固定步长下放大纯振荡模态。
 
-\paragraph{CFL 不是一个孤立常数。}
+\paragraph{CFL 条件及其依赖因素。}
 显式双曲求解器一般需要
 \begin{equation}\label{eq:cflgeneral}
 \Delta t\lesssim \frac{h}{c\,C(p,\text{网格},\text{通量},\text{时间格式})},
 \end{equation}
 其中 $c$ 是特征速度，$p$ 是多项式次数。高阶 DG 的局部微分算子谱会随 $p$
 扩张，故提高空间阶数通常使显式稳定步长更严格。
-隐式方法可放宽线性稳定性限制，但不能消除精度条件、求解器成本和约束相容性问题。
+隐式方法可放宽线性稳定性限制；步长选择仍需同时考虑精度、求解成本及约束相容性。
 
 \section{保辛与长时间电磁演化}\label{sec:bridge-symp}
 \begin{askai}
 对简谐振子分别写出显式 Euler 与隐式中点法的一步矩阵，计算它们对辛形式及二次能量的影响，再比较数值频率与真实频率。
 
-继续问：对一般非线性 Hamilton 系统，为什么保辛不能单独推出逐步精确守能？
+进一步展开：对一般非线性 Hamilton 系统，为什么保辛不能单独推出逐步精确守能？
 \end{askai}
 在无源、无耗、适当边界条件下，Maxwell 系统有 Hamilton/Poisson 结构。
 若一种\emph{兼容空间离散}产生有限维系统
@@ -831,7 +844,7 @@ H_h(u_h)=\tfrac12u_h^\mathsf TK_hu_h,
 \end{equation}
 则因反对称性 $\dot H_h=0$。在 Maxwell 的非正则 Poisson 写法中，
 $P_h$ 可能\emph{退化}，散度约束表现为 Casimir 或不变量；
-不能因此直接把所有 $u_h$ 当作全局正则坐标。
+此时应在辛叶或适当约束变量上讨论正则坐标。
 若限制在合适的非退化辛叶上，或通过势变量和约束处理获得正则 Hamilton 系统，
 可使用标准保辛方法。
 
@@ -851,8 +864,7 @@ $(u_h^{n+1}+u_h^n)^\mathsf TQ_h/2$，立即得到
 \end{equation}
 这是\textbf{线性、无耗、离散能量内积兼容}情况下的精确二次能量保持；
 中点法在正则 Hamilton 系统上也保辛。
-这两种性质的理由不同，不能把 \eqref{eq:midpoint-energy} 无条件推广到非线性、介质耗散、
-PML 或带外部做功的情形。
+式 \eqref{eq:midpoint-energy} 使用线性斜伴随条件；非线性、材料耗散、PML 或外部做功需要相应的离散能量平衡分析。
 
 \paragraph{St\"ormer--Verlet / leapfrog 与 Yee--FDTD。}
 振子可采用交错推进
@@ -882,12 +894,152 @@ R_{\rm MP}=\frac{1+\mathrm i\omega\Delta t/2}{1-\mathrm i\omega\Delta t/2},
 长时间电磁波计算既要关心几何/能量稳定，也要控制时空离散的总色散误差；
 第 7 章将专门检验高阶 DG 的\emph{空间}色散。
 
+\section{ADER：局部时空预测与校正}\label{sec:ader}
+式 \eqref{eq:mol} 给出空间残差，而高阶更新还需要描述一步之内的演化。
+ADER（Arbitrary high-order DERivatives）通过时间展开或局部时空预测构造这类信息。
+对常系数平流 $\partial_tu+a\partial_xu=0$，经典 Taylor 构造使用
+\begin{equation}\label{eq:ader-taylor}
+\partial_t^m u=(-a)^m\partial_x^m u,\qquad
+q_K(x,t_n+\tau)=\sum_{m=0}^{r}
+\frac{\tau^m}{m!}(-a)^m\partial_x^m u_h(x,t_n).
+\end{equation}
+这是 Cauchy--Kovalevskaya 过程的线性例子。对一般系统，现代 ADER 也可由单元内的时空弱问题求得
+$q_K(\bm x,t)$，随后把预测值代入数值通量，完成与邻居耦合的校正。
+以无源有限体积更新为例，
+\begin{equation}\label{eq:ader-corrector}
+|K|(\bar U_K^{n+1}-\bar U_K^n)
+=-\sum_{f\subset\partial K}\int_{t_n}^{t_{n+1}}\int_f
+\widehat{\mathcal F}(q_K,q_{K_f};\bm n_f)\,\dd S\,\dd t.
+\end{equation}
+DG 更新还包含基函数加权的体积项。局部预测器的可计算性来自单元内信息；
+守恒耦合来自共享界面通量。预测阶数、积分阶数与空间精度共同决定全离散阶数，
+显式双曲校正仍需相应 CFL 条件。局部预测与时间自适应构造参见
+\href{https://doi.org/10.1016/j.cma.2014.07.019}{Dumbser (2014)}。
+
+\section{CERK：步内连续时间近似}\label{sec:cerk}
+连续显式 Runge--Kutta（continuous explicit Runge--Kutta, CERK）用阶段导数构造整个时间步上的近似。
+对自治系统 $\dot u=L_h(u)$，写成
+\begin{equation}\label{eq:cerk}
+\begin{aligned}
+k_i&=L_h\left(u^n+\Delta t\sum_{j<i}a_{ij}k_j\right),\\
+u_h(t_n+\theta\Delta t)&\approx u^n+
+\Delta t\sum_{i=1}^{s}b_i(\theta)k_i,\qquad 0\leq\theta\leq1.
+\end{aligned}
+\end{equation}
+$b_i(0)=0$，$b_i(1)=b_i$；非自治问题还需在阶段时刻评价右端。
+连续扩展具有自己的阶条件。以二阶 Heun 法为例，
+\begin{equation}\label{eq:cerk-heun}
+k_1=L_h(u^n),\quad k_2=L_h(u^n+\Delta t k_1),\qquad
+b_1(\theta)=\theta-\tfrac12\theta^2,\quad
+b_2(\theta)=\tfrac12\theta^2.
+\end{equation}
+在光滑条件下，该多项式给出二阶步内近似；取 $\theta=1$ 恢复 Heun 更新。
+高阶 CERK 的系数应由连续阶条件确定，参见
+\href{https://doi.org/10.1137/0913084}{Owren--Zennaro (1992)}。
+连续扩展可用于输出与时间耦合；将它用于单元局部预测时，阶段计算也须按局部问题组织，
+再由校正通量加入邻居影响，见
+\href{https://congress2.cimne.com/eccomas/proceedings/cfd2010/papers/01008.pdf}{Altmann--Gassner--Munz (2010)}。
+
+\section{LTS：时间分层与共享通量}\label{sec:lts}
+网格尺寸、材料波速和多项式次数造成不同单元的稳定步长差异。
+局部时间步进（local time stepping, LTS）据此分配 $\Delta t_K$，并在共同时间层同步。
+例如粗单元采用 $\Delta T$，细单元采用 $\Delta T/2$；在固定法向下，
+共享面上的积分必须满足
+\begin{equation}\label{eq:lts-flux}
+\Phi_f[t_n,t_n+\Delta T]
+=\Phi_f[t_n,t_n+\Delta T/2]
++\Phi_f[t_n+\Delta T/2,t_n+\Delta T],
+\end{equation}
+其中 $\Phi_f[a,b]=\int_a^b\int_f\widehat{\mathcal F}\,\dd S\,\dd t$。
+实现时累积同一组子区间通量，并向相邻单元施加相反符号。
+ADER 或 CERK 可提供各积分时刻的界面预测值；时间分层、数据可用性、积分阶数与同步规则
+仍是 LTS 的组成部分。真实时间 LTS 需同时保持时间精度和界面守恒。
+对于 Maxwell，电荷更新与磁场边环量也需时间相容，才能维持相应 Gauss 约束。
+
+\begin{askai}
+\textbf{略去内容与关键词：}continuous RK order conditions、local predictor、conservative LTS；这里略去高阶系数表与调度实现。
+
+对一维平流的两个相邻单元采用 $2:1$ 时间步长比，使用式 \eqref{eq:cerk-heun} 提供步内值，
+列出通量积分、细步更新与粗步同步的顺序。证明共享通量在两单元总量中抵消。
+
+进一步展开：将粗侧状态冻结为 $u^n$，通过步长减半实验比较时间阶数。
+\end{askai}
+
+\section{IMEX：传播与刚性源项的分拆}\label{sec:imex}
+ADER、CERK 与 LTS 处理时间近似及局部步长差异。
+当材料响应或碰撞时间远短于目标演化时间时，还会出现刚性。
+隐显式方法（implicit--explicit, IMEX）将右端拆为
+\begin{equation}\label{eq:imex-split}
+\dot u_h=F_h(u_h)+G_h(u_h),
+\end{equation}
+其中 $F_h$ 显式处理，$G_h$ 隐式处理。分拆依据是谱尺度与求解成本，
+例如对旋度传播显式推进，对快速局部耗散隐式推进。
+一个自治加性 RK 格式可写成
+\begin{equation}\label{eq:imex-rk}
+\begin{aligned}
+Y_i&=u^n+\Delta t\sum_{j<i}\widetilde a_{ij}F_h(Y_j)
+           +\Delta t\sum_{j\le i}a_{ij}G_h(Y_j),\\
+u^{n+1}&=u^n+\Delta t\sum_i\widetilde b_iF_h(Y_i)
+              +\Delta t\sum_i b_iG_h(Y_i).
+\end{aligned}
+\end{equation}
+$\widetilde A$ 严格下三角，$A$ 可取对角隐式形式。
+两个系数表须满足加性阶条件，见
+\href{https://doi.org/10.1016/S0168-9274(97)00056-1}{Ascher--Ruuth--Spiteri (1997)}。
+若 $G_h$ 仅含局部材料变量且质量矩阵按单元分块，阶段求解可限制在各块内；
+若隐式部分包含空间微分耦合，则需要相应的全局线性或非线性求解。
+
+\paragraph{导电 Maxwell 示例。}
+本段恢复正的常数 $\varepsilon,\mu$，引入欧姆电流 $\bm j=\sigma\bm E$，$\sigma\geq0$。
+于是
+\begin{equation}\label{eq:conductive-maxwell}
+\varepsilon\partial_t\bm E=\curl\bm H-\sigma\bm E,\qquad
+\mu\partial_t\bm H=-\curl\bm E.
+\end{equation}
+电场松弛时间为 $\tau_\sigma=\varepsilon/\sigma$（$\sigma>0$）。
+纯耗散模态 $\dot E=-E/\tau_\sigma$ 的显式 Euler 稳定步长为 $\Delta t\leq2\tau_\sigma$。
+一阶 IMEX Euler 展示最基本的分拆：
+\begin{equation}\label{eq:imex-euler-maxwell}
+\begin{aligned}
+(\varepsilon+\sigma\Delta t)\bm E^{n+1}
+ &=\varepsilon\bm E^n+\Delta t\,\curl_h\bm H^n,\\
+\mu\bm H^{n+1}&=\mu\bm H^n-\Delta t\,\curl_h\bm E^n.
+\end{aligned}
+\end{equation}
+这里假定系数按点或块相乘；一般有限元形式需使用材料质量矩阵。
+纯耗散模态的放大因子变为 $(1+\Delta t/\tau_\sigma)^{-1}$。
+传播部分仍受显式稳定域限制：当 $\sigma=0$ 且空间算子具有纯虚谱时，
+这一一阶例子退化为不适于无耗波的显式 Euler。
+实际波动求解应选择虚轴稳定性合适的显式表，并检查完整 IMEX 放大矩阵。
+
+在无边界能量通量时，连续模型满足
+\begin{equation}\label{eq:conductive-energy}
+\frac{\dd}{\dd t}\frac12\int_\Omega
+(\varepsilon|\bm E|^2+\mu|\bm H|^2)\,\dd x
+=-\int_\Omega\sigma|\bm E|^2\,\dd x.
+\end{equation}
+因此离散验证目标是含物理耗散的能量平衡。
+电 Gauss 约束还要求电荷更新使用与电场方程相同时间权重的电流；
+对于式 \eqref{eq:imex-euler-maxwell}，应相容地使用 $\sigma\bm E^{n+1}$。
+若研究未解析松弛极限，需进一步检验极限模型、渐近保持性与刚性条件下的阶数。
+
+\begin{askai}
+\textbf{略去内容与关键词：}IMEX Runge--Kutta、additive order conditions、stiff accuracy、asymptotic preserving；这里略去高阶系数构造与刚性极限证明。
+
+对式 \eqref{eq:conductive-maxwell} 的一维横向 Fourier 模态构造 $2\times2$ 放大矩阵，
+比较显式 Euler 与式 \eqref{eq:imex-euler-maxwell} 在不同 $\sigma\Delta t/\varepsilon$ 下的谱半径、
+能量和相位误差。区分消除耗散步长限制与稳定传播这两个条件。
+
+进一步展开：选取文献中一组明确的 IMEX 系数，报告出处，并以时间收敛实验检查其实际阶数。
+\end{askai}
+
 \section{求解器设计的检查表}
 \begin{enumerate}
 \item 先规定要保持的量：电荷连续性、两类 Gauss 约束、离散能量，还是长时间相位精度？
 \item 再选空间自由度与通量：单元平均、边/面自由度、连续或不连续的局部多项式。
 \item 随后选时间格式：稳定域、计算成本、时间阶数，以及是否需要特定保结构性质。
 \item 最后分别验证：空间收敛、时间收敛、数值散度、能量平衡、相位/振幅误差。
+\item 对 LTS 记录各时间层更新次数与界面通量平衡；对 IMEX 分别检查传播 CFL、刚性衰减与阶段求解成本。
 \end{enumerate}
 \section{练习}
 \begin{enumerate}
@@ -897,11 +1049,12 @@ R_{\rm MP}=\frac{1+\mathrm i\omega\Delta t/2}{1-\mathrm i\omega\Delta t/2},
 \end{enumerate}
 \endgroup
 
-\chapter{数值求解：双曲通量与散度约束必须一起处理}
+\chapter{数值求解：双曲通量与散度约束}
 \label{ch:numerics}
 \begin{chaptersummary}
 前一章区分了空间通量与时间推进，本章把它们用于 Maxwell 型双曲方程，并检查连续散度约束在网格上如何演化。有限体积通量负责相邻单元的信息交换，Yee 型交错结构则利用离散旋度与散度的相容性保持磁约束。两种要求需要共同纳入求解器设计。
 \end{chaptersummary}
+\studyroute{这里略去完整三维 FDTD 的材料、边界和电流沉积实现。}{Yee scheme; constrained transport; charge-conserving current deposition; GLM}{构造一个立方体的边--面--体关联矩阵，说明共享边电场如何保证磁通总和不变。}
 \section{半离散有限体积格式}
 将区域划分为控制体 $K$，定义单元平均
 \begin{equation}
@@ -944,7 +1097,7 @@ V_i^{n+1}=V_i^n-\frac{\Delta t}{\Delta x}
 E_y(x,t)=B_z(x,t)=\exp[-(x-t-x_0)^2/\sigma^2]
 \quad\text{（在实线上，或取周期延拓）}.
 \end{equation}
-以 $L^1$ 或 $L^2$ 误差比较不同网格，并检查 CFL 数 $\nu=\Delta t/\Delta x$ 的影响。一阶显式格式取 $\nu\leq1$ 是此例的稳定性条件；多维、更高阶或其他时间离散不能机械沿用这一数值。
+以 $L^1$ 或 $L^2$ 误差比较不同网格，并检查 CFL 数 $\nu=\Delta t/\Delta x$ 的影响。一阶显式格式取 $\nu\leq1$ 是此例的稳定性条件；多维、高阶或其他时间离散的稳定步长由相应算子和时间格式重新确定。
 
 \begin{lstlisting}[caption={一维周期网格的 Rusanov 有限体积更新（伪代码）}]
 Given cell averages V[i] = (Ey[i], Bz[i]), i = 0,...,N-1
@@ -959,8 +1112,8 @@ For each time step:
 where flux(Ey,Bz) = (Bz,Ey)
 \end{lstlisting}
 
-\section{核心困难：一般保守格式未必保持散度}
-对六分量 $U$ 采用一般单元中心有限体积格式，可以使演化方程按控制体保守，却\emph{不自动保证}离散 $\Div_h\bm B=0$。这是两种不同的结构：
+\section{通量守恒与离散散度约束}
+对六分量 $U$ 采用一般单元中心有限体积格式，可获得控制体通量平衡；离散 $\Div_h\bm B=0$ 还要求旋度与散度的相容关系。二者对应如下结构：
 \begin{center}
 \begin{tabular}{p{0.41\linewidth}p{0.43\linewidth}}
 \toprule
@@ -971,13 +1124,13 @@ where flux(Ey,Bz) = (Bz,Ey)
 \bottomrule
 \end{tabular}
 \end{center}
-因此，实现 Maxwell 求解器时，不宜仅凭“用了守恒型格式”就宣称散度约束自然成立。
+Maxwell 求解器应分别验证面通量平衡与散度约束传播。
 
 \section{Yee 网格与 constrained transport 的几何核心}
 \begin{askai}
 在一个取向明确的立方单元上，将六个面磁通量按外法向求和，再用边电场线积分代入各面更新式。请逐条列出每条边的两次贡献，验证磁通量总和的时间导数为零。
 
-继续问：若相邻面使用的同一条边电场不一致，抵消在哪一步失败？
+进一步展开：若相邻面使用的同一条边电场不一致，抵消在哪一步失败？
 \end{askai}
 直角交错网格上，把磁通量 $B_f$ 放在网格\emph{面}，把电场环量 $E_e$ 放在网格\emph{边}。Faraday 方程在每一个有向面上的离散积分形式为
 \begin{equation}\label{eq:CT}
@@ -993,8 +1146,8 @@ where flux(Ey,Bz) = (Bz,Ey)
 Yee-FDTD 同时采用时间与空间交错；上述推导展示其中的\emph{空间离散拓扑}及磁约束保持机制。电 Gauss 约束需要兼容的电流沉积或离散连续性方程，完整实现还需处理边界、材料界面、稳定性和起始半步数据。
 \end{remark}
 
-\section{另一条路线：divergence cleaning（概念介绍）}
-如果采用单元中心有限体积格式，也可加入辅助变量，把散度误差转化为可传播、可耗散的模式（例如 GLM 清理）。这种方法适应已有通量求解框架，但会修改演化系统；它与严格利用离散复形保持 $D_hC_h=0$ 的 constrained transport 思想不同。具体 GLM 参数、辅助方程和边界条件应在明确设计目标后再引入，本稿不将其当作已实现的方法。
+\section{散度清理（divergence cleaning）}
+如果采用单元中心有限体积格式，也可加入辅助变量，把散度误差转化为可传播、可耗散的模式（例如 GLM 清理）。这种方法适应已有通量求解框架，但会修改演化系统；它与严格利用离散复形保持 $D_hC_h=0$ 的 constrained transport 思想不同。这里略去辅助方程、清理波速和边界闭合；可检索 hyperbolic divergence cleaning、GLM Maxwell system，并要求给出完整能量与边界分析。
 
 \section{建议的数值实践路线}
 \begin{enumerate}
@@ -1009,10 +1162,10 @@ Yee-FDTD 同时采用时间与空间交错；上述推导展示其中的\emph{�
 \begin{chaptersummary}
 上一章以有限体积展示通量与约束，本章从弱形式和函数空间出发构造 Galerkin 与 DG 离散。局部多项式和数值迹产生半离散系统，其能量与波传播误差还取决于通量和时间推进。通过一维可复算例子，本章将空间阶数、频散与计算代价联系起来。
 \end{chaptersummary}
+\studyroute{这里略去边元基函数与交换投影的构造，集中于 DG 弱形式、能量和一维频散。}{N\'ed\'elec elements; commuting projection; DG energy estimate; Fourier--Bloch symbol}{从最低阶边环量自由度解释切向连续性，再对 $p=1$ 的 DG 单元符号求物理分支。}
 \section{从弱形式到近似空间：数学问题变成线性代数}
 第 5 章的弱形式 \eqref{eq:weakinternal} 已经允许解不再处处可微。
-这里不重新推导 Sobolev 空间的完备性、迹定理或嵌入定理，
-而是直接回答计算问题：\textbf{在多大的函数类中找解？用哪些有限维基函数逼近？}
+本章据此选择函数空间与有限维近似。完备性、迹定理和嵌入定理的证明在此略去，可按 Sobolev trace theorem 与 Galerkin approximation 检索。
 以简单的区域 $\Omega$ 为例，$L^2(\Omega)$ 提供平方可积的能量度量，
 $H^1(\Omega)$ 要求一阶弱导数在 $L^2$ 中。
 Maxwell 的旋度结构更适合 $H(\curl;\Omega)$，电/磁通量的法向迹
@@ -1062,8 +1215,8 @@ $\partial_t\bm B=-\curl\bm E$ 分别乘测试场并积分。
 &=0.
 \end{align}
 光滑情形下，这就是对原 PDE 的一次分部积分改写；对低正则性场，
-边界配对应由适当的\emph{切向迹及其对偶意义}解释，不能简单假定点值存在。
-真正实施 DG 时，每个单元分别使用这两式，并将内侧/外侧的切向场通过
+边界配对由\emph{切向迹及其对偶空间}解释。
+实施 DG 时，每个单元分别使用这两式，并将内侧/外侧的切向场通过
 \emph{数值切向通量}联接；这正是前一章“界面通量”在电磁场上的版本。
 为让读者可以亲手推导矩阵和频散关系，下面先研究与 Maxwell 横向特征场
 完全等价的一维对称双曲系统。
@@ -1105,7 +1258,7 @@ $M_h\dot u_h=R_h(u_h)$。
 \begin{askai}
 对周期一维系统 $\partial_tU+A\partial_xU=0$，取对称常矩阵 $A$，从式 \eqref{eq:dgweak} 开始分别代入中心和上风通量，逐界面推导式 \eqref{eq:dgenergy}。请严格沿用 $[U]=U^+-U^-$ 的约定。
 
-继续问：为什么半离散能量稳定仍需分别检查全离散时间推进与 Maxwell 散度约束？
+进一步展开：为什么半离散能量稳定仍需分别检查全离散时间推进与 Maxwell 散度约束？
 \end{askai}
 对 \eqref{eq:dgmodel}，两个常见的界面通量是
 \begin{align}\label{eq:dg-fluxes}
@@ -1131,7 +1284,7 @@ $\int_K (AU_h)\cdot\partial_xU_h\,\dd x
 对于多维 Maxwell，能量估计仍可使用每个面对应的法向 $A(n)$，
 但物理边界通量必须一并计入，而且散度约束仍需单独检查。
 
-\section{数字频散关系：为什么高阶 DG 有吸引力}\label{sec:dg-dispersion}
+\section{高阶 DG 的数值频散关系}\label{sec:dg-dispersion}
 \begin{checkpoint}
 请比较振幅耗散、相速度误差和群速度误差；为什么中心通量可能守恒半离散能量，却仍有非零相位误差？能量估计为何也不能单独保证 Maxwell 离散谱正确？
 \end{checkpoint}
@@ -1155,7 +1308,7 @@ $\dd\omega_h/\dd k-c$ 描述\emph{群速度偏差}。
 \begin{askai}
 取一维周期均匀网格和 $p=1$ Legendre 基函数，从弱形式构造 $M,N,r,\ell$，再推导式 \eqref{eq:p1symbol}。求其两个特征分支，并解释如何在 $\theta\to0$ 时识别物理分支。
 
-继续问：用附录代码复算 $\theta=0.5,1.0,1.5$ 的相速度误差，并与表格比较。
+进一步展开：用附录代码复算 $\theta=0.5,1.0,1.5$ 的相速度误差，并与表格比较。
 \end{askai}
 取标量右行特征场
 $\partial_tu+\partial_xu=0$、等距周期单元 $h$，
@@ -1180,7 +1333,7 @@ r_j=1,\quad\ell_i=(-1)^i.
 \end{equation}
 该矩阵共有 $p+1$ 个特征分支：其中在 $\theta\to0$ 时连续趋于 $-\mathrm i\theta$
 的分支称为\emph{物理分支}，其余是单元内部的非物理/高频分支；
-两者不能在画色散曲线时混淆。
+绘制色散曲线需沿波数连续跟踪所选分支。
 
 \paragraph{两个极端例子。}
 当 $p=0$ 时，
@@ -1192,7 +1345,7 @@ r_j=1,\quad\ell_i=(-1)^i.
 \end{equation}
 因此相速度比值为 $c_{\rm ph,h}/c=\sin\theta/\theta$，
 随波数增大明显偏离 1。
-当 $p=1$ 时，可以\emph{不使用任何黑箱软件}写出
+当 $p=1$ 时，代入 Legendre 基函数得到
 \begin{equation}\label{eq:p1symbol}
 \mathcal L_1(\theta)=
 \begin{pmatrix}z-1&z-1\\3(1-z)&-3(1+z)\end{pmatrix}.
@@ -1241,22 +1394,21 @@ $1.5$ & $3.35003\times10^{-1}$ & $1.18404\times10^{-2}$ & $2.42693\times10^{-4}$
 \end{semilogyaxis}
 \end{tikzpicture}
 \caption{一维常系数上风 DG 的半离散物理模态色散误差（纵坐标对数刻度）。
-数据按式 \eqref{eq:dgsymboleig} 的特征值逐点计算；本图不包括时间推进误差，
-也不是所有 DG 通量和网格的普遍误差界。}
+数据按式 \eqref{eq:dgsymboleig} 的特征值逐点计算，适用于本节指定网格、积分与通量，仅包含空间半离散误差。}
 \label{fig:dgdisp}
 \end{figure}
 \FloatBarrier
 
-\noindent\textbf{如何解读？}
+\noindent\textbf{误差趋势。}
 在这一\emph{特定}均匀网格、常系数、精确积分、特征上风通量的例子中，
 从常数近似提高到一次、二次局部多项式，\emph{物理模态}的相速度误差显著降低（见图~\ref{fig:dgdisp}）。
 对小 $kh$，相对色散误差依次具有
 $O((kh)^2)$、$O((kh)^4)$、$O((kh)^6)$ 的行为。
 复杂网格、材料跳跃、欠积分以及其他通量会改变频散曲线，上述规律适用于本例所列条件。
 另外，$p$ 提高会增加局部未知量、积分代价并收紧显式时间步长；
-同等\emph{总自由度或计算成本}下的优势必须另作实验，不能只凭本表下结论。
+同等\emph{总自由度或计算成本}下的比较需要独立的基准实验。
 
-\section{高阶空间精度为何可能被时间推进破坏？}
+\section{空间与时间误差的组合}
 令物理空间特征值为 $\lambda_h=-\alpha_h-\mathrm i\omega_h$，
 时间积分器的放大因子为 $R(\Delta t\lambda_h)$，则完整的离散频率是
 \begin{equation}\label{eq:fullfrequencies}
@@ -1266,22 +1418,21 @@ $O((kh)^2)$、$O((kh)^4)$、$O((kh)^6)$ 的行为。
 \end{equation}
 取连续的相位分支以避免 $2\pi$ 混叠。
 无论 DG 空间阶数多高，如果时间格式很低阶或 $\Delta t$ 太大，
-$\omega_{h,\Delta t}$ 仍可能偏离真正频率。
-中点法的式 \eqref{eq:midpointdisp} 已经给出最简单反例。
+$\omega_{h,\Delta t}$ 仍可能偏离连续模型的频率。
+中点法的式 \eqref{eq:midpointdisp} 给出了时间色散的具体表达。
 这也解释了工程中的常见搭配：高阶 DG + 与其精度匹配的 RK 时间格式；
 或在长期结构保持优先时，采用针对离散 Hamilton/Poisson 结构设计的推进策略。
 \emph{数值色散小}、\emph{数值耗散小}、\emph{离散能量/辛结构好}是互相关联但不能互相替代的评价维度。
 
-\section{回到三维 Maxwell：DG 能做什么、不能自动做什么}
+\section{三维 Maxwell DG 的空间与约束设计}
 Maxwell DG 通常取每个单元的电场与磁场分量为局部多项式，
 以 $A(n)$ 的中心或特征上风通量处理面耦合；
 可以支持高阶曲面几何、非结构网格及 $hp$ 局部加密。
-但一般逐单元 $[\mathbb P_p]^6$ 空间\textbf{并不自动保证}
-$\Div_h\bm B=0$ 或带源的电 Gauss 约束；要进一步采用离散复形兼容空间、
+逐单元 $[\mathbb P_p]^6$ 空间还需配套约束设计，以控制磁散度和带源电 Gauss 约束。可采用离散复形兼容空间、
 适当的约束保持通量、局部散度自由基、清理变量或其它专门设计。
-特殊问题中的能量估计也不能替代所有边界与界面稳定性分析。
+物理边界和材料界面的稳定性应在相应通量下分析。
 
-\section{建议的高阶色散实验（可用几十行代码完成）}
+\section{高阶色散的数值实验}
 \begin{enumerate}
 \item 取 $p=0,1,2,3$，按 \eqref{eq:dgsymbol} 生成 $M,N,r,\ell$，取
 $\theta=0.1,0.2,\ldots,1.5$；对 $\mathcal L_p(\theta)$ 求特征值，追踪
@@ -1324,10 +1475,11 @@ $\Delta t/h$ 下重新画\emph{全离散}色散曲线，判断何时由时间误
 本卷的主线可概括为：\emph{几何结构决定方程的相容性；双曲结构决定信息如何传播；离散结构决定计算能否保留这些性质。} Maxwell 方程由此连接几何场论与计算 PDE。
 
 \appendix
-\chapter{符号速查与常见符号陷阱}
+\chapter{符号与约定速查}
 \begin{chaptersummary}
 本附录汇总前文的时空、微分形式与离散算子记号，便于在四维表达、三维分解和数值实现之间切换。使用公式时应同时核对度规、取向和单位约定。
 \end{chaptersummary}
+\studyroute{这里汇总前文约定；一般材料本构与其他号差下的公式转换可单独展开。}{metric signature; electromagnetic constitutive relations; Hodge dual}{保持本卷取向，说明恢复 $\varepsilon,\mu,c$ 后能量内积与波速如何改变。}
 \begin{longtable}{p{0.26\textwidth}p{0.66\textwidth}}
 \toprule
 记号 & 约定与解释\\
@@ -1354,12 +1506,13 @@ $D_hC_h=0$ & 离散散度作用在离散旋度上为零，依赖同一离散复�
 
 \paragraph{三种不同的“星”或对偶}这里的 Hodge 星不等于复共轭，也不等于矩阵伴随符号 $A^*$。四维 Lorentz Hodge 星与三维欧氏 Hodge 星在平方后的符号一般不同；不要直接把 $\star^2=1$ 从三维照搬到四维。
 
-\paragraph{度规与单位}把 $c$ 和材料本构恢复后，$\bm E$、$\bm B$ 之间还涉及物理单位与本构关系。对非均匀介质，最自然的变量可能是 $\bm D,\bm H$；主部矩阵、能量内积和特征速度都会随本构变化。本稿的 $\pm1$ 传播速度只适用于所选单位制下的真空平直时空。
+\paragraph{度规与单位}把 $c$ 和材料本构恢复后，$\bm E$、$\bm B$ 之间还涉及物理单位与本构关系。对非均匀介质，最自然的变量可能是 $\bm D,\bm H$；主部矩阵、能量内积和特征速度都会随本构变化。本卷的 $\pm1$ 传播速度只适用于所选单位制下的真空平直时空。
 
 \chapter{DG 数值频散复算：Python 代码}
 \begin{chaptersummary}
 本附录把第 7 章的一维 DG 单元符号转化为可运行的特征值计算，用于复现物理分支的半离散相速度误差。改变波数与多项式阶数，可以检验分析结论并观察分支选择的影响。
 \end{chaptersummary}
+\studyroute{这里提供单元符号的数值复算，略去完整 DG 场求解器的装配与时间推进。}{Legendre modal DG; physical eigenvalue branch; dispersion analysis}{复现表中误差，再沿波数连续跟踪特征值，比较最近特征值选择与连续跟踪。}
 本附录代码只需要 NumPy；针对一维常系数、周期均匀网格、精确 Legendre 积分、上风通量
 和\emph{空间半离散}。它构造式 \eqref{eq:dgsymboleig} 并输出第 7 章的相速度误差表。
 代码分析与 Maxwell 横向特征场等价的标量行波；完整 Maxwell 场和 Gauss 约束不在这一实验范围内。
@@ -1401,8 +1554,10 @@ $-\mathrm i\theta$ 最近的特征值。
 \begin{chaptersummary}
 本附录按电磁学、微分形式、PDE、有限体积、几何积分与 DG 等方向列出延伸读物，供读者针对正文中需要深化的环节继续学习。比较公式时应留意不同文献采用的符号约定。
 \end{chaptersummary}
-以下为适于进一步查阅的经典教材与专题读物，而非本稿逐页引用的文献目录。阅读时务必检查其度规号差、电磁张量分量与 Hodge 星约定。
+\studyroute{以下文献按主题提供进一步阅读入口，具体证明可结合前文关键词定位。}{computational electromagnetism; geometric integration; discontinuous Galerkin}{按所需证明或算法列出阅读顺序，并将文献记号与本卷符号表逐项对应。}
+以下读物按知识环节提供进一步查阅的入口；比较公式时需统一度规号差、电磁张量分量与 Hodge 星约定。
 \begin{enumerate}
+\raggedright
 \item D. J. Griffiths, \emph{Introduction to Electrodynamics}. 适于复习三维 Maxwell 方程和电磁波。
 \item B. F. Schutz, \emph{A First Course in General Relativity}. 适于学习四维张量和简单的时空几何。
 \item H. Flanders, \emph{Differential Forms with Applications to the Physical Sciences}. 适于从向量分析走向外微分形式。
@@ -1415,6 +1570,10 @@ $-\mathrm i\theta$ 最近的特征值。
 \item M. Ainsworth, ``Dispersive and dissipative behaviour of high order discontinuous Galerkin finite element methods,'' \emph{Journal of Computational Physics}, 198 (2004), 106--130. 适于专题阅读 DG 数值频散与耗散。
 \item D. S\'arm\'any, M. A. Botchev, and J. J. W. van der Vegt, ``Dispersion and Dissipation Error in High-Order Runge--Kutta Discontinuous Galerkin Discretisations of the Maxwell Equations,'' \emph{Journal of Scientific Computing}, 33 (2007), 47--74. 适于比较空间高阶与时间推进的综合频散特性。
 \item K. S. Yee, ``Numerical Solution of Initial Boundary Value Problems Involving Maxwell's Equations in Isotropic Media,'' \emph{IEEE Transactions on Antennas and Propagation}, 1966. 适于追溯交错电磁网格格式的原始思想。
+\item M. Dumbser (2014), \href{https://doi.org/10.1016/j.cma.2014.07.019}{\emph{Arbitrary-Lagrangian-Eulerian ADER-WENO Finite Volume Schemes with Time-Accurate Local Time Stepping for Hyperbolic Conservation Laws}}.
+\item B. Owren and M. Zennaro (1992), \href{https://doi.org/10.1137/0913084}{\emph{Derivation of Efficient, Continuous, Explicit Runge--Kutta Methods}}.
+\item C. Altmann, G. Gassner, and C.-D. Munz (2010), \href{https://congress2.cimne.com/eccomas/proceedings/cfd2010/papers/01008.pdf}{\emph{An Explicit Space-Time Adaptive Discontinuous Galerkin Scheme}}, ECCOMAS CFD.
+\item U. M. Ascher, S. J. Ruuth, and R. J. Spiteri (1997), \href{https://doi.org/10.1016/S0168-9274(97)00056-1}{\emph{Implicit-explicit Runge--Kutta methods for time-dependent partial differential equations}}, Applied Numerical Mathematics, 25, 151--167.
 \end{enumerate}
 
 \end{document}

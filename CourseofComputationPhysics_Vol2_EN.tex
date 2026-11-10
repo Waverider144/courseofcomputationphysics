@@ -381,15 +381,38 @@ M=\RR_t\times\Sigma,\qquad \Sigma=\RR^3.
 This decomposition constructs an \emph{evolution problem}; each inertial observer may choose their own time slices.
 
 \section{Splitting the Exterior Derivative}
+In the current product coordinates, $\partial_t$ is the time coordinate vector field,
+whereas $\dd t$ is a one-form in the dual coordinate basis, with $\dd t(\partial_t)=1$.
+For a time-dependent spatial $k$-form, use a time-independent spatial coordinate basis and define
+\[
+\alpha(t)=\sum_I\alpha_I(t,\bm x)\,\dd x^I,\qquad
+\partial_t\alpha:=\sum_I(\partial_t\alpha_I)\,\dd x^I,
+\]
+where $I=(i_1<\cdots<i_k)$ and $\dd x^I=\dd x^{i_1}\wedge\cdots\wedge\dd x^{i_k}$.
+Differentiating the coefficients leaves $\partial_t\alpha$ a spatial $k$-form.
+Separating the coordinate expression for the exterior derivative into space and time gives
+\begin{equation}\label{eq:splitd}
+\dd\alpha=\dd_\Sigma\alpha+\dd t\wedge(\partial_t\alpha).
+\end{equation}
+Both terms are $(k+1)$-forms. The second denotes the action of the composite operator
+$(\dd t\wedge\cdot)\circ\partial_t$, not a wedge product of a one-form with a vector field.
+For example, $\alpha=t\,\dd x$ gives $\partial_t\alpha=\dd x$ and
+$\dd\alpha=\dd t\wedge\dd x$.
+In these fixed product coordinates, $\partial_t\alpha$ also equals the
+Lie derivative $\mathcal L_{\partial_t}\alpha$ along $\partial_t$.
+For coordinate bases and exterior differentiation, see
+\href{https://www.davidtong.org/teaching/general-relativity/grhtml/S2}{Tong, Sections 2.3.1 and 2.4.1};
+for the decomposition using Lie derivatives, see
+\href{https://arxiv.org/abs/gr-qc/9701066}{Fecko, Section IV.B}.
+
 \begin{askai}
-Expand $\dd F$ for $F=B-\dd t\wedge E$ using the stated orientation and $\dd=\dd_\Sigma+\dd t\wedge\partial_t$. Identify signs from wedge-product interchange and time differentiation, and separate spatial three-forms from terms containing $\dd t$.
+Starting from $F=B-\dd t\wedge E$, expand $\dd F$ using \eqref{eq:splitd}.
+First differentiate the coefficients of $B,E$ in time, then wedge with $\dd t$.
+Check the form degree at each step, identify signs from wedge-product interchange
+and time differentiation, and separate spatial three-forms from terms containing $\dd t$.
 
 Follow-up: translate both resulting equations into three-dimensional vector notation and check the signs.
 \end{askai}
-For a time-dependent spatial $k$-form $\alpha(t)$,
-\begin{equation}\label{eq:splitd}
-\dd\alpha=\dd_\Sigma\alpha+\dd t\wedge\partial_t\alpha.
-\end{equation}
 Antisymmetry and the product rule give, for any spatial form $\beta$,
 \begin{equation}
 \dd(\dd t\wedge\beta)=-\dd t\wedge\dd_\Sigma\beta.
@@ -1587,6 +1610,13 @@ When comparing formulas, align metric signatures, electromagnetic tensor compone
 \item D. J. Griffiths, \emph{Introduction to Electrodynamics}. Three-dimensional Maxwell equations and electromagnetic waves.
 \item B. F. Schutz, \emph{A First Course in General Relativity}. Four-dimensional tensors and introductory space--time geometry.
 \item H. Flanders, \emph{Differential Forms with Applications to the Physical Sciences}. A route from vector analysis to exterior differential forms.
+\item D. Tong, \href{https://www.davidtong.org/teaching/general-relativity/grhtml/S2}{\emph{General Relativity}, Chapter 2}.
+Sections 2.3.1, 2.3.2, and 2.4.1 discuss dual coordinate bases, Lie derivatives of forms, and exterior differentiation.
+\item M. Fecko, \href{https://arxiv.org/abs/gr-qc/9701066}{\emph{On 3+1 decompositions with respect to an observer field via differential forms}},
+\emph{Journal of Mathematical Physics}, 38 (1997), 4542--4560,
+\href{https://doi.org/10.1063/1.532142}{doi:10.1063/1.532142}.
+Section IV.B decomposes the exterior derivative using spatial differentiation and Lie derivatives;
+the fixed product coordinates used here give a simplified case.
 \item L. C. Evans, \emph{Partial Differential Equations}. Weak solutions, function spaces, and energy methods.
 \item R. J. LeVeque, \emph{Finite Volume Methods for Hyperbolic Problems}. Conservation laws, numerical fluxes, and wave propagation.
 \item A. Bossavit, \emph{Computational Electromagnetism: Variational Formulations, Complementarity, Edge Elements}. Geometric discretization in electromagnetic computation.

@@ -385,15 +385,37 @@ M=\RR_t\times\Sigma,\qquad \Sigma=\RR^3.
 这一分解用于\emph{构造演化问题}；不同惯性观察者可分别选择自己的时间切片。
 
 \section{时空外微分的拆分}
+在当前乘积坐标中，$\partial_t$ 是时间坐标向量场，
+$\dd t$ 是对偶坐标基中的一形式，满足 $\dd t(\partial_t)=1$。
+对依赖时间的空间 $k$ 形式，在不随时间变化的空间坐标基下定义
+\[
+\alpha(t)=\sum_I\alpha_I(t,\bm x)\,\dd x^I,\qquad
+\partial_t\alpha:=\sum_I(\partial_t\alpha_I)\,\dd x^I,
+\]
+其中 $I=(i_1<\cdots<i_k)$，$\dd x^I=\dd x^{i_1}\wedge\cdots\wedge\dd x^{i_k}$。
+这里先对系数求时间导数，所得 $\partial_t\alpha$ 仍为空间 $k$ 形式。
+将外微分的坐标表达按时间与空间分组，得到
+\begin{equation}\label{eq:splitd}
+\dd\alpha=\dd_\Sigma\alpha+\dd t\wedge(\partial_t\alpha).
+\end{equation}
+两项都是 $(k+1)$ 形式；第二项表示复合算子
+$(\dd t\wedge\cdot)\circ\partial_t$ 的作用，而非一形式与向量场的外积。
+例如 $\alpha=t\,\dd x$ 时，$\partial_t\alpha=\dd x$，
+故 $\dd\alpha=\dd t\wedge\dd x$。
+在当前固定乘积坐标中，$\partial_t\alpha$ 也等于沿 $\partial_t$ 的
+Lie 导数 $\mathcal L_{\partial_t}\alpha$。
+坐标基与外微分可参见
+\href{https://www.davidtong.org/teaching/general-relativity/grhtml/S2}{Tong 讲义第 2.3.1、2.4.1 节}；
+以 Lie 导数表述的分解见
+\href{https://arxiv.org/abs/gr-qc/9701066}{Fecko 第 IV.B 节}。
+
 \begin{askai}
-从 $F=B-\dd t\wedge E$ 出发，按本卷取向和 $\dd=\dd_\Sigma+\dd t\wedge\partial_t$ 的约定逐项展开 $\dd F$。请指出每个符号来自外积交换还是时间求导，并分别识别空间三形式与含 $\dd t$ 的部分。
+从 $F=B-\dd t\wedge E$ 出发，利用式 \eqref{eq:splitd} 逐项展开 $\dd F$。
+先对 $B,E$ 的系数求时间导数，再与 $\dd t$ 外积；请核对每一步的形式次数，
+指出每个符号来自外积交换还是时间求导，并分别识别空间三形式与含 $\dd t$ 的部分。
 
 进一步展开：把得到的两条形式方程翻译成三维向量方程，逐项核对符号。
 \end{askai}
-对依赖时间的空间 $k$ 形式 $\alpha(t)$，有
-\begin{equation}\label{eq:splitd}
-\dd\alpha=\dd_\Sigma\alpha+\dd t\wedge\partial_t\alpha.
-\end{equation}
 由反对称性和外微分的乘积法则，对任意空间形式 $\beta$：
 \begin{equation}
 \dd(\dd t\wedge\beta)=-\dd t\wedge\dd_\Sigma\beta.
@@ -1558,6 +1580,12 @@ $-\mathrm i\theta$ 最近的特征值。
 \item D. J. Griffiths, \emph{Introduction to Electrodynamics}. 适于复习三维 Maxwell 方程和电磁波。
 \item B. F. Schutz, \emph{A First Course in General Relativity}. 适于学习四维张量和简单的时空几何。
 \item H. Flanders, \emph{Differential Forms with Applications to the Physical Sciences}. 适于从向量分析走向外微分形式。
+\item D. Tong, \href{https://www.davidtong.org/teaching/general-relativity/grhtml/S2}{\emph{General Relativity}, Chapter 2}.
+第 2.3.1、2.3.2、2.4.1 节分别介绍对偶坐标基、形式的 Lie 导数与外微分。
+\item M. Fecko, \href{https://arxiv.org/abs/gr-qc/9701066}{\emph{On 3+1 decompositions with respect to an observer field via differential forms}},
+\emph{Journal of Mathematical Physics}, 38 (1997), 4542--4560,
+\href{https://doi.org/10.1063/1.532142}{doi:10.1063/1.532142}.
+第 IV.B 节用空间外微分与 Lie 导数给出时空分解；本文采用的固定乘积坐标对应其简化情形。
 \item L. C. Evans, \emph{Partial Differential Equations}. 适于补充弱解、函数空间和能量方法。
 \item R. J. LeVeque, \emph{Finite Volume Methods for Hyperbolic Problems}. 适于系统学习守恒律、数值通量和波传播。
 \item A. Bossavit, \emph{Computational Electromagnetism: Variational Formulations, Complementarity, Edge Elements}. 适于理解电磁场计算中几何离散的作用。

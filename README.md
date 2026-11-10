@@ -80,6 +80,8 @@ The project began with a mathematically trained friend's request for a route int
 
 Contributions may address derivations, numerical verification, terminology, translations, or additional physical domains. Preserve the concise structure, state assumptions, and provide references for new technical material.
 
+See the [Co-author Guidelines](CONTRIBUTING.md) ([中文版](CONTRIBUTING.zh-CN.md)) for the writing style and collaboration workflow, the [chapter templates](docs/templates/README.md) for LaTeX structure, and the [AI prompts](docs/ai-prompts.md) for drafting, editing, and verification tasks.
+
 ## Acknowledgement
 
 Thanks to GPT for assistance in turning the author's ideas into a working manuscript.

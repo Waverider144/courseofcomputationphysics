@@ -80,6 +80,8 @@ make vol0-hardware        # 可选 CUDA 与单主机 MPI 实验
 
 欢迎贡献推导、数值验证、术语、翻译或其他物理领域的内容。请保持简明结构，明确假设，并为新增技术内容提供参考文献。
 
+参与合作请先阅读[合作者指南](CONTRIBUTING.zh-CN.md)（[English](CONTRIBUTING.md)），了解写作风格与协作流程；[章节模板](docs/templates/README.md)提供 LaTeX 结构，[AI Prompt 集](docs/ai-prompts.zh-CN.md)提供起草、编辑与验证任务的可复用提示。
+
 ## 致谢
 
 感谢 GPT 协助将作者的构想整理为教材。

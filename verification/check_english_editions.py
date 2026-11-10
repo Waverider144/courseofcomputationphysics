@@ -91,9 +91,11 @@ def check_result_tables():
 
 def check_readme_links():
     checked = 0
-    for name in ("README.md", "README.zh-CN.md", "docs/experiments.md",
-                 "Vol0_Linear_Algebra_HPC/README.md"):
-        path = ROOT/name
+    paths = [ROOT/name for name in ("README.md", "README.zh-CN.md",
+                                   "CONTRIBUTING.md", "CONTRIBUTING.zh-CN.md",
+                                   "Vol0_Linear_Algebra_HPC/README.md")]
+    paths.extend(sorted((ROOT/"docs").rglob("*.md")))
+    for path in paths:
         for target in re.findall(r"\[[^\]]+\]\(([^)]+)\)", path.read_text()):
             if "://" in target or target.startswith("#"):
                 continue
@@ -101,6 +103,32 @@ def check_readme_links():
             assert (path.parent/destination).exists(), ("broken local link", path, target)
             checked += 1
     return checked
+
+
+def check_cover_authors():
+    authors = {}
+    for volume, stems in (
+        ("0", ("Course_of_Computational_Physics_Vol0",
+               "Course_of_Computational_Physics_Vol0_EN")),
+        ("I", ("Course_of_Computational_Physics_Vol1_Revised",
+               "Course_of_Computational_Physics_Vol1_EN")),
+        ("II", ("CourseofComputationPhysics_Vol2_CN",
+                "CourseofComputationPhysics_Vol2_EN")),
+    ):
+        pair = []
+        for stem in stems:
+            pdf = ROOT/(stem+".pdf")
+            info = subprocess.check_output(["pdfinfo", str(pdf)], text=True)
+            match = re.search(r"^Author:[ \t]*([^\n]*)$", info, re.M)
+            author = " ".join(match.group(1).split()) if match else ""
+            assert author, ("missing PDF author", pdf)
+            cover = subprocess.check_output(
+                ["pdftotext", "-f", "1", "-l", "1", str(pdf), "-"], text=True)
+            assert author in " ".join(cover.split()), ("missing cover credit", pdf, author)
+            pair.append(author)
+        assert pair[0] == pair[1], ("bilingual author mismatch", volume, pair)
+        authors[volume] = pair[0]
+    return authors
 
 
 def check_pdf(stem, volume):
@@ -143,6 +171,8 @@ def main():
     report = {"Volume_II_hash_checks": check_volume2(),
               "result_table_rows": check_result_tables(),
               "local_document_links": check_readme_links(), "volumes": {}}
+    if not args.sources_only:
+        report["cover_authors"] = check_cover_authors()
     for volume, directory, english_dir, pattern, count in (
         (0, "Vol0_Linear_Algebra_HPC", "Vol0_Linear_Algebra_HPC_EN", "*/*.tex", 29),
         (1, "vol1_revised", "vol1_revised_en", "*.tex", 22),

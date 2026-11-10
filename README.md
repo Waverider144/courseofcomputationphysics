@@ -1,5 +1,7 @@
 # Course of Computational Physics
 
+**English** | [简体中文](README.zh-CN.md)
+
 Initiated by Harvey Tan.
 
 A concise route from physical models to numerical algorithms and reproducible computation, for readers with a background in mathematics. The three volumes connect modeling assumptions, PDE structure, discretization, matrix solvers, and modern computer architecture.

@@ -91,7 +91,7 @@ def check_result_tables():
 
 def check_readme_links():
     checked = 0
-    for name in ("README.md", "docs/experiments.md",
+    for name in ("README.md", "README.zh-CN.md", "docs/experiments.md",
                  "Vol0_Linear_Algebra_HPC/README.md"):
         path = ROOT/name
         for target in re.findall(r"\[[^\]]+\]\(([^)]+)\)", path.read_text()):

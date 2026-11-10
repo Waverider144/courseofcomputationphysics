@@ -1,0 +1,28 @@
+\chapter{Parallel Throughput on CPUs and GPUs}\label{v0ch:27}
+\begin{chaptersummary}
+Layout controls a single execution stream; parallel performance also requires sufficient independent work and resources. This chapter connects CPU threads and GPU SIMT to occupancy, coalescing, and device residency. Evaluate throughput, dependencies, launch, and migration together, using end-to-end timing to assess acceleration.
+\end{chaptersummary}
+\learninggoals{Explain NUMA and false sharing; distinguish SIMD/SIMT; assess coalescing, occupancy, and transfer amortization.}
+\paragraph{Core Question}Why do more threads or higher occupancy not necessarily shorten runtime?
+
+\section{CPU Threads and Memory Placement}
+Multicore execution distributes elements, rows, or grid blocks among threads. OpenMP loops need conflict-free writes or synchronization. Binding and first touch determine NUMA page placement; cross-socket access changes latency and bandwidth. Threads writing distinct variables on one cache line can still cause false sharing. Blocking and padding separate hotspots. SIMD and multicore threading are complementary levels.
+On hybrid-core processors, thread performance, affinity, and power state affect short experiments. The records therefore include CPU model, available logical processors, and BLAS configuration; sustained all-core throughput requires calibration with a corresponding workload.
+\section{GPU Execution Resources}
+CUDA groups threads into blocks, schedules blocks onto SMs, and executes warps in SIMT fashion.\cite{cuda}
+Contiguous threads accessing contiguous elements favor coalescing. Divergence, irregular gathers, and insufficient parallelism reduce utilization. Registers and shared memory limit resident blocks/warps. Occupancy measures residency, not performance; raising it while sacrificing reuse or causing spills may be counterproductive.
+SpMV short and long rows have different workloads. DG elements can be batched into small matrix kernels. Yee/LBM should first align spatial indexing, then consider shared caching. Fixed launch overhead can dominate small problems.
+\section{Transfers, Asynchrony, and Residency}
+\[
+ T_{\rm accelerator}=T_{\rm H2D}+T_{\rm kernels}
+ +T_{\rm D2H}+T_{\rm synchronization}.
+\]
+Keep evolving fields, geometry, and preconditioner data on the device when possible. Copy/compute overlap requires hardware support, appropriate streams, and buffer management. An asynchronous call's return is not completion. Use device events or synchronization, separating first launch, steady kernels, and transfer-inclusive totals.
+Unified memory supplies shared addressing and demand migration, not the elimination of data movement. Faults, granularity, and residency still matter. Compare explicit prefetch and ownership policies with explicit-transfer measurements.
+\conceptbridge{Why can timing an asynchronous call with a CPU clock produce a fictitious speedup?}{The host often only enqueues work. Stop timing after the corresponding device work completes, and state whether transfer and initialization are included.}{Host submission $\longrightarrow$ device execution $\longrightarrow$ completion synchronization and valid timing.}
+\section{A Reproducible Interface}
+The CUDA program compares single-component AoS/SoA access, advances periodic Yee fields in two phases, and checks results on the host. Compilation, device availability, and numerical validation are recorded separately; timings are produced after device execution. A complete experiment also records model, driver, precision, block configuration, registers, device bandwidth, and transfer scope.
+\costnote{GPU benefits depend on size and residency. Sparse triangular dependencies, reductions, and small kernels may limit acceleration. CPU implementations should also avoid oversubscription between BLAS and outer threads.}
+\coderef{gpu/yee_layout.cu}
+\aiexercise{List warp addresses for SoA and AoS $E_x$ updates. Estimate transaction use and identify quantities requiring profiler confirmation.}{Design timings including transfers, warmup, repetitions, and synchronization. Derive how many steps amortize one device migration.}
+\studyroute{Device-specific pipelines and autotuning are omitted. See \cite{cuda}.}{OpenMP; NUMA first touch; false sharing; SIMT; coalescing; occupancy; device residency}

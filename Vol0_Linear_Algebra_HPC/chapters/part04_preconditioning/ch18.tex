@@ -1,0 +1,28 @@
+\chapter{不完全分解与区域分解}\label{v0ch:18}
+\begin{chaptersummary}
+局部三角求解与扫掠难以直接扩展到大量处理器。本章把未知量划分为子域，通过局部求解与重叠交换构造可并行的预条件器。局部耦合得到有效处理后，跨域低频误差仍需要粗空间；这一需求自然连接后续多重网格。
+\end{chaptersummary}
+\learninggoals{写出加性 Schwarz；区分重叠、RAS 与对称性；解释粗空间的必要性。}
+\paragraph{核心问题}怎样并行应用近似逆，同时保留足够的全局信息？
+
+\section{局部求解的组合}
+令 $R_i$ 将全局向量限制到子域，$A_i=R_iAR_i^T$。加性 Schwarz 逆作用为
+\[
+ B=\sum_i R_i^TA_i^{-1}R_i,\qquad \bm z=B\bm r.
+\]
+子域可重叠，各局部系统用精确 LU、ILU 或其他近似解。对 SPD $A$、精确或 SPD 局部逆且子域覆盖全部自由度时，$B$ 可为 SPD。乘性 Schwarz 顺序更新残差，类似分域 GS。
+RAS 将局部修正只注入不重叠的核心区域，减少重复交换，但通常产生非对称逆作用。因此选择外层方法时，应同时检查原矩阵与 RAS 的对称性，按标准 PCG 的条件判断是否适用。
+\section{粗空间与块系统}
+单层局部方法跨越许多子域传递平滑误差较慢。加上粗空间 $Z$，
+\[
+ B_0=Z(Z^TAZ)^{-1}Z^T,
+\]
+可处理全局模式，再与局部修正组合。分域数增加而无粗层，迭代次数往往增长；具体界依赖重叠、子域尺度和 PDE。
+对于鞍点系统，块消元得到 Schur 补
+$S=A_{22}-A_{21}A_{11}^{-1}A_{12}$。近似块对角或块三角预条件可分别处理不同物理尺度，而非将所有条目交给一个通用 ILU。
+\conceptbridge{每个子域都已解得很准确，为何整体仍收敛慢？}{局部精确性只解决子域内部关系；缓慢跨域变化可能几乎不被任何单次局部修正消除。粗空间承担全局信息交换，不能由无限提高局部精度自动替代。}{局部精确解 $\longrightarrow$ 跨域剩余模式 $\longrightarrow$ 全局粗修正。}
+\section{最小实验}
+将一维 Poisson 分成四段，比较块 Jacobi、重叠一层的加性 Schwarz，以及加入常数型子域粗空间的版本。固定总自由度并增加子域数，记录局部构造、交换量和迭代数，以观察粗空间对跨域误差的作用。分布式扩展性能随后通过多进程计时测量。
+\costnote{更多重叠增加局部存储与通信，也可能改善收敛。局部 ILU 将串行依赖限制在子域内，但粗求解和全局归约最终可能成为瓶颈。}
+\aiexercise{对八点 Poisson 显式写出两个重叠子域的 $R_i$ 和 $B$，验证对称性；将注入改为 RAS 后再次检查。}{给压力--速度块系统推导 Schur 补，说明块三角预条件在外层为何常配 GMRES。}
+\studyroute{略去 Schwarz 条件数界、BDDC 与 FETI-DP。参考 \cite{saad,petsc}。}{additive Schwarz; restricted additive Schwarz; domain decomposition; coarse space; Schur complement}

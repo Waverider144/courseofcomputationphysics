@@ -1,0 +1,61 @@
+% !TeX program = xelatex
+\documentclass[11pt,openany]{ctexbook}
+\input{vol1_revised/preamble}
+\title{计算物理学简明教程\\[6pt]\Large 从动力学约化到现代高阶离散}
+\author{}
+\date{2026 年 11 月}
+\begin{document}
+\frontmatter
+\maketitle
+\chapter*{前言}
+\addcontentsline{toc}{chapter}{前言}
+计算物理在有限资源下表示物理状态、约化自由度、补充闭合关系，并构造有限维演化。每一步都需要说明保留的信息、引入的假设以及可验证的结构。本卷以守恒、稳定性、对称性和波动误差评价这些选择。
+
+全书围绕四个问题组织：如何表示状态（representation），如何利用尺度和统计信息约化动力学（reduction），如何用物理假设补足未解变量的影响（closure），以及如何约束有限维残差（discretization）。模型选择决定计算对象，离散方法决定其近似表示与演化；结构保持贯穿这一过程。
+
+第一部分从 Hamilton 动力学进入 Liouville、动理学与连续介质。第二部分从分部积分建立函数空间与弱形式，比较试探空间、测试空间及不同残差约束。第三部分推导 DG、FR、VCJH、Mortar 和时间推进。第四、五部分分别发展离散速度与物理约化两条路线。第六部分联系网格、方法选择和验证。
+
+本卷面向具有本科高年级数学基础的读者，先备知识包括多元微积分、线性代数、ODE、PDE 与基础数值分析。关键定义、边界项和算法构造在正文中给出；一般迹定理、误差理论和研究专题由“展开与检索”与具体 AI 问题提供入口。每章的学习目标与概念联系用于定位当前步骤在知识链中的作用。
+
+本卷在代数系统的形成处引向第 0 卷《数值线性代数与现代高性能计算》，由矩阵结构继续讨论分解、Krylov、预条件、多重网格和并行执行。第二卷则以 Maxwell 方程继续研究几何、约束传播与电磁离散。
+
+\paragraph{符号约定}
+$\rho_N$ 为归一化的多粒子概率密度，$f_s$ 为数密度型分布；$\rho$ 为质量密度，$\rho_c$ 为电荷密度。$u$ 为标量场，$U$ 为守恒变量或其离散系数，具体维数随模型给出。网格尺度为 $h$、多项式次数为 $p$、时间步长为 $\Delta t$。第 10--14 章一维界面统一取左迹 $u^-$、右迹 $u^+$，跳跃为 $[u]=u^+-u^-$，平均为 $\{u\}=(u^-+u^+)/2$。数值法向通量另含法向符号。碰撞时间、黏性应力与离散松弛时间按章节明确区分。
+
+\tableofcontents
+\mainmatter
+\part{从微观动力学到连续物理模型}
+\input{vol1_revised/chapters/ch01}
+\input{vol1_revised/chapters/ch02}
+\input{vol1_revised/chapters/ch03}
+\input{vol1_revised/chapters/ch04}
+\part{连续方程的数学结构}
+\input{vol1_revised/chapters/ch05}
+\input{vol1_revised/chapters/ch06}
+\input{vol1_revised/chapters/ch07}
+\input{vol1_revised/chapters/ch08}
+\input{vol1_revised/chapters/ch09}
+\part{现代高阶离散算法专题}
+\input{vol1_revised/chapters/ch10}
+\input{vol1_revised/chapters/ch11}
+\input{vol1_revised/chapters/ch12}
+\input{vol1_revised/chapters/ch13}
+\input{vol1_revised/chapters/ch14}
+\part{介观动力学与 LBM}
+\input{vol1_revised/chapters/ch15}
+\input{vol1_revised/chapters/ch16}
+\part{复杂物理系统中的约化与闭合}
+\input{vol1_revised/chapters/ch17}
+\input{vol1_revised/chapters/ch18}
+\input{vol1_revised/chapters/ch19}
+\part{计算物理中的网格与验证}
+\input{vol1_revised/chapters/ch20}
+\input{vol1_revised/chapters/ch21}
+\input{vol1_revised/chapters/ch22}
+\backmatter
+\input{vol1_revised/references}
+\clearpage
+\phantomsection
+\addcontentsline{toc}{chapter}{术语索引}
+\printindex
+\end{document}

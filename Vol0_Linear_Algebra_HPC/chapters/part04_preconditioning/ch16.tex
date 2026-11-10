@@ -1,0 +1,30 @@
+\chapter{预条件的作用与代价}\label{v0ch:16}
+\begin{chaptersummary}
+Krylov 方法以算子作用构造修正空间，预条件则进一步调整不同方向的尺度与耦合。本章将近似分解接入投影方法，比较左、右和对称变换。评价预条件时，需要同时考察变换后收敛、逆作用成本及其复用方式；不同矩阵类别分别对应条件数、谱聚簇和非正规性分析。
+\end{chaptersummary}
+\learninggoals{区分左右和对称预条件；正确使用逆作用；将构造与应用计入总成本。}
+\paragraph{核心问题}怎样用一个便宜问题改善原问题，而不改变最终解？
+
+\section{变换与残差}
+固定可逆 $M$ 可用于
+\[
+ M^{-1}A\bm x=M^{-1}\bm b\quad\text{（左）},\qquad
+ AM^{-1}\bm y=\bm b,\ \bm x=M^{-1}\bm y\quad\text{（右）}.
+\]
+若 $M=CC^T$ SPD，可用对称变换
+$C^{-1}AC^{-T}\widehat{\bm x}=C^{-1}\bm b$，$\bm x=C^{-T}\widehat{\bm x}$。实现通过三角求解或近似求解，不显式构造 $M^{-1}$。
+对于 SPD，谱等价
+$c\,\bm v^TM\bm v\le\bm v^TA\bm v\le C\,\bm v^TM\bm v$
+给出有效条件数上界 $C/c$。非对称系统则不能仅凭条件数下降断言 GMRES 一定更快；特征向量与非正规性也影响残差多项式。
+\conceptbridge{左、右预条件的特征值相同，为什么监测行为仍不同？}{当 $M$ 可逆时两个预条件矩阵相似，但对应变量、残差度量和多项式作用向量不同。相似变换不保持 Euclidean 范数。应明确算法最小化什么以及最终检验哪一个方程。}{等价精确解 $\longrightarrow$ 不同投影几何 $\longrightarrow$ 不同残差历史。}
+\section{最小算例与代价}
+取 $A=\diag(1,10^6)$、$M=A$，一次预条件即可消除尺度差异；但对一般大矩阵，构造精确 $M=A$ 的求解成本就是原问题。Jacobi 只取对角，块方法保留局部耦合，多重网格近似处理跨尺度耦合。
+\[
+ T_{\rm total}=T_{\rm setup}
+ +k(T_A+T_{M^{-1}}+T_{\rm orth}+T_{\rm reduce})
+ +T_{\rm verify}.
+\]
+多右端或多时间步可以摊销构造；矩阵系数改变后能否复用需重新评估。
+\costnote{预条件应同时控制存储、构造、应用、通信与稳健性。迭代次数少而三角求解昂贵，可能比更多次便宜迭代耗时。}
+\aiexercise{对一个非对称三阶矩阵分别实现左右预条件 GMRES，画真实与预条件残差曲线并解释差别。}{给定两种预条件器的构造和每步时间，求多右端数量达到多少时较昂贵的构造开始划算。}
+\studyroute{略去非正规场值界及一般谱等价证明。参考 \cite{saad,templates}。}{left preconditioning; right preconditioning; spectral equivalence; time to solution}

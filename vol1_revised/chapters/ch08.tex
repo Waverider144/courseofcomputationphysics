@@ -1,0 +1,145 @@
+\chapter{有限体积法：数值通量与高分辨率格式}\label{ch:8}
+\begin{chaptersummary}
+守恒律的弱形式以控制体通量平衡描述间断。本章从单元平均、Riemann 问题和共同通量构造有限体积法，再利用 Godunov 阶数障碍说明非线性重构的作用。守恒、单调性和熵稳定性分别约束通量与更新，为 DG 和 FR 的界面设计提供基础。
+\end{chaptersummary}
+\learninggoals{由积分守恒构造单元更新；解释 Riemann 通量；区分 Godunov 定理、TVD 与高阶重构；核对重构的平均值和单位。}
+\studyroute{正文依次讨论 Godunov、MUSCL、TVD 与 WENO；系统特征分解、完整光滑度指标和非线性熵收敛证明留待进一步展开。}{finite volume; Riemann problem; Godunov order barrier; MUSCL; WENO}{在三个单元平均值上计算 minmod 重构，并将 Rusanov 通量代入两个相邻控制体，核对内部通量的符号。}
+\section{控制体、单元平均与共同通量}\index{有限体积法}
+有限体积法从控制体守恒式出发：
+\[
+\frac{\dd}{\dd t}
+\int_{\Omega_i}U\dd V
++
+\int_{\partial\Omega_i}
+\bm F\cdot\bm n\dd S
+=
+\int_{\Omega_i}S\dd V.
+\]
+相邻单元以相反符号使用同一界面通量，因此内部通量在整体求和时抵消，得到局部与全局守恒关系。
+
+
+定义 $\bar U_K=|K|^{-1}\int_KU$。自由度是单元平均，界面状态由平均值重构。
+一致数值法向通量满足 $\widehat F(U,U;n)=F(U)\cdot n$，交换两侧并翻转法向后变号。
+对一维标量方程，Riemann 初值为界面两侧常数 $U_L,U_R$；
+精确解在界面上的通量给出 Godunov 通量，近似求解器则以可计算的波速近似。
+例如
+\[
+\widehat F(U_L,U_R)=\frac{F(U_L)+F(U_R)}2-\frac{\alpha}2(U_R-U_L),
+\qquad
+\alpha\ge\max_{[U_L,U_R]}|F'(U)|.
+\]
+线性平流 $F(U)=aU$、$a>0$ 时精确通量是 $aU_L$。
+单元更新还需积分通量在一个时间步内的变化；高阶空间重构与时间积分共同决定全离散精度。
+
+\section{Godunov 定理与非线性重构}
+Godunov 定理是守恒律数值计算中的基本限制。对线性标量平流问题，任何满足以下条件的线性格式：
+
+\begin{enumerate}
+  \item 线性；
+  \item 单调，即不产生新的极值；
+  \item 一致；
+\end{enumerate}
+
+在一般非整数 Courant 数下，线性单调一致格式的精度至多为一阶。对常速平流，整数 Courant 数的精确网格平移是特殊情形。
+
+直观地说，高阶线性重构需要使用正负交替的权重来提高局部逼近阶数，而单调性要求更新具有凸组合性质。两者一般不能同时成立。
+
+因此，提高单调格式的精度需要改变上述条件。现代高分辨率方法通常采用非线性重构：
+
+\begin{authornote}
+\textbf{潜在疑问：}
+“为什么 Godunov 定理之后自然要引入非线性重构？非线性到底绕开了哪个限制？”
+
+\textbf{作者补充：}
+Godunov 定理指出，在线性单调格式的适当条件下，精度至多为一阶。高分辨率方法因此让重构或限制器依赖局部解：光滑区域保留较高阶近似，在陡峭区域调整斜率以抑制振荡。这使格式成为非线性的，从而不再落在定理所约束的线性格式类别中。
+
+\textbf{核心概念联系：}
+\[
+\text{Godunov theorem}
+\longrightarrow
+\text{nonlinear reconstruction}
+\longrightarrow
+\text{high-resolution schemes}
+\]
+\end{authornote}
+
+\begin{itemize}
+  \item 保留守恒性；
+  \item 允许算法是非线性的；
+  \item 在光滑区域恢复高阶；
+  \item 在间断附近退化为一阶单调格式。
+\end{itemize}
+
+以有限体积法为例，
+\[
+\frac{\dd \bar U_i}{\dd t}
+=
+-\frac{1}{\Delta x}
+\left(
+\widehat F_{i+1/2}
+-
+\widehat F_{i-1/2}
+\right).
+\]
+关键在于构造界面左右状态
+\[
+U_{i+1/2}^{L},
+\qquad
+U_{i+1/2}^{R},
+\]
+并通过 Riemann 求解器或近似 Riemann 求解器计算数值通量。
+
+MUSCL 方法采用分片线性重构，例如
+\[
+U_{i+1/2}^{L}
+=
+U_i+\frac12\sigma_i,
+\]
+
+\begin{askai}
+AI 展开问题：
+\begin{quote}
+用一维有限体积的三个相邻 cell average 构造 MUSCL reconstruction。分别用 unlimited slope 和 minmod limiter 计算 \(U_{i+1/2}^L\)，说明限制器如何在光滑区保留二阶、在间断附近退回一阶。
+\end{quote}
+
+进一步展开：
+\begin{quote}
+给一个含间断的数据例子，逐项计算 minmod、van Leer 和 Superbee 的斜率差异。
+\end{quote}
+\end{askai}
+
+这里 $\sigma_i$ 表示一个单元宽度上的增量，量纲与 $U_i$ 相同。
+例如 $\sigma_i=\operatorname{minmod}(U_i-U_{i-1},U_{i+1}-U_i)$，
+其中同号时 minmod 取绝对值较小者，异号时取零。
+斜率 \(\sigma_i\) 随局部光滑性调整；minmod、van Leer 和 Superbee 采用不同的限制方式。这样可以在光滑区保留近似二阶精度，在激波或间断附近降低重构阶数以抑制振荡。
+
+TVD 方法要求离散总变差不增加：
+\[
+TV(U^{n+1})\le TV(U^n),
+\qquad
+TV(U)=\sum_i|U_{i+1}-U_i|.
+\]
+它把“不过度产生振荡”转化为可分析的离散条件。
+
+ENO/WENO 方法不直接限制单一斜率，而是在多个候选模板之间选择或加权。WENO 在光滑区域使用高阶组合，在包含间断的模板上自动降低权重。
+
+Godunov 定理揭示的是一个结构性折中：
+\[
+\text{高阶精度}
+\quad\leftrightarrow\quad
+\text{单调性与无振荡}.
+\]
+格式设计据局部解的光滑性调整重构与耗散。
+
+\section{守恒、熵与高阶光滑区}
+WENO 以候选重构 $q_r$ 的非线性权重形成界面值
+\[
+U_{i+1/2}^{L}=\sum_r\omega_rq_r,\qquad
+\omega_r=\frac{\alpha_r}{\sum_s\alpha_s},\qquad
+\alpha_r=\frac{d_r}{(\epsilon_W+\beta_r)^2}.
+\]
+$\beta_r$ 度量模板光滑性，$d_r$ 是对应高阶线性组合的理想权重；
+$\epsilon_W$ 的尺度需与变量及网格相容。
+光滑区阶数依赖权重恢复到理想值的速度，极值附近的行为需单独分析。
+标量 TVD 的全离散结论依赖通量、限制器和时间步长；
+一般系统的熵稳定设计还需熵变量和相容数值熵通量。WENO 原始构造见~\cite{jiang1996}。

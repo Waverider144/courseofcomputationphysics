@@ -1,0 +1,28 @@
+\chapter{Geometric Multigrid}\label{v0ch:19}
+\begin{chaptersummary}
+Smoothing removes oscillatory error, while domain decomposition reveals the difficulty of smooth global modes. Geometric multigrid combines fine-grid smoothing with coarse correction: restrict the fine residual, solve a coarse error equation, and prolong the correction. Its efficiency comes from treating each error scale in a suitable space.
+\end{chaptersummary}
+\learninggoals{Derive two-grid error propagation; define R, P, and Galerkin coarse operators; distinguish V-cycles, W-cycles, and FMG.}
+\paragraph{Core Question}How can each error scale be treated on a suitable grid?
+
+\section{Error Equations and Coarse Correction}
+The residual is $\bm r_h=\bm b_h-A_h\bm x_h=A_h\bm e_h$. With interpolation $P$ and restriction $R$, define
+\[
+ A_H=RA_hP,\quad A_H\bm e_H=R\bm r_h,\quad
+ \bm x_h\leftarrow\bm x_h+P\bm e_H.
+\]
+Exact coarse solution has error operator $I-PA_H^{-1}RA_h$. With pre- and postsmoothing $S_{\rm pre},S_{\rm post}$, the two-grid operator is
+\[
+ E_{\rm TG}=S_{\rm post}(I-PA_H^{-1}RA_h)S_{\rm pre}.
+\]
+For SPD systems, take $R=P^T$. Suitable symmetric smoothing and positive-definite coarse solution can provide a fixed SPD preconditioner; arbitrary pre/post combinations do not ensure this.
+\section{One-Dimensional Interpolation and Recursion}
+The fine grid contains $N=2N_H+1$ interior points. Interpolation injects at coincident coarse nodes and averages between them, with homogeneous error boundaries. Taking $R=P^T$ fixes the restriction normalization; any overall scaling of $R$ must also scale the coarse operator and right-hand side.
+A V-cycle recurses once per level and a W-cycle twice. FMG starts with a coarse solution, prolongs through successive levels, and applies cycles to obtain an initial approximation near discretization accuracy. The first two specify recursive cycles; FMG organizes the coarse-to-fine solution process.
+\conceptbridge{How can a lower-resolution grid improve the fine solution?}{The coarse grid represents error that remains slowly varying on the fine grid; high-frequency detail is assigned to smoothing. Its right-hand side is the restricted residual, and its unknown is an error correction, not a replacement physical solution.}{Fine residual $\longrightarrow$ coarse error equation $\longrightarrow$ fine correction.}
+\section{Experiments and Complexity}
+For Poisson with $N=63,127,255$, use two weighted-Jacobi pre/post sweeps and a direct coarsest solve. Record reduction per cycle and work per unknown. Under ideal geometric coarsening, level sizes form a geometric series and a V-cycle costs $O(N)$. Mesh-independent convergence additionally requires smoothing and approximation properties.
+\costnote{Boundary layers, anisotropy, coefficient jumps, and complex geometry can defeat simple point smoothing or interpolation. Match line relaxation, semicoarsening, or improved coarse spaces to the operator.}
+\coderef{sparse_linear_algebra/multilevel.py}
+\aiexercise{For seven fine interior nodes, write $P$, $P^TAP$, and the two-grid error matrix. Verify exact removal of coarse-space errors.}{Plot mixed-frequency error after presmoothing, coarse correction, and postsmoothing. Compare V-cycle cost with additional fine sweeps.}
+\studyroute{Mesh-independent convergence proofs and full two-grid local Fourier analysis are omitted. See \cite{briggs}.}{coarse grid correction; Galerkin coarse operator; V cycle; W cycle; full multigrid}

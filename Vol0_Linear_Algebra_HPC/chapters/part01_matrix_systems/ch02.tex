@@ -1,0 +1,35 @@
+\chapter{矩阵结构与求解难度}\label{v0ch:2}
+\begin{chaptersummary}
+上一章确定了矩阵所表示的离散算子。本章进一步考察对称性、正定性、非正规性与敏感性，将存储结构联系到求解难度。由此，Cholesky、CG、GMRES 和预条件方法的选择有了明确依据：先确认算法成立的条件，再分析问题敏感性与实际收敛。
+\end{chaptersummary}
+\learninggoals{识别 SPD 与不定系统；区分特征值、奇异值、条件数和谱半径；理解非正规例子的局限。}
+\paragraph{核心问题}同样稀疏的两个矩阵，为什么可能需要完全不同的求解策略？
+
+\section{能量结构与零空间}
+实矩阵 $A=A^T$ 且 $\bm x^TA\bm x>0$（$\bm x\ne0$）称 SPD；若只保证非负，则为半正定。Dirichlet Poisson 矩阵 SPD，纯 Neumann 离散通常含常数零空间，需要兼容右端和规范条件。对称不定矩阵的二次型可正可负，例如
+\[
+ A_s=\begin{bmatrix}2&1\\1&0\end{bmatrix}.
+\]
+鞍点系统 $\left[\begin{smallmatrix}K&B^T\\B&0\end{smallmatrix}\right]$ 即使 $K$ SPD，整体也通常不定。非对称性可来自上风输运、非对称边界处理或线性化。
+SPD 使 $\frac12\bm x^TA\bm x-\bm b^T\bm x$ 严格凸，Cholesky 主元为正，CG 的能量最小化及分母正性成立。非对称矩阵不能直接套用这些结论。
+\section{三种尺度量}
+对于可逆 $A$，
+\[
+ \kappa_2(A)=\norm{A}_2\norm{A^{-1}}_2
+ =\frac{\sigma_{\max}(A)}{\sigma_{\min}(A)},\qquad
+ \rho(A)=\max_i|\lambda_i(A)|.
+\]
+奇异值控制 Euclidean 范数放大，特征值描述不变方向，谱半径刻画固定迭代矩阵的渐近收敛。对于 SPD 矩阵，三者进一步联系为 $\kappa_2=\lambda_{\max}/\lambda_{\min}$；一般矩阵的条件数则由奇异值之比给出。
+\conceptbridge{全部特征值都等于 1，为什么还可能难求解？}{非正规矩阵的特征向量可以接近线性相关，甚至不存在完整特征基。误差传播中的矩阵多项式范数不仅由特征值大小决定，还受特征向量条件及 Jordan 结构影响。因此谱图需要与奇异值、非正规性和实际残差历史共同解释。}{特征值位置 $\longrightarrow$ 多项式作用 $\longrightarrow$ 向量范数响应。}
+\section{最小反例与网格效应}
+取 $A_K=\left[\begin{smallmatrix}1&K\\0&1\end{smallmatrix}\right]$。它的特征值恒为 1，但
+$A_K(0,1)^T=(K,1)^T$，且 $\kappa_2(A_K)$ 随 $K$ 增大而增长。它仍可能在精确算术下两步 GMRES 收敛，说明条件数也不是迭代次数的唯一预测量。
+一维 Poisson 特征值为
+\[
+ \lambda_j=4h^{-2}\sin^2\frac{j\pi}{2(N+1)},\quad 1\le j\le N,
+\]
+因此网格细化时 $\kappa_2=O(h^{-2})$。离散更准确与代数系统更难求解可同时发生。
+\costnote{完整奇异值分解对大型稀疏矩阵代价高。实际先使用 PDE 结构、边界和离散能量判断，再用小规模谱估计、残差和网格序列实验。}
+\aiexercise{分别计算 $A_K$ 在 $K=1,10,100$ 时的奇异值和条件数；构造右端使 GMRES 一步和两步的残差不同。}{推导 Poisson 特征值并验证网格加倍时条件数的变化，说明该变化为何不等于所有右端的实际迭代增长。}
+\crossref{本章条件用于第 6、13、15 章；第 16 章讨论预条件后的结构。}
+\studyroute{略去伪谱和一般非正规收敛界。参考 \cite{trefethen,saad}。}{SPD; singular values; condition number; nonnormality; pseudospectrum}

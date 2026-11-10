@@ -1,0 +1,11 @@
+\chapter{Reproduction and Measurement Conventions}
+From the repository root, run \texttt{make vol0-examples} to generate CPU experiments, figures, and JSON; use \texttt{make vol0-en} to build this edition. Dependencies are Python, NumPy, SciPy, Matplotlib, and XeLaTeX. BLAS defaults to one thread, keeping thread configuration separate from algorithm comparisons.
+\par
+Shared \path{results/measurements.json} records environment, parameters, timing, residuals, and errors; \path{results/validation.json} records numerical assertions. Byte counts use explicit work models. A null \texttt{dram\_bytes\_measured} means no hardware counters were used; effective bandwidth inferred from modeled bytes is not measured DRAM bandwidth.
+\par
+GPU and MPI sources are under \path{gpu/} and \path{mpi/} in the shared code directory. Experiments record compilation, numerical device validation, and cross-node performance as separate evidence levels. Commands and timing conventions appear in \path{docs/experiments.md}. Figures come from the code; timings refer to the recorded implementation, workload, and hardware configuration.
+\section{A Common Error and Cost Record}
+Record equations, boundaries, initial data, physical final time, mesh/order, unknowns, step size/count, precision, error norms, constraints, setup, advance time, hardware, and threads. Fixed-grid throughput and fixed-error total time answer different questions.
+\section{Transferability}
+Recalibrate after changes to processor, power mode, threads, compiler, or libraries. Cache-resident arrays use roofs for the corresponding cache level; implementations with NumPy temporaries include intermediate reads and writes in their traffic model. Distributed experiments additionally record network, binding, message size, and reduction strategy.
+\input{Vol0_Linear_Algebra_HPC_EN/appendices/results}

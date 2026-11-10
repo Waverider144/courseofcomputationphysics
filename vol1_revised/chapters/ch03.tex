@@ -1,0 +1,271 @@
+\chapter{电磁场、Maxwell 方程与自洽耦合}\label{ch:3}
+
+\begin{chaptersummary}
+前两章从粒子与分布函数构造物质模型，本章进一步引入与物质自洽耦合的电磁场。Maxwell 约束联系电荷守恒，场粒子反馈形成非线性系统，线性化则提取基态附近的小扰动算子。由此得到的局部响应为色散关系、稳定性分析及第二卷的电磁离散奠定基础。
+\end{chaptersummary}
+\learninggoals{连接电荷连续性与 Maxwell 约束；列出 Vlasov--Maxwell 的自洽数据；在给定基态处构造 Fr\'echet 导数并解释平面波分析的条件。}
+\studyroute{这里略去材料模型与动理学响应的具体选取，集中于线性化算子的共同结构。}{Fr\'echet derivative; linear response; Vlasov linearization}{对 $\bm D=\varepsilon\bm E+\alpha|\bm E|^2\bm E$ 求切线张量，说明基态方向如何进入线性化方程。}
+
+\section{电磁守恒与场粒子耦合}\index{Vlasov--Maxwell 系统}
+Maxwell 方程组为
+\[
+\nabla\cdot\bm E=\frac{\rho_c}{\varepsilon_0},
+\qquad
+\nabla\cdot\bm B=0,
+\]
+\[
+\frac{\partial\bm B}{\partial t}+\nabla\times\bm E=0,
+\]
+\[
+\frac{\partial\bm E}{\partial t}
+-c^2\nabla\times\bm B
+=
+-\frac{\bm J}{\varepsilon_0}.
+\]
+
+对 Amp\`ere--Maxwell 方程取散度，并使用 Gauss 定律，得到
+\[
+\frac{\partial\rho_c}{\partial t}
++\nabla\cdot\bm J=0.
+\]
+
+\begin{askai}
+AI 展开问题：
+\begin{quote}
+从 Amp\`ere--Maxwell 方程
+\[
+\partial_t\bm E-c^2\nabla\times\bm B=-\bm J/\varepsilon_0
+\]
+出发，逐步取散度并使用 Gauss 定律，推导电荷守恒方程。请特别解释为什么 \(\nabla\cdot(\nabla\times\bm B)=0\) 是关键结构。
+\end{quote}
+
+进一步展开：
+\begin{quote}
+给出一个离散算子例子，说明如果离散的 div-curl 结构不满足 \(D_hC_h=0\)，可能怎样制造非物理电荷。
+\end{quote}
+\end{askai}
+
+因此 Maxwell 方程的连续结构自动包含电荷守恒。数值离散若破坏这一结构，可能产生非物理电荷。
+
+带电连续介质中的 Lorentz 力为
+\[
+\bm f_L=\rho_c\bm E+\bm J\times\bm B.
+\]
+结合流体方程和 Ohm 定律，可得到双流体模型或单流体 MHD。
+对动理学物种，$f_s$ 决定 $\rho_c$、$\bm J$，场又通过 $q_s(\bm E+\bm v\times\bm B)$ 改变 $f_s$。这一双向依赖构成场粒子自洽耦合。单流体 MHD 还需低频、准中性及尺度排序，将粒子模型与物种流体方程约化为共同速度、压力和磁场；具体封闭见第~\ref{ch:18}~章。
+
+\section{非线性算子与局部线性化}
+真空 Maxwell 方程是线性的，但 Maxwell 方程与介质、载流子、流体和非线性本构关系耦合后，整体系统通常是非线性的。设耦合模型抽象写成
+\[
+\Nop(\bm U)=0.
+\]
+
+\begin{authornote}
+\textbf{潜在疑问：}
+“将 Maxwell 耦合系统写成 \(\Nop(\bm U)=0\)，如何帮助我们分析微扰？”
+
+\textbf{作者补充：}
+具体方程中的时间导数、空间导数和非线性耦合可以合记为一个作用在未知场上的算子。这样无需改变原问题，就能统一讨论解附近的微扰：算子的导数描述微小变化如何传递，也给 Newton 迭代提供每一步要近似求解的线性方程。
+
+\textbf{核心概念联系：}
+\[
+\text{coupled field equations}
+\longrightarrow
+\Nop(\bm U)=0
+\longrightarrow
+\text{linearized operator}
+\]
+\end{authornote}
+
+在基态 \(\bm U_0\) 附近写
+\[
+\bm U=\bm U_0+\epsilon\bm u,
+\qquad 0<\epsilon\ll1.
+\]
+若算子足够光滑，则
+\[
+\Nop(\bm U_0+\epsilon\bm u)
+=
+\Nop(\bm U_0)
++\epsilon D\Nop[\bm U_0](\bm u)
++\frac{\epsilon^2}{2}
+D^2\Nop[\bm U_0](\bm u,\bm u)
++\cdots.
+\]
+若基态满足
+\[
+\Nop(\bm U_0)=0,
+\]
+保留一阶项得
+\[
+\Lop\bm u=0,
+\qquad
+\Lop:=D\Nop[\bm U_0].
+\]
+
+这里 \(D\Nop[\bm U_0]\) 是 Fr\'echet 导数，也可称线性化算子、Jacobian 算子或切线算子。它是非线性算子在基态处的局部线性近似。
+
+例如非线性介质满足
+\[
+\bm D=\bm D(\bm E),
+\qquad
+\bm B=\bm B(\bm H).
+\]
+令
+\[
+\bm E=\bm E_0+\epsilon\bm e,
+\qquad
+\bm H=\bm H_0+\epsilon\bm h.
+\]
+本构关系的一阶展开为
+\[
+\bm D(\bm E_0+\epsilon\bm e)
+=
+\bm D(\bm E_0)
++
+\epsilon
+\left.
+\frac{\partial\bm D}{\partial\bm E}
+\right|_{\bm E_0}\bm e
++\Order(\epsilon^2),
+\]
+\[
+\bm B(\bm H_0+\epsilon\bm h)
+=
+\bm B(\bm H_0)
++
+\epsilon
+\left.
+\frac{\partial\bm B}{\partial\bm H}
+\right|_{\bm H_0}\bm h
++\Order(\epsilon^2).
+\]
+
+\begin{askai}
+AI 展开问题：
+\begin{quote}
+把有限维 Taylor 展开和 Fr\'echet 导数并排比较，逐步解释为什么非线性材料关系
+\[
+\bm D=\bm D(\bm E),\qquad \bm B=\bm B(\bm H)
+\]
+在基态附近会产生切线材料张量。请用一个各向异性材料的矩阵例子说明。
+\end{quote}
+
+进一步展开：
+\begin{quote}
+如果 \(\bm D(\bm E)\) 是非线性的，为什么扰动方程里出现的是 \(\partial\bm D/\partial\bm E|_{\bm E_0}\) 而不是原来的 \(\bm D\)？
+\end{quote}
+\end{askai}
+
+定义切线材料张量
+\[
+\bm\varepsilon_{\mathrm{tan}}
+=
+\left.\frac{\partial\bm D}{\partial\bm E}\right|_{\bm E_0},
+\qquad
+\bm\mu_{\mathrm{tan}}
+=
+\left.\frac{\partial\bm B}{\partial\bm H}\right|_{\bm H_0}.
+\]
+对无色散的瞬时本构，以下进一步取时间不变的基态，使切线材料张量不随时间变化，并取零扰动电流。此时一阶扰动满足线性 Maxwell 型系统
+\[
+\nabla\times\bm e
+=
+-\bm\mu_{\mathrm{tan}}\frac{\partial\bm h}{\partial t},
+\]
+\[
+\nabla\times\bm h
+=
+\bm\varepsilon_{\mathrm{tan}}\frac{\partial\bm e}{\partial t}.
+\]
+
+\section{Vlasov 微扰与波的色散关系}
+在 Vlasov--Maxwell 系统中，取满足零阶方程的平衡 $f_{s0}$、$\bm E_0=0$ 与给定 $\bm B_0$，设
+\[
+f_s=f_{s0}+\epsilon f_{s1},
+\qquad
+\bm E=\epsilon\bm E_1,
+\qquad
+\bm B=\bm B_0+\epsilon\bm B_1.
+\]
+忽略 \(\Order(\epsilon^2)\) 项，可得
+\[
+\frac{\partial f_{s1}}{\partial t}
++\bm v\cdot\nabla_{\bm x}f_{s1}
++\frac{q_s}{m_s}
+(\bm v\times\bm B_0)\cdot\nabla_{\bm v}f_{s1}
+=
+-\frac{q_s}{m_s}
+(\bm E_1+\bm v\times\bm B_1)
+\cdot\nabla_{\bm v}f_{s0}.
+\]
+扰动电流为
+\[
+\bm J_1=\sum_s q_s\int \bm v f_{s1}\dd\bm v.
+\]
+
+对常系数、有限个振幅未知量构成的封闭线性系统，或已经完成速度积分响应的动理学系统，进一步采用平面波
+\[
+\bm u_1(\bm x,t)
+=
+\widehat{\bm u}
+\exp[\ii(\bm k\cdot\bm x-\omega t)],
+\]
+
+\begin{authornote}
+\textbf{潜在疑问：}
+“为什么分析扰动时应该想到平面波？这是不是额外假设了所有解都是波？”
+
+\textbf{作者补充：}
+均匀背景附近的常系数线性化算子保持各 Fourier 模态的波数，因此可分别考察每个模态。缓慢变化的背景可在局部冻结系数，以平面波探测局部响应；边界和全局非均匀性则通过相应的整体问题处理。
+
+\textbf{核心概念联系：}
+\[
+\text{linear perturbation equation}
+\longrightarrow
+\text{plane-wave ansatz}
+\longrightarrow
+\text{dispersion relation}
+\]
+\end{authornote}
+
+则
+\[
+\partial_t\mapsto-\ii\omega,
+\qquad
+\nabla\mapsto\ii\bm k.
+\]
+线性偏微分方程组变为
+\[
+\bm M(\omega,\bm k)\widehat{\bm u}=0.
+\]
+
+\begin{askai}
+AI 展开问题：
+\begin{quote}
+从平面波代换
+\[
+\partial_t\mapsto-\ii\omega,\qquad \nabla\mapsto\ii\bm k
+\]
+开始，选一个简单线性 PDE 系统，逐步演示它如何变成
+\[
+\bm M(\omega,\bm k)\widehat{\bm u}=0.
+\]
+请解释为什么非零振幅要求 \(\det\bm M(\omega,\bm k)=0\)。
+\end{quote}
+
+进一步展开：
+\begin{quote}
+用一维声波方程或真空 Maxwell 平面波做例子，完整求出对应的色散关系。
+\end{quote}
+\end{askai}
+
+存在非零解的条件
+\[
+\det\bm M(\omega,\bm k)=0
+\]
+就是色散关系。
+
+对仍保留连续速度变量的动理学方程，首先得到的是速度空间响应问题；需指定解析延拓、积分路径与场方程后，才能建立相应介电响应及色散条件。
+
+微扰法按小参数逐阶构造解，稳定性分析考察线性扰动增长率。Fr\'echet 导数也生成非线性代数迭代所用的 Jacobian，其求解算法在第 0 卷讨论。

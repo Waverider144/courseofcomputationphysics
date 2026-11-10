@@ -1,0 +1,123 @@
+\chapter{回旋动理学与多尺度约化}\label{ch:19}
+\begin{chaptersummary}
+第 4 章的强磁场排序将快回旋与慢输运分离，本章据此构造回旋动理学。坐标变换与有序平均消去快角度，保留平行速度和磁矩分布；回旋平均与物理矩推回则重新连接约化粒子和自洽场。均匀磁场静电模型给出这条五维约化路线的具体形式。
+\end{chaptersummary}
+\learninggoals{列出强磁场排序与五维坐标；区分导引中心与回旋中心；计算 Fourier 回旋平均；说明动理学约化、矩闭合、场耦合和数值离散各自的步骤。}
+\studyroute{正文给出受控的均匀磁场静电例子，略去一般电磁 Lie 变换、二阶 Hamiltonian、磁化项和磁几何碰撞变换；具体模型须按同一变分阶数配套。}{guiding center; gyrocenter; gyroaverage; finite Larmor radius; gyrokinetic polarization; electromagnetic gyrokinetics}{在均匀磁场中对一个垂直 Fourier 电势作回旋平均，推导 Bessel 因子，再由指定的非绝热分布定义写出线性准中性关系。}
+
+\section{尺度排序与五维状态}\index{回旋动理学}
+以平衡尺度 $L_B$、离子热回旋半径 $\rho_{Li}$ 为参照，一组常用微扰排序为
+\[
+\epsilon=\rho_{Li}/L_B\ll1,\qquad
+\omega/\Omega_i=O(\epsilon),\qquad
+k_\parallel/k_\perp=O(\epsilon),\qquad
+k_\perp\rho_{Li}=O(1).
+\]
+弱扰动还可取 $|q_i\delta\phi|/T_i=O(\epsilon)$；
+本章后文的 $T_s$ 表示能量单位温度，即前文的 $k_BT_s$。
+具体电磁、碰撞和电子尺度模型还需补充相应排序。
+
+原相空间 $(\bm x,\bm v)$ 可改写为
+$(\bm R,v_\parallel,\mu,\vartheta)$，
+其中 $\mu=m v_\perp^2/(2B_0)$，$\vartheta$ 是快回旋角。
+先由导引中心变换处理平衡场的快回旋，
+再由回旋中心变换处理扰动引起的角度依赖。
+约化分布 $F_s(\bm R,v_\parallel,\mu,t)$ 不再独立依赖 $\vartheta$，
+保留三个位置和两个速度变量。
+在均匀 $B_0$ 下，对回旋角无关的函数 $A$，速度矩使用
+\[
+\int A\dd^3v=\frac{2\pi B_0}{m_s}
+\int_{-\infty}^{\infty}\int_0^\infty A\dd\mu\dd v_\parallel.
+\]
+角度积分已解析完成，平行速度与磁矩仍保留为独立变量。
+
+\conceptbridge{消去一个快角度后，场方程为何还需要极化和回旋平均？}
+{位置坐标从粒子位置变为回旋中心，密度与电流仍须在物理位置测量。
+把约化分布推回物理空间时，会出现有限回旋半径、极化与磁化贡献。
+这些贡献与约化动力学来自同一阶坐标变换，决定自洽场及能量配对。}
+{相空间坐标变换 $\longrightarrow$ 五维演化 $\longrightarrow$ 推回物理矩与自洽场。}
+
+\section{回旋平均与有限回旋半径}
+令粒子位置 $\bm x=\bm R+\bm\rho(\vartheta)$。
+在固定回旋中心与磁矩下定义
+\[
+\langle\phi\rangle_{\bm R}
+=\frac1{2\pi}\int_0^{2\pi}
+\phi(\bm R+\bm\rho(\vartheta))\dd\vartheta.
+\]
+对均匀磁场中的平面波，
+\[
+\left\langle\ee^{\ii\bm k\cdot\bm x}\right\rangle_{\bm R}
+=\ee^{\ii\bm k\cdot\bm R}
+J_0(k_\perp v_\perp/\Omega_s).
+\]
+当 $k_\perp\rho_{Ls}$ 有限时，环平均改变粒子对场的响应。
+小参数消去快角度，Bessel 因子则保留其对慢尺度耦合的影响。
+
+\section{动力学方程的结构与一个具体模型}
+一般回旋中心方程可按特征演化表示为
+\[
+\partial_tF_s+\dot{\bm R}_s\cdot\nabla_{\bm R}F_s
++\dot v_{\parallel s}\partial_{v_\parallel}F_s=C_s^{\mathrm{GK}}[F].
+\]
+特征、相空间测度和碰撞项需由同一约化坐标构造；
+非均匀磁场下的守恒形式使用对应的相空间 Jacobian。
+
+作为可计算例子，取均匀 $B_0\bm b$、无平衡梯度、无碰撞、静电低频扰动。
+令 $F_{0s}$ 为温度 $T_s$ 的均匀 Maxwellian，
+$h_s$ 为通常的非绝热分布变量，其规范由下节物理密度公式固定。
+一组对应的非线性静电方程为
+\begin{equation}\label{eq:slab-gk}
+\partial_th_s+v_\parallel\partial_\parallel h_s
++\bm v_{E,s}\cdot\nabla_\perp h_s
+=\frac{q_sF_{0s}}{T_s}\partial_t\langle\phi\rangle_{\bm R},
+\qquad
+\bm v_{E,s}=\frac{\bm b\times\nabla\langle\phi\rangle_{\bm R}}{B_0}.
+\end{equation}
+漂移速度等于环平均电场的 $\bm E\times\bm B/B_0^2$ 速度。
+均匀平衡下不含梯度驱动；加入密度、温度梯度后需配套加入驱动项。
+一般电磁构造与能量守恒见~\cite{brizard2007,abel2013}。
+
+\section{准中性、极化与 Amp\`ere 耦合}
+对上述均匀磁场模型的 Fourier 模态，物理密度扰动为
+\[
+\delta n_{s,\bm k}
+=-\frac{q_sn_{0s}}{T_s}\phi_{\bm k}
++\int J_{0s}h_{s,\bm k}\dd^3v,\qquad
+J_{0s}=J_0(k_\perp v_\perp/\Omega_s).
+\]
+准中性条件 $\sum_sq_s\delta n_s=0$ 因而给出
+\begin{equation}\label{eq:gk-qn}
+\sum_s\frac{q_s^2n_{0s}}{T_s}\phi_{\bm k}
+=\sum_sq_s\int J_{0s}h_{s,\bm k}\dd^3v.
+\end{equation}
+若改用 $g_{s,\bm k}=h_{s,\bm k}-(q_sF_{0s}/T_s)J_{0s}\phi_{\bm k}$，
+同一关系变成
+\[
+\sum_s\frac{q_s^2n_{0s}}{T_s}(1-\Gamma_{0s})\phi_{\bm k}
+=\sum_sq_s\int J_{0s}g_{s,\bm k}\dd^3v,
+\]
+\[
+\Gamma_{0s}=I_0(b_s)\ee^{-b_s},\qquad
+b_s=k_\perp^2T_s/(m_s\Omega_s^2).
+\]
+两种写法使用不同分布变量，极化项的位置因此改变。
+零波数的电势规范与粒子数兼容条件需要另行固定。
+
+电磁模型还需由平行电流确定 $A_\parallel$，
+并在相应排序中处理 $\delta B_\parallel$、极化和磁化。
+Amp\`ere 方程中的电流必须使用与所选回旋中心坐标、分布变量和场方程一致的推回。
+这些场关系连接保留的速度分布与电磁势；高阶矩截断属于另一种闭合选择。
+
+\section{碰撞、湍流输运与离散层次}
+回旋动理学碰撞模型需要保持适当的粒子、动量与能量矩，
+并与约化测度和熵耗散相容。湍流粒子与热通量由分布扰动和径向漂移的相关量产生，
+例如粒子通量具有 $\langle\int\delta f_s\,v_{E,r}\dd^3v\rangle$ 的结构。
+具体通量需按推回定义和平均区域计算。
+
+五维状态仍需在位置、平行速度、磁矩与时间上离散。
+域范围、速度尾截断和碰撞分辨率分别控制不同误差；
+选用谱、DG 或粒子表示属于随后发生的数值选择。
+
+\aiexercise{对 Maxwellian 平衡和均匀磁场，计算 $\langle\exp(\ii\bm k_\perp\cdot\bm\rho)\rangle$，再验证 $\int F_{0s}J_{0s}^2\dd^3v=n_{0s}\Gamma_{0s}$。由此证明 $h_s$ 与 $g_s$ 两种准中性写法一致。}
+{从式~\eqref{eq:slab-gk}~出发，固定周期边界和速度截断，列出验证准中性残差、自由能与速度空间收敛所需的数据。进一步阅读时选定一套电磁模型，逐项对应其分布变量、Jacobian、碰撞项与场方程。}

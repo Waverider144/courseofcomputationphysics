@@ -1,0 +1,75 @@
+\chapter{Modern Lattice Boltzmann Models and Algorithms}\label{ch:16}
+\begin{chaptersummary}
+Single-relaxation isothermal LBM established the route from discrete velocities to macroscopic transport. This chapter compares collision designs through moments, cumulants, and discrete entropy, then identifies additional variables and moment conditions for thermal, compressible, and boundary models. Model selection depends on target physics, Mach number, temperature variation, and a verified stability range.
+\end{chaptersummary}
+\learninggoals{Distinguish raw moments, central moments, and cumulants; write MRT and discrete entropy constraints; explain additional moment requirements for thermal and compressible models; design boundary and Galilean-error tests.}
+\studyroute{Model structures and basic formulas are given; explicit MRT tables, high-order cumulant back-transforms, and coefficients of particular compressible lattices are omitted and should be obtained from the selected original model.}{MRT lattice Boltzmann; cumulant collision; entropic lattice Boltzmann; thermal lattice; Galilean invariance}{Compare the conserved moments and adjustable nonconserved modes of BGK, MRT, and cumulant collision, using a common viscosity and error measures for the same shear wave.}
+
+\section{MRT: Relaxation in Moment Space}\index{MRT--LBM}
+For an invertible moment transform $m=Tf$, multiple-relaxation-time collision is
+\[
+m^*=m-S(m-m^{\mathrm{eq}}),\qquad
+f^*=T^{-1}m^*.
+\]
+Conserved moments have zero rates in $S=\diag(s_a)$; other modes may relax at different rates.
+The shear-stress rate $s_\nu$ determines
+\[
+\nu=c_s^2\Delta t\left(\frac1{s_\nu}-\frac12\right).
+\]
+Other nonconserved rates affect acoustics, bulk viscosity, and lattice-scale damping.
+For local diagonal relaxation, $0<s_a<2$ controls individual relaxation modes;
+the full update also includes streaming, equilibrium linearization, and boundaries, so its combined spectrum must be checked~\cite{dhumieres2002}.
+
+\conceptbridge{Why specify the moments in a multiple-relaxation model rather than list relaxation rates alone?}
+{The moment transform identifies conserved, stress, and higher-order nonequilibrium modes.
+Applying identical rates to different moments yields different collision operators.
+Central-moment and cumulant collisions also change the dependence of the collision coordinates on local velocity.}
+{Collision coordinates $\longrightarrow$ modal relaxation $\longrightarrow$ transport and nonhydrodynamic errors.}
+
+\section{Central Moments and Cumulants}
+Raw moments are $\sum_i f_i\bm c_i^\alpha$; central moments replace the velocity monomial with
+$(\bm c_i-\bm u)^\alpha$.
+For $\rho>0$, define a generating function using normalized populations $f_i/\rho$:
+\[
+K(\bm t)=\log\left(\frac1\rho\sum_i f_i
+\exp[\bm t\cdot(\bm c_i-\bm u)]\right),\qquad
+\kappa_\alpha=\left.\partial_{\bm t}^{\alpha}K\right|_{\bm t=0}.
+\]
+Second cumulants give the central covariance; higher cumulants subtract products of lower-order moments.
+Cumulant collision relaxes these coordinates and reconstructs $f_i$,
+controlling coupling among different orders of nonequilibrium information~\cite{geier2015}.
+Finite velocity sets still constrain independently representable moments. Equilibrium, rates, and corrections must be specified together.
+
+\section{Discrete Entropy and Positivity}\index{Entropic lattice Boltzmann}
+For positive populations, define the convex function
+\[
+H(f)=\sum_i f_i\log\frac{f_i}{w_i}.
+\]
+The entropic equilibrium minimizes $H$ under mass and momentum constraints.
+One entropic collision searches along $\Delta=f^{\mathrm{eq}}-f$ for a nonzero positivity-preserving root
+$H(f+\alpha\Delta)=H(f)$, then uses $0<\beta\le1$ to set
+$f^*=f+\alpha\beta\Delta$.
+Convexity gives $H(f^*)\le H(f)$ along this segment.
+This entropy estimate assumes an entropic equilibrium, a positivity domain, and a nonzero root. Polynomial equilibria or fixed BGK rates require the same conditions to be established for their collision maps.
+For the original discrete entropy construction, see~\cite{karlin1999}.
+
+\section{Thermal Models, Compressible Models, and Boundaries}
+The isothermal relation $p=c_s^2\rho$ fixes the corresponding equation of state.
+Heat transport requires an additional energy distribution or a richer velocity set,
+with matched heat-flux moments, specific heats, and target Prandtl number.
+Compressible flow additionally requires the correct energy flux, variable-temperature response, and sufficient velocity moments;
+the macroscopic limit must be verified for the selected velocity set, equilibrium expansion, and collision model.
+
+Halfway bounce-back at a stationary wall reverses outgoing populations into incoming ones;
+wall location and slip error depend on geometric treatment. Moving walls require momentum-exchange corrections,
+and inlet/outlet models reconstruct unknown incoming populations from prescribed macroscopic data.
+Thermal boundaries additionally specify energy exchange. Curved-wall interpolation, diffuse reflection, and rarefied-gas boundaries have distinct validity conditions.
+
+\section{Comparing Stability and Galilean Errors}
+Superpose a uniform background velocity $U_b$ on a shear wave. Its continuum decay rate should be independent of $U_b$.
+Viscosity and phase comparisons across background velocities measure Galilean errors due to higher lattice moments.
+Record Mach number, viscosity, lattice resolution, wall location, and population positivity.
+Linear spectra, discrete entropy, and nonlinear experiments probe different stability and error mechanisms.
+
+\aiexercise{Choose an explicit invertible D2Q9 moment transform and identify conserved and shear modes. Set all nonconserved rates equal and determine when the associated equilibrium moments recover the BGK update.}
+{For a periodic shear wave at two background velocities, compare decay errors of BGK, MRT, and a documented cumulant model. Identify the additional state variables and moment constraints needed for temperature variation.}

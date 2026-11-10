@@ -1,0 +1,37 @@
+\chapter{残差、误差与数值收敛}\label{v0ch:3}
+\begin{chaptersummary}
+矩阵性质明确后，还需要判断计算何时可以停止。本章通过残差与误差的精确关系连接问题敏感性、浮点实现和迭代监测，为后续算法提供统一的验收标准。核心是同时报告归一化方式与真实残差，并把线性代数误差放回离散误差和物理观测量的尺度中。
+\end{chaptersummary}
+\learninggoals{区分前向、后向误差和残差；设置含绝对容差的准则；识别递推残差与真实残差漂移。}
+\paragraph{核心问题}软件报告收敛时，我们究竟知道了什么？
+
+\section{可计算量与未知误差}
+定义 $\bm e_k=\bm x_*-\bm x_k$，$\bm r_k=\bm b-A\bm x_k$，则
+\[
+ A\bm e_k=\bm r_k,\quad
+ \frac{\norm{\bm e_k}}{\norm{\bm x_*}}
+ \le \kappa(A)\frac{\norm{\bm r_k}}{\norm{\bm b}}\quad(\bm b\ne0).
+\]
+因此残差小只说明方程被近似满足；误差还受逆算子的放大影响。对 $A=\diag(1,10^{-8})$、$\bm x_*=(1,1)^T$、$\bm x_k=(1,0)^T$，相对残差约 $10^{-8}$，相对解误差却约 $1/\sqrt2$。
+范数型相对后向误差可用
+\[
+ \eta_k=\frac{\norm{\bm b-A\bm x_k}}
+ {\norm{A}\norm{\bm x_k}+\norm{\bm b}}
+\]
+度量：它允许 $A$ 和 $\bm b$ 在同一相对尺度内扰动，使 $\bm x_k$ 成为扰动问题的精确解。分量后向误差则使用 $|A||\bm x_k|+|\bm b|$ 逐分量归一化。
+\conceptbridge{为什么不直接把残差压到机器精度？}{离散模型、输入数据和浮点运算各自限定了可辨别尺度。过度求解消耗时间而不改善目标误差；过早停止又可能污染物理量。应先分配误差预算，再用条件数、稳定性估计或目标量测试判断代数误差是否足够小。}{离散误差预算 $\longrightarrow$ 代数容差 $\longrightarrow$ 可验证结果。}
+\section{停止与有限精度}
+常用真实残差准则为
+\[
+ \norm{\bm r_k}\le
+ \max(\texttt{atol},\texttt{rtol}\norm{\bm b}).
+\]
+$\bm b=0$ 时采用绝对阈值或初始残差尺度；$A\bm x=0$ 仍需考虑零空间。变量单位差异大时先明确行列缩放，避免某个分量主导范数。
+浮点模型 $\mathrm{fl}(a\circ b)=(a\circ b)(1+\delta)$、$|\delta|\lesssim u$ 适用于正常范围内单次基本运算；消去、上溢和下溢会限制相对精度。算法稳定性描述实现对扰动的控制，条件数描述问题本身的敏感性。
+Krylov 递推残差可能随舍入误差逐渐偏离 $\bm b-A\bm x_k$，因此最终验收采用重新计算的真实残差。分母过小、正交性丢失和预条件失效分别进入 breakdown 与停滞诊断，并据此决定继续迭代或切换策略。
+\section{实验与监测}
+对上述对角例子同时打印相对残差、相对误差和 $\eta_k$；对 Poisson 网格序列固定物理误差目标，改变 \texttt{rtol}，观察过度求解的成本。非线性 Newton 外迭代还需记录非线性残量，内层线性收敛不等于整体收敛。
+\costnote{一次真实残差需要一次算子作用和范数；分布式范数通常包含全局归约。应平衡监测频率与可靠性，最终验收不省略。}
+\coderef{sparse_linear_algebra/solvers.py}
+\aiexercise{逐项计算本章对角例子的前向误差、相对残差与后向误差，并解释它们为何不矛盾。}{设计包含零右端、变量缩放和最大迭代数的停止逻辑；比较递推残差与重新计算残差的成本。}
+\studyroute{略去分量扰动理论与残差替换的误差分析。参考 \cite{golub,templates}。}{forward error; backward error; true residual; residual replacement; inexact Newton}

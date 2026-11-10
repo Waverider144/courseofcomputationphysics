@@ -1,0 +1,92 @@
+\chapter{VCJH 修正函数与能量稳定性}\label{ch:12}
+\begin{chaptersummary}
+FR 的端点条件给出守恒，但内部修正仍有自由度。本章在一维线性平流中用修正能量范数约束这一自由度，构造 VCJH 单参数族。归一化、质量矩阵与积分规则固定后，可以准确说明其 DG、特定 SD 和 Huynh 修正函数之间的关系。
+\end{chaptersummary}
+\learninggoals{写出 VCJH 参数化修正函数；推导正定条件与线性能量恒等式；在指定条件下识别 DG 和 SD 参数；以谱和误差评估参数。}
+\studyroute{正文证明限于一维常系数平流、仿射静止网格及精确多项式积分；非线性熵、曲网格和扩散扩展作为进一步阅读。}{VCJH correction function; energy stable flux reconstruction; modified Sobolev norm; SBP CPR}{对 $p=1,2,3$ 计算修正函数端点、提升矩阵和修正质量矩阵，并检验线性能量矩阵恒等式。}
+
+\section{参数化修正函数}\index{VCJH 方法}
+令 $p\ge1$，$P_p$ 为标准 Legendre 多项式，
+$a_p=(2p)!/[2^p(p!)^2]$ 为其最高次系数。
+采用~\cite{vincent2011}~的归一化：
+\[
+\eta_p=\frac{c(2p+1)(a_pp!)^2}{2},
+\]
+\begin{equation}\label{eq:vcjh-functions}
+\begin{aligned}
+g_L(\xi)&=\frac{(-1)^p}{2}
+\left[P_p(\xi)-\frac{\eta_pP_{p-1}(\xi)+P_{p+1}(\xi)}{1+\eta_p}\right],\\
+g_R(\xi)&=\frac12
+\left[P_p(\xi)+\frac{\eta_pP_{p-1}(\xi)+P_{p+1}(\xi)}{1+\eta_p}\right].
+\end{aligned}
+\end{equation}
+$P_k(1)=1$、$P_k(-1)=(-1)^k$ 直接给出四个 FR 端点条件。
+$c$ 为无量纲参数；改变参数时，界面通量仍保持一致，内部模式的提升随之变化。
+
+\conceptbridge{为何引入含高阶导数的修正能量，而不是只检查端点条件？}
+{端点条件只规定通量积分。能量估计还需控制内部模式与界面提升的配对。对最高阶模式调整范数，可以寻找使离散分部积分成立的提升算子；正定性保证该估计实际控制全部自由度。}
+{守恒端点条件 $\longrightarrow$ 内部提升 $\longrightarrow$ 正定修正能量。}
+
+\section{修正范数与稳定参数区间}
+在精确积分的多项式基中，$D$ 为参考导数矩阵，$M$ 为质量矩阵，定义
+\begin{equation}\label{eq:vcjh-norm}
+K_c=\frac c2(D^p)^{\mathsf T}MD^p,\qquad H_c=M+K_c.
+\end{equation}
+于是
+\[
+U^{\mathsf T}H_cU
+=\int_{-1}^1u_h^2\dd\xi
++\frac c2\int_{-1}^1(\partial_\xi^pu_h)^2\dd\xi.
+\]
+在 Legendre 模态基下，仅最高阶对角元变化：
+\[
+H_c=\diag\left(2,\frac23,\ldots,
+\frac{2}{2p+1}+c(a_pp!)^2\right).
+\]
+因此
+\begin{equation}\label{eq:vcjh-bound}
+c>c_-:=-\frac{2}{(2p+1)(a_pp!)^2}
+\quad\Longleftrightarrow\quad H_c>0
+\quad\Longleftrightarrow\quad\eta_p>-1.
+\end{equation}
+因为 $D^{p+1}=0$，有 $K_cD=0$。修正函数~\eqref{eq:vcjh-functions}~的导数矩阵满足
+\[
+C=H_c^{-1}R^{\mathsf T}B,\qquad
+H_cD+D^{\mathsf T}H_c=R^{\mathsf T}BR.
+\]
+这一矩阵解释与 SBP--CPR 构造相容~\cite{ranocha2016}。
+
+\section{线性能量证明}
+对常数 $a$，FR 方程乘 $U_j^{\mathsf T}H_c$。
+离散分部积分将体积贡献化为两端迹的平方差，提升项补入共同通量。
+周期求和得到
+\[
+\frac{\dd}{\dd t}\sum_j\frac{J_j}{2}U_j^{\mathsf T}H_cU_j
+=\sum_f(\widehat f-a\{u_h\})[u_h]
+=-\frac{|a|}{2}\sum_f[u_h]^2.
+\]
+常数模态满足 $K_c\bm1=0$，因此该提升同时保持物理单元平均。
+负参数仍可在~\eqref{eq:vcjh-bound}~内给出正定范数；
+接近下界时最高阶模式的权重变小，参数评价还需关注范数等价常数、谱半径和误差。
+
+\section{特定参数关系与实际选择}
+在本文的精确质量矩阵和线性平流设定下：
+\begin{center}\small
+\begin{tabularx}{\textwidth}{@{}l>{\raggedright\arraybackslash}X@{}}
+\toprule
+参数 & 具体关系\\
+\midrule
+$c=0$ & $H_c=M$，恢复第~\ref{ch:11}~章的精确积分 DG 提升。\\
+$\eta_p=p/(p+1)$ & 对应内部通量点为 $P_p$ 零点、两端包含接口的特定一维 SD 通量构造。\\
+$\eta_p=(p+1)/p$ & 得到 Huynh 的 $g_2$ 修正函数；与特定 Lobatto 求积 DGSEM 的关系需同时固定求积和节点。\\
+\bottomrule
+\end{tabularx}
+\end{center}
+这些关系以指定的修正函数、节点和求积为基础。
+改变 SD 节点、非线性通量插值或空间维数时，可沿相同的体积与提升矩阵逐项比较。
+文献中的参数若记作 $\kappa$ 且定义 $K=\kappa(D^p)^{\mathsf T}MD^p$，
+则本章 $c=2\kappa$。
+选择参数可依目标波数的色散、可用 CFL 和误差阈值比较；线性能量允许区间提供可分析的起点。
+
+\aiexercise{以 $p=2$ 的 Legendre 基构造 $D,M,R,B$，对 $c=0$、SD 参数及一个负的稳定参数计算 $H_c,C$。检验正定性、$H_cC=R^{\mathsf T}B$ 和修正能量导数。}
+{固定总自由度、上风通量及 RK4，分别测量上述参数的平滑波误差和稳定步长。报告半离散与全离散结果，并把非线性稳定性问题列为进一步阅读。}

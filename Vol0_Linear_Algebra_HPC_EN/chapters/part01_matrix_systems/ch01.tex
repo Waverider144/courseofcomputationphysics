@@ -1,0 +1,40 @@
+\chapter{Why Scientific Computing Leads to Matrix Problems}\label{v0ch:1}
+\begin{chaptersummary}
+Volumes I and II construct finite-dimensional representations and discrete fluxes; the next task is to solve the resulting equations. Unknowns, local coupling, and boundary treatment establish the correspondence between a matrix and its discrete operator. This correspondence guides factorization and iterative methods and provides a common view of assembled and matrix-free implementations.
+\end{chaptersummary}
+\learninggoals{Derive a matrix from one-dimensional Poisson; distinguish mass, stiffness, and Jacobian matrices; recognize the common operator behind assembled and matrix-free implementations.}
+\paragraph{Core Question}How do local differential relations become couplings among finitely many unknowns?
+
+\section{From Derivatives to Five Unknowns}
+Consider $-u''=f$ on $(0,1)$ with $u(0)=g_0,u(1)=g_1$. Set $h=1/6$ and $u_i\approx u(ih)$. The five interior equations are
+\[
+ A\bm u=\bm b,\quad
+ A=h^{-2}\begin{bmatrix}
+ 2&-1&0&0&0\\-1&2&-1&0&0\\0&-1&2&-1&0\\
+ 0&0&-1&2&-1\\0&0&0&-1&2
+ \end{bmatrix},\quad
+ \bm b=\begin{bmatrix}f_1+g_0/h^2\\f_2\\f_3\\f_4\\f_5+g_1/h^2\end{bmatrix}.
+\]
+Rows represent equations and columns represent degrees of freedom. Each local difference reads three values, giving at most three nonzeros per row; boundary data enter the right-hand side with their coefficients. For $u=x(1-x)$ and $f=2$, the second difference is exact, providing a direct check of the matrix, signs, and boundary treatment.
+\conceptbridge{Why distinguish definitions of unknowns after obtaining a finite-dimensional system?}{Nodal values, cell averages, and basis coefficients are different coordinates. The discrete operator maps them to residuals; its entries encode trial spaces, testing, and neighboring interactions. Changing coordinates or boundary elimination changes the matrix even when the PDE is unchanged.}{Continuous operator $\longrightarrow$ degrees of freedom and testing $\longrightarrow$ algebraic coupling.}
+\section{Assembly, Blocks, and Nonlinearity}
+The finite-element approximation $u_h=\sum_j u_j\phi_j$ gives
+\[
+ M_{ij}=\int\phi_i\phi_j,\qquad
+ K_{ij}=\int\nabla\phi_i\cdot\nabla\phi_j,\qquad
+ M\dot{\bm u}+K\bm u=\bm f.
+\]
+Basis functions with overlapping support couple. Local matrices are assembled through local-to-global numbering. In finite volumes, one interface flux enters both neighboring residuals. DG volume terms form element blocks, while face fluxes form adjacency blocks. Multiphysics may produce block or saddle-point systems. Globally supported spectral bases can yield dense differentiation matrices.
+For a nonlinear residual $\bm F(\bm u)=0$, the Newton correction satisfies
+\[
+ J(\bm u_k)\delta\bm u=-\bm F(\bm u_k),\qquad J_{ij}=\partial F_i/\partial u_j.
+\]
+$J$ linearizes the residual at the current state. Together with time-discrete mass terms and boundary treatment, it determines the linear system.
+\section{Storing a Matrix or Applying an Operator}
+Banded, block-sparse, Kronecker, and regular-stencil representations describe different structures at the same system size.
+A matrix-free implementation computes $\bm v\mapsto A\bm v$ directly, using element integration or neighboring differences without storing all entries. Preconditioning may still use an assembled approximation.
+\costnote{Tridiagonal multiplication takes $O(N)$ time and storage; dense storage takes $O(N^2)$. Matrix-free evaluation reduces entry and index reads but can repeat geometry, coefficient, or integration work. Compare implementations of the same operator at the same accuracy.}
+\coderef{sparse_linear_algebra/solvers.py}
+\crossref{Volume I constructs $M,K,J$ through spatial discretization. Chapters 5, 23, and 26 discuss fill-in, operator fingerprints, and data layout.}
+\aiexercise{For the five-interior-point problem, take $g_0=1,g_1=2,f=0$. Derive each right-hand-side entry and verify the linear exact solution. Then construct the linear finite-element mass and stiffness matrices.}{Implement the same difference in CSR and as a matrix-free function. Compare outputs and identify their shared boundary convention.}
+\studyroute{General weak boundary enforcement and nonlinear convergence proofs are omitted. See \cite{golub,saad}.}{degrees of freedom; assembly; Jacobian; matrix-free operator}

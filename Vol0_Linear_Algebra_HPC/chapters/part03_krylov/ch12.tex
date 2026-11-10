@@ -1,0 +1,30 @@
+\chapter{GMRES}\label{v0ch:12}
+\begin{chaptersummary}
+Arnoldi 提供了正交基与小型 Hessenberg 表示，GMRES 在这个空间中选择二范数残差最小的修正。本章推导增量最小二乘求解，再说明重启如何在存储与收敛之间取舍。算法内的残差估计与原方程的真实残差由此获得各自明确的监测和验收作用。
+\end{chaptersummary}
+\learninggoals{推导 GMRES 最小二乘；解释 Givens 与重启；正确解读预条件残差。}
+\paragraph{核心问题}有了正交基，怎样确定最有效的线性组合？
+
+\section{从大残差到小最小二乘}
+写 $\bm x_m=\bm x_0+V_m\bm y$，则
+\[
+ \bm r_m=V_{m+1}(\beta\bm e_1-\bar H_m\bm y),\qquad
+ \bm y_m=\arg\min_{\bm y}\norm{\beta\bm e_1-\bar H_m\bm y}_2.
+\]
+等范数依赖 $V_{m+1}$ 的正交性。每次新增一列，用 Givens 消去次对角条目并同步旋转右端，更新残差估计；最后回代求 $\bm y_m$。无需每个内迭代都构造完整解向量。
+对第 11 章两步例子，$\beta=1$，最小二乘解为
+\[
+ y_1=-95/348,\qquad y_2=25\sqrt5/174,\qquad
+ \norm{\bm r_2}_2=7/\sqrt{174}.
+\]
+它提供完整可核验的 Arnoldi--最小二乘链。
+\section{重启与预条件语义}
+GMRES($m$) 经过 $m$ 步后更新解，以新残差重新开始。每个周期只保留 $m$ 个方向，减少存储，但丢弃之前的子空间信息，可能停滞。较大的重启长度也增加正交化与全局通信成本。
+左预条件求解 $M^{-1}A\bm x=M^{-1}\bm b$，内部最小化的通常是 $\norm{M^{-1}\bm r}$；右预条件则保持真实残差的目标。具体库的停止与回调语义应分别确认。
+\conceptbridge{残差曲线一直下降，为什么最终验收仍要重新计算？}{最小二乘估计依赖当前 Arnoldi 关系和预条件尺度；舍入误差会破坏这些关系，左预条件还改变残差的度量。真实方程残差才对应第 3 章的误差解释。}{投影残差监测 $\longrightarrow$ 库语义与尺度 $\longrightarrow$ 原方程验收。}
+\section{计算接口}
+SciPy 实验以 \texttt{M} 表示逆预条件器作用，并采用左预条件。\texttt{callback\_type='pr\_norm'} 在每个内迭代报告预条件残差量，最终再计算 $\bm b-A\bm x$ 验收。记录重启长度、最大周期和容差时，同时区分周期数与内迭代数。\cite{scipy}
+\costnote{一个周期约 $m$ 次算子和预条件作用，正交化 $O(Nm^2)$，基存储 $O(Nm)$。非对称系统常适用，但重启参数和预条件质量需要共同优化。}
+\coderef{sparse_linear_algebra/solvers.py}
+\aiexercise{对本章 $3\times2$ 最小二乘显式做两次 Givens 旋转，核验系数和残差范数。}{比较 GMRES(10)、GMRES(30) 与 ILU-GMRES 的总时间和真实残差，分别报告内迭代与重启周期。}
+\studyroute{略去停滞构造、调和 Ritz 向量与回收子空间。参考 \cite{saad,templates}。}{restarted GMRES; Givens QR; preconditioned residual; deflated GMRES}

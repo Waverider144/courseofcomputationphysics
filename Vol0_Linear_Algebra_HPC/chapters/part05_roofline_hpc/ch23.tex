@@ -1,0 +1,50 @@
+\chapter{离散方法的计算与访存指纹}\label{v0ch:23}
+\begin{chaptersummary}
+Roofline 分析需要具体算子的工作量与数据流量。本章据此比较差分、有限体积、有限元、DG、FR 与 LBM，联系自由度、局部性、阶数和几何对复用的影响。这些计算与访存特征构成方法的性能指纹，下一章的 Yee 更新和后续综合实验将给出可运行的实例。
+\end{chaptersummary}
+\learninggoals{构造各方法的工作量和访问模型；区分装配与矩阵自由；比较体项、面项及迁移碰撞。}
+\paragraph{核心问题}空间离散如何决定机器实际读取和计算什么？
+
+\section{差分与有限体积}
+三维七点 Laplacian 可按
+\[
+ (\bm L u)_{ijk}
+ =h^{-2}(u_{i+1,j,k}+u_{i-1,j,k}+u_{i,j+1,k}
+ +u_{i,j-1,k}+u_{i,j,k+1}+u_{i,j,k-1}-6u_{ijk})
+\]
+计算。按五次邻值求和、一次乘 6、一次相减和一次缩放共 8 FLOPs。每点七读一写的语义流量为 64 bytes；理想空间复用下可接近每点一读一写的 16 bytes，均未计写分配。缓存分块和时间分块分别改善空间与跨步复用；边界和依赖限制其规模。
+有限体积包含梯度重构、限制器、面 Riemann 通量和残量累加。非结构面访问可能产生 gather/scatter；每面只算一次可减少重复计算，但并行累加需着色、原子或面缓冲。每单元独立遍历则避免冲突而增加重复通量。两者应在同一精度与守恒条件下比较。
+\section{有限元、DG 与 FR}
+低阶装配 FEM 的主核可为稀疏矩阵乘；装配过程还涉及求积、几何和稀疏累加。矩阵自由重新执行单元算子，以计算换取条目与索引流量。
+三维张量单元每方向 $n=p+1$ 点，直接稠密体算子可达 $O(n^6)$，和因子分解将三个方向导数降为 $O(n^4)$：
+\[
+ (\partial_\xi u)_{ijk}=\sum_{\ell=0}^{p}D_{i\ell}u_{\ell jk}.
+\]
+三个方向各执行 $n^3$ 个长度 $n$ 点积，计 $3n^3(2n-1)$ FLOPs。若一次读输入、写三组输出，最低场数据流量约 $32n^3$ bytes，另计导数矩阵、几何和材料。实际批量、寄存器压力及面数据改变复用。
+DG 的体项、面通量与提升操作可分别建模；FR 由点值导数与界面通量差修正组成，两者在张量网格上均可利用局部矩阵乘。它们的算子关系由校正函数、求积与节点共同确定，稳定性则进一步通过相应能量或谱估计检验。
+\conceptbridge{高阶每单元做更多运算，为何仍可能更快？}{增加阶数可能提高数据复用并以较少单元达到目标误差；同时自由度、面成本和显式稳定步长也会改变。只有把空间误差、时间误差和总步数同时计入，才能评价收益。}{局部高阶运算 $\longrightarrow$ 复用与误差变化 $\longrightarrow$ 总成本比较。}
+\section{LBM 的迁移与碰撞}
+每格点保存 $Q$ 个分布分量，BGK 碰撞为
+\[
+ f_q^*=f_q-\tau^{-1}(f_q-f_q^{\rm eq}),\qquad
+ f_q(\bm x+\bm c_q\Delta t,t+\Delta t)=f_q^*(\bm x,t).
+\]
+D2Q9、D3Q19、D3Q27 分别有 9、19、27 个分量。双缓冲迁移最低读写约 $2Q$ 个标量；双精度 D2Q9 为 144 bytes/格点，尚未计碰撞临时量和边界。
+SoA 将同一方向的连续格点排在一起，AoS 将同格点分量排在一起；适用性取决于 SIMD/SIMT 映射及碰撞实现。push 将后碰撞值写到邻点，pull 从邻点读取；周期单射迁移可避免冲突，复杂边界需另行处理。
+\section{统一比较表}
+\begin{center}\small
+\begin{tabularx}{\textwidth}{lXX}
+\toprule 方法&主要复用与访问&常见限制\\\midrule
+FDM&规则邻点、跨点复用&带宽、边界、时间步\\
+FVM&面几何、重构与通量&非规则访问、分支、累加\\
+FEM&局部求积或稀疏乘&装配与应用路径不同\\
+DG&体张量与面数据&寄存器、提升、稳定步长\\
+FR&点导数与通量修正&节点和校正函数、面通信\\
+LBM&方向分量迁移与碰撞&布局、存储、复杂边界\\
+FDTD&交错旋度 stencil&两相依赖、带宽、色散\\\bottomrule
+\end{tabularx}
+\end{center}
+\costnote{表中按访问特征定位瓶颈。比较方法时，固定物理问题、误差、精度、硬件和并行规模；分析 NumPy 实现时，再将临时数组流量计入理想融合核模型。}
+\coderef{roofline/kernels.py; dg_fr/transport.py; lbm/stream_collision.py}
+\aiexercise{为七点 Laplacian、三维张量导数和 D2Q9 迁移分别列运算与读写表，明确哪些读可由缓存复用。}{用相同周期正弦输运比较一阶上风 FVM 与高阶 DG 的空间误差、步数和总时间；不要把 LBM 的流体模型与任意标量方程直接等同。}
+\studyroute{略去一般曲边和因子分解及 FR 能量稳定性证明。参考 \cite{hesthaven,vcjh,frdisp,roofline}。}{sum factorization; matrix-free FEM; DG volume surface; FR correction; LBM SoA AoS}

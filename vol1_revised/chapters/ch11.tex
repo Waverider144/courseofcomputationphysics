@@ -1,0 +1,78 @@
+\chapter{通量重构方法}\label{ch:11}
+\begin{chaptersummary}
+DG 的强形式可以把界面残差表示为单元内部的提升。FR 从这个思路出发，先插值局部通量，再用端点修正函数接入共同通量。本章推导其节点更新和守恒性质，并通过质量矩阵提升条件给出与特定 DG 离散的精确关系。
+\end{chaptersummary}
+\learninggoals{由一维守恒律构造不连续通量与修正通量；写出 FR 空间算子；证明单元平均守恒；核对 DG 关系所需的基、积分和通量条件。}
+\studyroute{略去多维曲网格、非线性别名误差及一般 FR 熵分析；下一章进一步构造能量稳定修正函数。}{Huynh flux reconstruction; correction function; lifting operator; SBP correction procedure}{在三个 Gauss 节点上构造二次解多项式和三次修正函数，组装节点 FR 算子，并与精确积分的 DG 强形式比较。}
+
+\section{不连续通量与端点修正}\index{FR 方法}
+考虑一维 $u_t+\partial_xF(u)=0$。在仿射单元 $x=x_j+J_j\xi$ 上，
+选择 $p+1$ 个不同节点 $\xi_i$ 与 Lagrange 基 $\ell_i$，
+\[
+u_j^\delta(\xi)=\sum_{i=0}^pu_{ji}\ell_i(\xi),\qquad
+f_j^D(\xi)=\sum_{i=0}^pF(u_{ji})\ell_i(\xi).
+\]
+$f^D$ 是通量的次数 $p$ 插值；非线性 $F(u^\delta)$ 的次数可能更高。
+界面求解器由两侧解迹产生共同的正向通量 $f_L^*,f_R^*$。
+取次数至多 $p+1$ 的修正函数，满足
+\[
+g_L(-1)=1,\quad g_L(1)=0,\qquad
+g_R(-1)=0,\quad g_R(1)=1.
+\]
+修正通量为
+\begin{equation}\label{eq:fr-flux}
+f^C=f^D+(f_L^*-f^D(-1))g_L+(f_R^*-f^D(1))g_R.
+\end{equation}
+于是 $f^C(-1)=f_L^*$、$f^C(1)=f_R^*$。
+全局共享的界面通量在每侧局部多项式中得到相同端点值。FR 原始构造见~\cite{huynh2007}。
+
+\conceptbridge{界面通量只给出两个端点值，为何足以改变全部内部自由度？}
+{修正函数将端点的通量差延伸为单元内多项式。取其导数后，每个解节点都接收到界面残差。修正函数的形状决定这一提升如何作用于各多项式模式，并影响谱与稳定性。}
+{端点通量差 $\longrightarrow$ 修正多项式 $\longrightarrow$ 内部残差提升。}
+
+\section{FR 节点更新与局部守恒}
+令 $D_{ik}=\ell_k'(\xi_i)$、$C_{iL}=g_L'(\xi_i)$、$C_{iR}=g_R'(\xi_i)$。
+在节点上约束修正后的微分残差，得到
+\begin{equation}\label{eq:fr-operator}
+J_j\dot u_{ji}
+=-\sum_kD_{ik}F(u_{jk})
+-(f_L^*-f_L^D)g_L'(\xi_i)
+-(f_R^*-f_R^D)g_R'(\xi_i).
+\end{equation}
+记 $R$ 为取两端点值的 $2\times(p+1)$ 矩阵，则
+$J_j\dot{\bm u}_j=-D\bm f_j-C(\bm f^*-R\bm f_j)$。
+导数均为次数至多 $p$ 的多项式，故该节点等式在单元内也是多项式恒等式。
+精确积分给出
+\[
+\frac{\dd}{\dd t}\left(J_j\int_{-1}^1u_j^\delta\dd\xi\right)
+=-f_R^*+f_L^*.
+\]
+共同通量与端点条件因此保证单元平均守恒；具体修正函数仍需满足所需稳定性条件。
+
+\section{与 DG 的矩阵关系}
+在同一基中，令 $M_{ik}=\int\ell_i\ell_k$，$B=\diag(-1,1)$。
+多项式分部积分给出
+\[
+MD+D^{\mathsf T}M=R^{\mathsf T}BR.
+\]
+对线性通量 $F(u)=au$，DG 强形式为
+\[
+J_j\dot{\bm u}_j=-aD\bm u_j-M^{-1}R^{\mathsf T}B
+(\bm f^*-aR\bm u_j).
+\]
+因此，当
+\begin{equation}\label{eq:fr-dg-lift}
+C=M^{-1}R^{\mathsf T}B,
+\end{equation}
+且试探表示、积分、映射和通量相同时，FR 与该 DG 半离散算子一致。
+模态实现通过可逆基变换给出同一关系。
+对非线性通量、欠积分或其他修正函数，需重新比较各个体积与边界算子。
+
+\section{误差与谱分析}
+修正函数改变单元模式的界面反馈。周期均匀网格可对 Bloch 符号求谱，
+比较物理分支的耗散、色散和显式稳定步长。
+能量法则直接检查一个范数下的演化，并纳入物理边界。
+耗散、色散与稳定步长还取决于通量、修正函数和时间积分器。按总自由度与误差比较成本时，应将这些选择与形式阶数一并记录。
+
+\aiexercise{对 $p=1$、线性通量与 Gauss 解节点，计算 $M,D,R,B$。由式~\eqref{eq:fr-dg-lift}~求 $g_L',g_R'$，积分并核对四个端点条件，最后与 DG 局部矩阵逐项比较。}
+{将一个修正函数改变为另一满足端点条件的多项式。检验单元守恒是否保持，再计算周期符号特征值，说明守恒与稳定性分别需要什么条件。}

@@ -1,0 +1,212 @@
+\chapter{Finite Differences: Consistency, Stability, and Wave Errors}\label{ch:7}
+\begin{chaptersummary}
+With function spaces and residual mechanisms established, grid functions and difference operators provide a direct discrete model. Taylor expansion gives consistency; error evolution gives stability; modified equations and numerical frequencies quantify dissipation and dispersion. These analyses provide a common reference for finite-volume and high-order methods and time integration.
+\end{chaptersummary}
+\learninggoals{Derive truncation errors from stencils; state the assumptions of periodic Fourier analysis; distinguish stability, the necessary CFL condition, and convergence; calculate amplitude and phase errors.}
+\studyroute{Advection, grid norms, and error propagation establish the difference analysis. Finite-boundary SBP--SAT analysis and the full convergence proof are left for further study.}{grid function; truncation error; von Neumann analysis; modified equation; SBP--SAT}{Derive the upwind amplification factor mode by mode, then use discrete Parseval to prove periodic discrete L2 contraction.}
+\section{Grid Functions and Difference Operators}
+On uniform nodes $x_i=ih$, let $U_i\approx u(x_i)$. Define
+\[
+(D_-U)_i=\frac{U_i-U_{i-1}}h,\qquad
+(D_0U)_i=\frac{U_{i+1}-U_{i-1}}{2h},\qquad
+\norm{U}_{2,h}^2=h\sum_i|U_i|^2.
+\]
+Grid functions belong to finite-dimensional sequence spaces. Difference operators approximate the differential equation at grid points;
+interpolation can compare a grid function with a continuous field.
+\section{Consistency, Stability, and Modified Equations}\index{Finite difference method}
+Consider linear advection:
+\[
+u_t+au_x=0,
+\qquad
+u(x,t)=u_0(x-at).
+\]
+
+\begin{authornote}
+\textbf{Potential Question:}
+"After discussing complex physical models, why begin numerical discretization with linear advection?"
+
+\textbf{Author Supplement:}
+Complex transport equations combine several physical mechanisms, obscuring the source of numerical error. Linear advection isolates propagation at a fixed speed, allowing separate examination of changes in transport, amplitude, and phase. It is a reference model for numerical mechanisms; conclusions must be reassessed for nonlinearity, variable coefficients, and boundaries.
+
+\textbf{Core Conceptual Connection:}
+\[
+\text{complicated transport physics}
+\longrightarrow
+\text{linear advection as minimal model}
+\]
+\end{authornote}
+
+The forward time difference satisfies
+\[
+\frac{u_i^{n+1}-u_i^n}{\Delta t}
+=
+u_t+\Order(\Delta t),
+\]
+The centered spatial difference satisfies
+\[
+\frac{u_{i+1}-u_{i-1}}{2\Delta x}
+=
+u_x+\Order(\Delta x^2).
+\]
+The order of a scheme follows from matching local expansions of discrete and continuous operators.
+
+For a linear constant-coefficient scheme, write an error mode as
+\[
+e_i^n=\widehat e^n\ee^{\ii kx_i},
+\]
+
+\begin{authornote}
+\textbf{Potential Question:}
+"Why can arbitrary errors be analyzed through Fourier modes? Why does studying one mode characterize overall error propagation?"
+
+\textbf{Author Supplement:}
+For a linear, constant-coefficient, translation-invariant scheme, each discrete Fourier mode retains its wave number after one update; only its complex amplitude changes. Amplification factors can therefore be studied separately to determine modal growth. This analysis applies most directly to infinite or periodic uniform grids. Finite boundaries, variable coefficients, and nonlinearity can introduce additional coupling.
+
+\textbf{Core Conceptual Connection:}
+\[
+\text{arbitrary numerical error}
+\longrightarrow
+\text{Fourier modes}
+\longrightarrow
+\text{amplification factor}
+\]
+\end{authornote}
+
+\begin{askai}
+Ask AI:
+\begin{quote}
+Starting from the Fourier decomposition of an arbitrary discrete error, develop von Neumann stability analysis step by step: explain why a linear constant-coefficient difference scheme preserves each Fourier mode and how this permits separate amplification-factor analysis.
+\end{quote}
+
+Follow-up:
+\begin{quote}
+Substitute \(e_i^n=\widehat e^n e^{\ii kx_i}\) into first-order upwinding, derive \(G(k)\), and plot \(|G(k)|\) for different CFL numbers.
+\end{quote}
+\end{askai}
+
+This gives
+\[
+\widehat e^{n+1}=G(k)\widehat e^n.
+\]
+The one-step amplification factor describes each mode. For an advection discretization required to be non-growing, the contraction condition is
+\[
+|G(k)|\le1.
+\]
+
+Explicit schemes are also subject to a CFL constraint. Define
+\[
+\nu=\frac{a\Delta t}{\Delta x}.
+\]
+The numerical domain of dependence must contain the physical domain of dependence.
+
+\begin{authornote}
+\textbf{Potential Question:}
+"How is \(\nu=a\Delta t/\Delta x\) related to domains of dependence, and why does it constrain explicit schemes?"
+
+\textbf{Author Supplement:}
+Characteristic speeds determine physical dependence, while the stencil and time step determine numerical information propagation. Containment of the physical domain by the numerical domain under refinement is necessary for convergence; error-evolution estimates establish stability. CFL connects these two propagation ranges.
+
+\textbf{Core Conceptual Connection:}
+\[
+\text{amplification factor stability}
+\longrightarrow
+\text{CFL number}
+\longrightarrow
+\text{domain of dependence}
+\]
+\end{authornote}
+
+For \(a>0\), first-order upwinding is
+\[
+u_i^{n+1}
+=
+u_i^n-\nu(u_i^n-u_{i-1}^n)
+=
+(1-\nu)u_i^n+\nu u_{i-1}^n.
+\]
+When
+\[
+0\le\nu\le1
+\]
+the new value is a convex combination of old values, so no new local extrema are created.
+
+Its modified equation is
+\[
+u_t+au_x
+=
+\frac{a\Delta x}{2}(1-\nu)u_{xx}
++\cdots.
+\]
+
+\begin{askai}
+Ask AI:
+\begin{quote}
+Perform modified-equation analysis for first-order upwinding. Starting from Taylor expansion, derive term by term
+\[
+u_t+au_x=\frac{a\Delta x}{2}(1-\nu)u_{xx}+\cdots
+\]
+and explain how the diffusion term on the right represents numerical dissipation.
+\end{quote}
+
+Follow-up:
+\begin{quote}
+Write a minimal Python experiment comparing dissipation in centered and upwind schemes for a propagating Gaussian pulse.
+\end{quote}
+\end{askai}
+
+The equivalent diffusion explains upwind dissipation: it suppresses high-frequency error and also smooths genuine small scales.
+General linear stability requires, over a fixed physical time $T$,
+$\sup_{n\Delta t\le T}\norm{S_h^n}\le C_T$, with a mesh-independent constant.
+For scalar translation-invariant updates, Parseval converts this to a uniform bound on modal powers.
+Bounded growth with $|G|\le1+C\Delta t$ is admissible; a one-step value $|G|>1$ must be assessed in the refinement limit.
+For example,
+\[
+|G(k)|>1,
+\]
+indicates one-step growth. If an amplification value remains separated from 1 by a fixed positive amount under refinement, its powers become unbounded over fixed physical time.
+For a well-posed linear initial-value problem in a compatible discrete setting, consistency and stability together imply convergence.
+
+\section{Numerical Dispersion and Wave Errors}
+Let a continuous wave be
+\[
+u=\widehat u\ee^{\ii(kx-\omega t)}.
+\]
+For linear advection,
+\[
+\omega=ak.
+\]
+the phase and group velocities both equal \(a\):
+\[
+c_p=\frac{\omega}{k}=a,
+\qquad
+c_g=\frac{\dd\omega}{\dd k}=a.
+\]
+
+A discrete scheme generally gives a numerical frequency
+\[
+\omega_{\mathrm{num}}(k).
+\]
+
+\begin{askai}
+Ask AI:
+\begin{quote}
+Choose a specific difference scheme for one-dimensional advection and derive \(\omega_{\mathrm{num}}(k)\). Explain how \(\operatorname{Re}\omega_{\mathrm{num}}\) and \(\operatorname{Im}\omega_{\mathrm{num}}\) describe phase and dissipation errors.
+\end{quote}
+
+Follow-up:
+\begin{quote}
+Compare phase-speed errors for two schemes at the same wave number \(k\), and estimate the accumulated phase shift after propagation over many wavelengths.
+\end{quote}
+\end{askai}
+
+If
+\[
+\operatorname{Re}\omega_{\mathrm{num}}\neq ak,
+\]
+there is numerical dispersion; if
+\[
+\operatorname{Im}\omega_{\mathrm{num}}<0,
+\]
+there is numerical dissipation.
+
+Shock calculations generally require some dissipation, whereas acoustic, electromagnetic, and elastic waves place greater demands on long-range phase accuracy. Scheme selection must reflect the target physics.

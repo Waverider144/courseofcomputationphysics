@@ -1,0 +1,22 @@
+\chapter{Memory Hierarchies and Operator Implementation}\label{v0ch:26}
+\begin{chaptersummary}
+Ideal traffic estimates set reuse targets; implementation determines the storage levels through which data actually move. Registers, caches, and DRAM connect to layout, blocking, fusion, and SIMD through temporaries, dependencies, and access paths. Optimization reduces movement at the limiting level and is evaluated under common accuracy and timing conventions.
+\end{chaptersummary}
+\learninggoals{Analyze strides and cache reuse; explain fusion, blocking, SIMD, and matrix-free tradeoffs; design fair timings.}
+\paragraph{Core Question}Why does a program repeatedly move data that ideally need only one read?
+
+\section{Hierarchy, Locality, and Layout}
+Registers are close to execution units; L1/L2/L3 caches provide increasing capacity, and DRAM supplies main capacity. Sharing arrangements depend on architecture. Contiguous access improves cache-line use and prefetching; large strides and random gathers may waste transactions. Working-set size determines which reuse survives.
+In C-order three-dimensional arrays, the final index is contiguous. Align inner loops and thread mappings accordingly. SoA often favors cross-point vectorization; AoS may favor using every component at a point; AoSoA combines these within blocks. Judge layouts by the actual kernel.
+\section{Fusion and Blocking}
+Evaluating $w=a u+b v$ through two temporary arrays adds writes and reads. Fusion can read $u,v$ and write $w$ directly, but increases live registers; excessive fusion can cause spills.
+Spatial blocking retains neighboring stencil planes. Temporal blocking reuses subdomains across steps while respecting dependence cones and expanded halos. Two-phase Yee or multistage RK cannot be fused arbitrarily across steps without synchronization.
+Tensor DG can reuse derivative matrices and batch elements. Keeping three derivatives and fluxes simultaneously may exceed register/cache capacity. Matrix-free evaluation reduces sparse indexing but repeats geometry work; mixed precision additionally requires error analysis.
+\conceptbridge{Why can zero-copy or matrix-free code remain slow?}{Avoiding explicit copies or matrix entries removes only one class of work. Cache misses, hidden temporaries, migration, and extra arithmetic may still dominate. Infer traffic from actual access paths, not interface names.}{Storage representation $\longrightarrow$ actual access paths $\longrightarrow$ per-level resource use.}
+\section{SIMD and Minimal Experiments}
+SIMD applies one instruction to several elements, requiring independent iterations, suitable layout/alignment, and manageable branching. Vectorization reports, assembly, and counters are more reliable than source appearance.
+Compare contiguous and strided seven-point traversal, D2Q9 SoA/AoS, and explicit-Kronecker versus sequential tensor contractions. Warm up, retain outputs, repeat timings, and report statistics. Separate large arrays from cache-resident cases.
+\costnote{Report allocation and kernel times separately, comparing preallocated and dynamically allocated implementations within a common timing scope. Individual NumPy operations invoke compiled kernels; fusion across operations depends on the execution strategy.}
+\coderef{roofline/kernels.py; lbm/stream_collision.py; dg_fr/transport.py}
+\aiexercise{List every NumPy seven-point temporary and its lifetime. Compare resulting bytes with Chapter 23's fused lower bound.}{Design working sets fitting L1, fitting L3, and exceeding last-level cache. Explain why one undifferentiated bandwidth cannot describe them all.}
+\studyroute{Cache replacement, compiler vectorization, and microarchitectural port analysis are omitted. See \cite{roofline,cuda}.}{cache blocking; loop fusion; temporal blocking; SIMD; AoSoA; working set}

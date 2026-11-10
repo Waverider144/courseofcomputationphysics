@@ -1,0 +1,33 @@
+\chapter{Sparse LU and Large Sparse Systems}\label{v0ch:5}
+\begin{chaptersummary}
+Sparsity reduces storage of the original matrix, but elimination introduces new couplings in its factors. Elimination graphs explain fill, while ordering, symbolic analysis, and numerical factorization expose its separate costs. These intermediate structures determine memory and work estimates and motivate fill truncation in incomplete factorization.
+\end{chaptersummary}
+\learninggoals{Identify Schur-complement fill; explain elimination graphs and ordering; state conditional cost estimates for regular two- and three-dimensional problems.}
+\paragraph{Core Question}Why can factors exceed memory when the original matrix is sparse?
+
+\section{Elimination Connects Neighbors}
+Partition one pivot from the remaining unknowns:
+\[
+ A=\begin{bmatrix}a&\bm r^T\\\bm c&B\end{bmatrix}
+ \quad\Rightarrow\quad
+ S=B-\bm c a^{-1}\bm r^T.
+\]
+Even if $B_{ij}=0$, $c_i r_j\ne0$ can make $S_{ij}$ nonzero. In a symmetric graph, eliminating a vertex connects its remaining neighbors into a clique. Eliminating the center of a four-vertex star first connects the three leaves; eliminating leaves first avoids these extra edges.
+\conceptbridge{Why does numbering affect memory without changing the physical solution?}{Renumbering permutes coordinates, but elimination forms Schur complements in that order. The variables retained at each step determine which interactions become new couplings. Ordering optimizes intermediate structure and the computational path.}{Same coupling graph $\longrightarrow$ different elimination paths $\longrightarrow$ different factor fill.}
+\section{Ordering and Two-Stage Analysis}
+Minimum-degree orderings favor vertices with few connections. Nested dissection uses small separators to divide the graph, eliminating interiors before separators. Symbolic analysis predicts nonzeros, elimination trees, and storage; numerical factorization computes values. Dynamic pivoting in nonsymmetric LU may alter predictions, linking actual memory to stability choices.
+For regular, locally coupled elliptic problems with $N$ unknowns, suitable nested dissection, and no additional pivot-growth effects, typical estimates are
+\[
+\begin{array}{c|cc}
+ &\text{Factorization work}&\text{Factor storage}\\\hline
+2D&O(N^{3/2})&O(N\log N)\\
+3D&O(N^2)&O(N^{4/3})
+\end{array}
+\]
+These estimates assume regular meshes and the stated ordering model. With $n$ points per direction, $N\sim n^2$ in two dimensions and $N\sim n^3$ in three. A common definition of the unknown count is therefore essential to cost comparisons.
+\section{A Poisson Experiment}
+Generate five-point Poisson in CSR and convert to the solver's CSC format. Compare natural numbering with an approximate minimum-degree-type ordering, recording $\nnz(A)$, $\nnz(L)+\nnz(U)$, factorization time, and solve time. Begin the three-dimensional seven-point experiment at a small size and expand while monitoring factor storage.
+\costnote{Sparse direct methods often suit moderate-sized, difficult-to-precondition systems and multiple right-hand sides. Fill and communication may limit large three-dimensional problems. Record numerical refactorization, symbolic reuse, and right-hand-side amortization separately.}
+\coderef{sparse_linear_algebra/solvers.py}
+\aiexercise{Eliminate a four-vertex star SPD matrix center-first and leaf-first. Write every Schur complement and draw the fill edges.}{Compare natural ordering and COLAMD factor counts for two-dimensional Poisson. Explain why this experiment illustrates ordering rather than proving the asymptotic bounds.}
+\studyroute{Separator theorems, supernodes, and multifrontal implementation are omitted. See \cite{golub,saad}.}{fill-in; elimination graph; nested dissection; symbolic factorization; multifrontal}

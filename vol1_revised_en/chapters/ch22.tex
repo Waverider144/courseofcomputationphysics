@@ -1,0 +1,114 @@
+\chapter{Method Selection and the Complete Computational Workflow}\label{ch:22}
+\begin{chaptersummary}
+Representation, scale reduction, closure, discretization, and meshes now form a complete modeling chain. Quantities of interest organize these choices, while separate tests address model, reduction, spatial, temporal, and algebraic errors. Conservation, stability, and convergence become an executable workflow, with method combinations determined by target accuracy, structural preservation, and verification evidence.
+\end{chaptersummary}
+\learninggoals{Select models and discretizations for a physical objective; distinguish five error classes; vary spatial resolution, time steps, and tolerances independently; distinguish numerical verification from physical validation.}
+\studyroute{Verification strategies are organized here; experimental uncertainty, error estimators, and project-scale data management are omitted. Algebraic solvers and computer architecture are developed in Volume~0.}{verification and validation; grid convergence; temporal convergence; model error; reduction error; quantity of interest}{For a wave or transport problem, define a quantity of interest and vary model, mesh, degree, time step, and algebraic tolerance independently to separate error sources.}
+\section{Method Selection and Combined Strategies}
+For fixed geometry and high wall-accuracy requirements, body-fitted meshes directly resolve boundary layers.
+
+For complex moving geometry, immersed boundaries simplify meshing when wall shear is secondary to the main target.
+
+For strongly varying local scales, use quadtree or octree adaptation.
+
+For moderate boundary motion, use moving meshes.
+
+For large relative motion of several rigid bodies, use overset grids.
+
+Industrial software often combines
+\[
+\text{Body-fitted wall layers}
++
+\text{Adaptive far field},
+\]
+\[
+\text{Octree background mesh}
++
+\text{Immersed boundaries},
+\]
+\[
+\text{Overset grids}
++
+\text{Local moving meshes}.
+\]
+
+\begin{askai}
+Ask AI:
+\begin{quote}
+For rotating blades with far-field sound propagation, compare the subproblems addressed by body-fitted, moving, overset, and adaptive far-field meshes. Propose a combined strategy based on each region's requirements.
+\end{quote}
+
+Follow-up:
+\begin{quote}
+Construct a selection table using geometric stationarity, motion amplitude, boundary-layer accuracy, local scale variation, and stable time step.
+\end{quote}
+\end{askai}
+\section{The Complete Computational Workflow}
+A reliable calculation generally proceeds through the following steps:
+
+\begin{enumerate}
+  \item Select a model using ratios such as \(\mathrm{Kn}\), \(\mathrm{Re}\), and \(\mathrm{Ma}\).
+  \item Specify conserved variables, material laws, and boundary conditions.
+  \item Choose a mesh strategy adapted to geometry and local scales.
+  \item Choose discretizations meeting conservation, stability, and wave-accuracy requirements.
+  \item Form the algebraic system through explicit or implicit time integration.
+  \item Record algebraic tolerances and target-quantity sensitivity to residuals; solution algorithms are developed in Volume~0.
+  \item Monitor model, mesh, and discretization errors, and linear and nonlinear residuals separately.
+\end{enumerate}
+
+Residuals measure satisfaction of algebraic equations. Model validity and discretization accuracy additionally require benchmarks, mesh and temporal convergence studies, and comparison with physical data.
+
+\section{Five Error Classes and Verification Evidence}\index{Verification and validation}
+\begin{center}\small
+\begin{tabularx}{\textwidth}{@{}l>{\raggedright\arraybackslash}X@{}}
+\toprule
+Error level & Executable check\\
+\midrule
+Physical model & Compare with experiments, measurements, or a higher-fidelity model in its valid regime; report parameter and data uncertainties.\\
+Reduction and closure & Vary the small parameter and compare full and reduced models; check unresolved moments and scale-dependent terms.\\
+Spatial discretization & With sufficiently small time steps and tolerances, refine $h$ and increase $p$ separately; compare target quantities and expected orders.\\
+Time discretization & With adequately resolved space, halve $\Delta t$ and examine order and accumulated phase error.\\
+Algebraic solution & Tighten residual tolerances until target-quantity changes fall below spatial and temporal errors.\\
+\bottomrule
+\end{tabularx}
+\end{center}
+Geometric approximation, velocity-domain truncation, stochastic sampling, and boundary models should also be recorded at their respective levels.
+Relating algebraic residuals to solution error requires operator stability or target-quantity sensitivity.
+
+\section{Conservation, Stability, and Convergence Experiments}
+For periodic or closed source-free systems, record total mass, momentum, and energy;
+with sources and physical boundaries, record balance defects including inflow, outflow, and dissipation.
+Energy estimates or discrete entropy specify admissible evolution; wave problems additionally require phase and group-velocity measurements.
+Electromagnetic and MHD calculations should also record discrete divergence.
+
+Smooth analytic solutions test expected order; manufactured solutions provide sources and boundaries exercising all operators.
+Discontinuities, wall layers, and multiscale problems require error measures appropriate to their regularity and target quantities.
+Numerical verification measures solution error for a given model; physical validation assesses how well that model represents the target phenomenon.
+
+\conceptbridge{After residual, conservation, and grid-convergence checks pass, what evidence does the model still need?}
+{Those checks assess mathematical behavior within a chosen model and discretization. Physical validation also requires measurements or appropriate benchmarks under the target conditions,
+with uncertainty in constitutive laws, boundaries, and parameters. Together, these forms of evidence determine the credible scope of a computational conclusion.}
+{Numerical verification $\longrightarrow$ model--data comparison $\longrightarrow$ credibility of the quantity of interest.}
+
+\aiexercise{Build an error table for a periodic Alfv\'en wave or low-Mach shear wave, listing mesh, degree, time step, tolerance, conservation defect, and target-quantity error. Include controls that detect temporal error masking spatial convergence.}
+{Change the target to wall heat flux or turbulent transport. Identify additional collision, constitutive, boundary, and statistical assumptions, and data that can test them independently.}
+
+\section{The Dependency Chain}
+\[
+\begin{gathered}
+\text{Liouville and statistical representation}
+\longrightarrow\\
+\text{Kinetic and continuum models}
+\longrightarrow\text{Scale reduction and closure}
+\end{gathered}
+\]
+\[
+\begin{gathered}
+\longrightarrow\text{Function spaces and weak forms}
+\longrightarrow\\
+\text{Residuals, fluxes, and high-order discretization}\\
+\longrightarrow\text{Meshes and verification}.
+\end{gathered}
+\]
+The retained state determines required closure; the continuous operator and target structures determine suitable residual constraints.
+Target quantities and verification evidence then determine resolution and combinations of methods.

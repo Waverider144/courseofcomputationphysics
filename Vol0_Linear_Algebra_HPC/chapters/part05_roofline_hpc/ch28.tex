@@ -1,0 +1,29 @@
+\chapter{分布式计算与通信成本}\label{v0ch:28}
+\begin{chaptersummary}
+单机计算加速后，halo 交换、全局点积和粗层通信逐渐进入关键路径。本章在计算与内存 Roofline 之外引入消息延迟和数据量，解释强弱扩展、通信进度与重叠。算子依赖决定哪些通信可被隐藏，实际计时则检验这种重叠能否兑现。
+\end{chaptersummary}
+\learninggoals{建立 alpha-beta 模型；区分 halo 与 allreduce；解释重叠、流水化及粗层瓶颈。}
+\paragraph{核心问题}局部计算已经很快，为什么增加进程仍会停止加速？
+
+\section{通信成本与扩展}
+一次通信阶段可近似
+\[
+ T_{\rm comm}\approx n_{\rm msg}\alpha+V/B_{\rm net},
+\]
+其中 $\alpha$ 为有效消息启动延迟，$V$ 为指定计数口径的数据量，$B_{\rm net}$ 为有效带宽。协议、拓扑、拥塞和并发会改变参数。若计算、内存和网络完全不能重叠则成本相加；若理想重叠，可用最大值作为更乐观下界：
+\[
+ T\gtrsim\max(F/P_{\rm peak},Q/B_{\rm mem},T_{\rm comm}).
+\]
+该估算描述理想重叠下的资源下界；实际运行时间还由通信进度、资源争用与依赖链决定。
+强扩展固定总规模，局部立方域边长 $\ell$ 缩小时体工作 $O(\ell^3)$、面交换 $O(\ell^2)$，表面积体积比增大。弱扩展固定每进程工作，仍受全局归约、网络与粗网格影响。
+\section{halo、归约与重叠}
+规则 stencil 交换相邻面；FVM/DG 交换邻接面值或迹，高阶增加面数据及本地工作。Yee 需按磁、电两相的数据依赖安排交换。Krylov 除算子 halo 外，还含点积 allreduce；CG 的短递推不消除全局同步，GMRES 正交化可能增加归约。
+非阻塞模式先发接收与发送，计算不依赖 halo 的内部，再等待完成并处理边界。MPI 进度和实际重叠受实现与运行配置影响，应使用计时验证。\cite{mpi}
+流水化 Krylov 尝试把归约与计算重叠；通信规避方法通过块或 s-step 减少同步，但可能增加基病态性、额外运算和残差漂移。需要同时检查数值稳定性。
+\conceptbridge{通信量相同，为什么两个实现仍可能差很多？}{大量小消息受启动延迟支配，少量大消息更受带宽支配；通信是否位于关键路径、能否推进以及网络争用也不同。总字节数无法独立描述这些依赖。}{消息数量与大小 $\longrightarrow$ 进度和依赖 $\longrightarrow$ 关键路径时间。}
+\section{最小 MPI 实验}
+附带程序沿一个方向分割三维周期场，分别使用 \texttt{Sendrecv} 与 \texttt{Irecv/Isend+Waitall} 交换面，并核验全局 Fourier 模式的七点算子。记录包括进程数、局部大小、最大 rank 时间与误差。本机运行检验 MPI 语义，跨节点运行进一步测量网络扩展；多维分块还需六面交换与分区策略。
+\costnote{AMG 粗层局部工作不断缩小，通信比例增大，可能需要进程聚合。算子、预条件、归约和 I/O 应分别计时，强扩展比较使用全局最慢 rank。}
+\coderef{mpi/halo.cpp}
+\aiexercise{对 $n^3$ 网格在 $p$ 个近立方子域上推导每进程体工作、六面 halo 字节与表面积体积比。}{写出非阻塞 halo 的事件图，标出可重叠内部和必须等待的边界，再设计判定实际通信进度的实验。}
+\studyroute{略去网络拓扑建模、pipelined Krylov 误差分析及跨节点调优。参考 \cite{mpi,petsc}。}{alpha beta model; strong scaling; weak scaling; halo exchange; allreduce; pipelined Krylov; MPI progress}

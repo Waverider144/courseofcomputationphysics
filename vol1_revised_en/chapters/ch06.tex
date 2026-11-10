@@ -1,0 +1,136 @@
+\chapter{Projection, Interpolation, and the Galerkin Framework}\label{ch:6}
+\begin{chaptersummary}
+Weak formulations specify continuous solution and test spaces. Discretization then selects a finite-dimensional representation and residual constraints. Comparing interpolation, orthogonal projection, Galerkin testing, collocation, and control-volume conservation exposes these choices, while error orthogonality links approximation power to solution accuracy. Subsequent methods define their unknowns, operators, and interfaces within this framework.
+\end{chaptersummary}
+\learninggoals{Specify trial and test spaces; distinguish five approximation or residual mechanisms; state the conditions for an energy projection; construct mass matrices, residuals, and sparse coupling from local bases.}
+\studyroute{Basic error estimates for coercive problems are given; general discrete inf--sup theory for Petrov--Galerkin methods and nonconforming error estimates are omitted.}{Galerkin orthogonality; Riesz representation; Cea lemma; Petrov--Galerkin inf-sup}{Compare energy errors for $-\!u''=f$ on two linear finite-element meshes, then use a convection problem to examine stability when the test space changes.}
+
+\section{From a Continuous Operator to Residual Constraints}
+Let the continuous problem be $\mathcal A u=f$, with admissible fields in $V$ and test space $W$.
+Its weak form is $b(u,v)=\ell(v)$.
+Choose finite-dimensional trial and test spaces $V_h$ and $W_h$:
+\begin{equation}\label{eq:galerkin-general}
+\text{Find }u_h\in V_h:\qquad b(u_h,v_h)=\ell(v_h)
+\quad\forall v_h\in W_h.
+\end{equation}
+The residual functional $r_h(v)=\ell(v)-b(u_h,v)$ vanishes on $W_h$;
+it generally remains nonzero in other testing directions. Equal trial and test spaces give a Galerkin method;
+different spaces give a Petrov--Galerkin method. For nonlinear problems, the residual depends nonlinearly on the solution.
+
+\conceptbridge{After choosing a finite-dimensional representation, what is still needed to obtain numerical equations?}
+{Basis functions specify candidate solutions. Numerical equations additionally require the residual to vanish in selected testing directions, at selected points, or over selected control volumes. This constraint mechanism, together with interface treatment, defines the discrete operator.}
+{Representation space $\longrightarrow$ residual constraints $\longrightarrow$ finite-dimensional equations.}
+
+\section{Interpolation and Orthogonal Projection}\index{Galerkin method}\index{Interpolation}
+An interpolation operator $I_h$ satisfies prescribed degrees of freedom $\lambda_i$:
+$\lambda_i(I_hu)=\lambda_i(u)$. Nodal interpolation requires well-defined point values;
+point evaluation need not be continuous on a general higher-dimensional $H^1$ space, where local-average degrees of freedom may be used instead.
+
+An orthogonal projection $P_h$ in a Hilbert space satisfies
+\[
+P_hu\in V_h,\qquad (u-P_hu,v_h)_V=0\quad\forall v_h\in V_h.
+\]
+For $u(x)=x^2$ and $V_h=\Poly_1(-1,1)$, endpoint interpolation gives $I_hu=1$,
+whereas $L^2$ orthogonal projection gives $P_hu=1/3$.
+The same representation space can support different approximation operators.
+
+\section{Riesz Representation, Energy Norms, and Error Estimates}
+The Riesz map $R_V:V\to V'$ of a Hilbert space is defined by
+$\langle R_Vw,v\rangle=(w,v)_V$,
+giving each continuous linear functional a unique inner-product representative. A PDE bilinear form must additionally be checked for symmetry and coercivity.
+For a conforming Galerkin approximation with $V_h\subset V$, subtracting the continuous and discrete equations gives
+\[
+b(u-u_h,v_h)=0\quad\forall v_h\in V_h.
+\]
+If $b$ is symmetric positive definite, it defines the energy norm $\norm{v}_b^2=b(v,v)$, and
+\[
+\norm{u-u_h}_b=\inf_{w_h\in V_h}\norm{u-w_h}_b.
+\]
+For a bounded, coercive, but not necessarily symmetric $b$, any $w_h\in V_h$ gives
+\[
+\alpha\norm{u-u_h}_V^2
+\le b(u-u_h,u-w_h)
+\le M\norm{u-u_h}_V\norm{u-w_h}_V.
+\]
+Canceling the error norm yields C\'ea's estimate:
+\[
+\norm{u-u_h}_V\le\frac{M}{\alpha}
+\inf_{w_h\in V_h}\norm{u-w_h}_V.
+\]
+This relates numerical error to the approximation power of the space. Petrov--Galerkin and noncoercive problems require discrete inf--sup conditions.
+
+\section{Degrees of Freedom and Residual Mechanisms}
+\begin{center}\small
+\begin{tabularx}{\textwidth}{@{}l>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
+\toprule
+Method & Representation and degrees of freedom & Equation or residual constraint\\
+\midrule
+FDM & Grid functions, nodal values & Difference equations at grid points\\
+FVM & Cell averages and local reconstruction & Integral conservation in each control volume\\
+FEM & Local bases, trace-compatible degrees of freedom & Weak form on a finite test space\\
+Spectral Galerkin & Global modal coefficients & Residual vanishes against retained global modes\\
+Spectral collocation & Nodal values of a global interpolant & Differential equation at collocation points\\
+DG / FR & Element-local polynomials & Weak residual / corrected flux derivatives and shared interface fluxes\\
+LBM & Populations at discrete velocities & Streaming, collision, and their conserved moments\\
+\bottomrule
+\end{tabularx}
+\end{center}
+These methods share the language of finite-dimensional representations, residuals, and structural analysis.
+An interpretation as Hilbert-space orthogonal projection depends on the inner product, trial space, and residual conditions.
+
+\aiexercise{Compute endpoint interpolation and $L^2$ projection of $x^2$ onto $\Poly_1$ on $[-1,1]$, including both errors. Identify the inner product underlying orthogonality in symmetric Poisson Galerkin approximation.}
+{Compare central differences, cell-average FVM, and linear FEM for the same Poisson problem. Identify their degrees of freedom and residual constraints, and state the quadrature and boundary assumptions needed to obtain identical matrices on a uniform grid.}
+
+\section{Formation of Finite-Dimensional Algebraic Systems}
+Discretization of a PDE typically gives
+\[
+\bm A\bm x=\bm b
+\]
+or a nonlinear residual system
+\[
+\bm R(\bm U)=0.
+\]
+
+\begin{authornote}
+\textbf{Potential Question:}
+"Why does a continuous PDE become a finite-dimensional vector equation? Where do the degrees of freedom, residuals, and matrix entries come from?"
+
+\textbf{Author Supplement:}
+A continuous field has a value at every point, whereas a computer stores finitely many parameters. Discretization first represents an approximate field by grid values or basis coefficients, then enforces the equation in finitely many senses: collocation, control-volume conservation, or integration against test functions. The result is a finite-dimensional algebraic problem; nonlinear or time-dependent problems additionally require linearization or time discretization.
+
+\textbf{Core Conceptual Connection:}
+\[
+\text{continuous PDE}
+\longrightarrow
+\text{finite-dimensional DOFs}
+\longrightarrow
+\text{algebraic system}
+\]
+\end{authornote}
+
+Local differential operators usually produce sparse matrices, whereas boundary integral operators often produce dense ones. Matrix structure reflects the range of physical coupling.
+
+\begin{authornote}
+\textbf{Potential Question:}
+"Why does differential-operator locality become matrix sparsity? Why are integral-equation matrices often dense?"
+
+\textbf{Author Supplement:}
+A matrix row records which degrees of freedom enter one discrete equation. A local differential operator with a local basis or finite-difference stencil usually couples only nearby degrees of freedom, leaving few nonzeros per row. Global bases or integral operators may couple one degree of freedom to many distant ones. Sparsity therefore depends on both the operator and the discretization.
+
+\textbf{Core Conceptual Connection:}
+\[
+\text{operator locality}
+\longrightarrow
+\text{matrix sparsity or density}
+\]
+\end{authornote}
+
+
+With basis functions $\phi_j$ and $u_h=\sum_jU_j\phi_j$, equation~\eqref{eq:galerkin-general} gives
+$A_{ij}=b(\phi_j,\psi_i)$ and $b_i=\ell(\psi_i)$.
+For time-dependent problems,
+\[
+M_{ij}=(\phi_j,\psi_i),\qquad M_h\dot U_h=R_h(U_h,t).
+\]
+The mass matrix represents the pairing of the time derivative; the residual contains volume, boundary, and source terms.
+Their structure follows from representation and constraints. Algebraic solution algorithms are developed in Volume~0.

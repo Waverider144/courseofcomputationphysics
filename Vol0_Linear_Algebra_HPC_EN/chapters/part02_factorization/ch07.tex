@@ -1,0 +1,33 @@
+\chapter{QR and Least-Squares Problems}\label{v0ch:7}
+\begin{chaptersummary}
+Observed data, overdetermined constraints, and projection problems may replace exactly solvable equations with residual minimization. This chapter uses orthogonal factorization for least squares and explains accuracy loss in normal equations. QR reappears in Arnoldi and GMRES, where projection reduces a large system to a small least-squares problem.
+\end{chaptersummary}
+\learninggoals{Formulate least-squares projection; compare normal equations and QR; recognize rank deficiency and orthogonalization errors.}
+\paragraph{Core Question}How should an approximation be chosen when its residual cannot vanish?
+
+\section{Projection and Conditioning}
+For $A\in\R^{m\times n}$, $m\ge n$, minimize $\min_{\bm x}\norm{A\bm x-\bm b}_2$. With full column rank, the normal equations
+$A^TA\bm x=A^T\bm b$ have a unique solution, but
+\[
+ \kappa_2(A^TA)=\kappa_2(A)^2.
+\]
+Thin QR gives $A=Q_1R$, $Q_1^TQ_1=I$, hence
+\[
+ R\bm x=Q_1^T\bm b,\qquad
+ \bm r=(I-Q_1Q_1^T)\bm b.
+\]
+Orthogonal transformations preserve the two-norm without explicitly forming $A^TA$.
+\section{Three Orthogonalization Mechanisms}
+MGS sequentially removes projections onto existing directions. It resists some cancellation effects better than classical one-pass Gram--Schmidt, although ill-conditioned bases may still require reorthogonalization. Householder reflections $H=I-2\bm v\bm v^T/(\bm v^T\bm v)$ eliminate the entries below a column pivot and support stable dense QR. Givens rotations alter two components, suiting incremental Hessenberg reduction.
+\conceptbridge{Why not solve the smaller symmetric normal equations directly?}{The reduction squares singular values. Forming the product can lose information when small singular values approach roundoff scales. QR uses norm-preserving transformations at the original scale; rank deficiency also requires rank detection and a solution-selection criterion.}{Residual minimization $\longrightarrow$ orthogonal projection $\longrightarrow$ stable small triangular problem.}
+\section{A Minimal Example and Rank Deficiency}
+Fit $c_0+c_1t$ to $(t_i,b_i)=(0,1),(1,2),(2,2)$:
+\[
+ A=\begin{bmatrix}1&0\\1&1\\1&2\end{bmatrix},\quad
+ \bm c=(7/6,1/2)^T,\quad
+ \bm r=\bm b-A\bm c=(-1/6,1/3,-1/6)^T.
+\]
+Verify $A^T\bm r=0$. Identical columns make the least-squares solution nonunique. Column-pivoted QR supports numerical-rank assessment, and SVD supplies a minimum-norm solution at a specified threshold. A small diagonal entry in unpivoted $R$ is a diagnostic clue; reliable rank assessment also examines column dependence.
+\costnote{Dense thin QR costs approximately $2mn^2-2n^3/3$ FLOPs. Store Householder vectors instead of a full $Q$. Sparse QR can also fill in. Normal equations have a defined role when conditioning is moderate and performance is important.}
+\aiexercise{Construct thin QR explicitly for the three-point fit. Verify the orthogonal residual and compare with normal equations.}{Make the second column equal to the first plus $10^{-k}$ times an independent vector. Compare residuals and coefficient errors for QR, normal equations, and SVD.}
+\studyroute{Backward-stability proofs, rank-revealing QR, and SVD algorithms are omitted. See \cite{golub,trefethen}.}{Householder QR; modified Gram Schmidt; Givens; rank revealing QR; least squares}

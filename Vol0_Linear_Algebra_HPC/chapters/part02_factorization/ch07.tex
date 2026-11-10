@@ -1,0 +1,33 @@
+\chapter{QR 与最小二乘问题}\label{v0ch:7}
+\begin{chaptersummary}
+精确方程可能被观测数据、过定约束或投影问题替代，此时目标变为最小化残差。本章用正交分解处理最小二乘，说明正规方程为什么可能损失精度。QR 随后在 Arnoldi 和 GMRES 中再次出现：大型系统的投影最终转化为一个小型最小二乘问题。
+\end{chaptersummary}
+\learninggoals{建立最小二乘投影；比较正规方程与 QR；识别秩亏及正交化误差。}
+\paragraph{核心问题}残差不能为零时，怎样选择最有意义的近似解？
+
+\section{投影与条件数}
+对于 $A\in\R^{m\times n}$、$m\ge n$，求 $\min_{\bm x}\norm{A\bm x-\bm b}_2$。满列秩时正规方程
+$A^TA\bm x=A^T\bm b$ 唯一可解，但
+\[
+ \kappa_2(A^TA)=\kappa_2(A)^2.
+\]
+薄 QR 给出 $A=Q_1R$、$Q_1^TQ_1=I$，从而
+\[
+ R\bm x=Q_1^T\bm b,\qquad
+ \bm r=(I-Q_1Q_1^T)\bm b.
+\]
+正交变换保持二范数，无需显式形成 $A^TA$。
+\section{三种正交化机制}
+MGS 将当前向量逐个减去已获得方向上的投影；它比经典一次性 Gram--Schmidt 更能抵抗某些消去误差，但病态基仍可能需要重正交化。Householder 反射 $H=I-2\bm v\bm v^T/(\bm v^T\bm v)$ 一次消去一列下方元素，适合稳定的稠密 QR。Givens 旋转只改变两个分量，适合增量消去 Hessenberg 矩阵的新条目。
+\conceptbridge{为什么不把正规方程当作更小的对称系统直接求解？}{缩小尺寸的同时，正规方程把奇异值平方。若小奇异值已接近舍入误差尺度，形成乘积会削弱可辨识信息。QR 用保范数的变换保留原问题尺度；秩亏时还需秩判定和解的选择。}{最小残差 $\longrightarrow$ 正交投影 $\longrightarrow$ 稳定的小型三角问题。}
+\section{最小算例与秩亏}
+用三点 $(t_i,b_i)=(0,1),(1,2),(2,2)$ 拟合 $c_0+c_1t$：
+\[
+ A=\begin{bmatrix}1&0\\1&1\\1&2\end{bmatrix},\quad
+ \bm c=(7/6,1/2)^T,\quad
+ \bm r=\bm b-A\bm c=(-1/6,1/3,-1/6)^T.
+\]
+验证 $A^T\bm r=0$。若两列相同，最小二乘解便不唯一；列主元 QR 可辅助数值秩判定，SVD 则给出指定阈值下的最小范数解。可靠秩判定还需考察列相关性，无主元 $R$ 的小对角元可作为进一步检查的线索。
+\costnote{稠密薄 QR 约 $2mn^2-2n^3/3$ FLOPs。存储 Householder 向量而非完整 $Q$ 可减少成本。稀疏 QR 仍可能填充；条件较好且性能优先时正规方程也可有明确使用范围。}
+\aiexercise{对三点拟合显式构造薄 QR，验证正交残差并比较正规方程结果。}{令第二列为第一列加 $10^{-k}$ 倍独立向量，比较 QR、正规方程及 SVD 的残差和系数误差。}
+\studyroute{略去后向稳定性证明、秩揭示 QR 与 SVD 算法。参考 \cite{golub,trefethen}。}{Householder QR; modified Gram Schmidt; Givens; rank revealing QR; least squares}

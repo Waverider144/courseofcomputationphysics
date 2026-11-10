@@ -1,0 +1,30 @@
+\chapter{Algebraic Multigrid}\label{v0ch:20}
+\begin{chaptersummary}
+Geometric multigrid uses an existing mesh hierarchy; when the main input is a sparse matrix, coarse spaces must be built from algebraic coupling. Classical AMG and smoothed aggregation use strong connections, near-nullspace modes, and PDE information to construct interpolation. Both retain the error directions that smoothing leaves behind.
+\end{chaptersummary}
+\learninggoals{Explain algebraically smooth error; distinguish classical interpolation from aggregation; record operator complexity and coarse costs.}
+\paragraph{Core Question}Given only a sparse matrix, which errors should the coarse level represent?
+
+\section{From Geometric to Algebraic Smoothness}
+An error changed little by relaxation is algebraically smooth relative to that smoother. For typical diffusion M-matrices, large negative off-diagonal entries often signal strong coupling. One classical strength criterion is
+$-a_{ij}\ge\theta\max_{k\ne i}(-a_{ik})$.
+The criterion depends on signs and problem type and does not transfer unchanged to arbitrary nonsymmetric or block systems.
+Classical AMG selects coarse variables and builds interpolation through strong connections. Smoothed aggregation first groups variables into tentative interpolation $P_0$, then improves its energy properties using
+\[
+ P=(I-\omega D^{-1}A)P_0,\qquad A_c=P^TAP
+\]
+or related operations. Elasticity often requires rigid-body near-null modes; more complex systems may require block information or dedicated strategies.
+\conceptbridge{Why does AMG need physical information beyond the nonzero pattern?}{A pattern identifies coupling but not low-energy or poorly relaxed combinations. Coefficient magnitudes, signs, anisotropy, and near-nullspaces determine the directions that interpolation must retain.}{Matrix coupling $\longrightarrow$ difficult error modes $\longrightarrow$ appropriate interpolation space.}
+\section{Complexity and Reliable Combinations}
+Grid and operator complexities are
+\[
+ C_g=\frac{\sum_\ell N_\ell}{N_0},\qquad
+ C_o=\frac{\sum_\ell\nnz(A_\ell)}{\nnz(A_0)}.
+\]
+Denser coarse levels may increase setup, memory, and communication even when iteration counts decrease. AMG can be a standalone iteration or an outer preconditioner. Standard CG needs a fixed SPD overall cycle; variable inner strategies generally motivate FGMRES.
+\section{An Executable Teaching Model}
+The one-dimensional Poisson example combines adjacent aggregation, tentative constant interpolation, one Jacobi smoothing step, and an exact coarse solve into a two-level action. It verifies $P^TAP$, symmetry, and residual correction. Production AMG adds recursive coarsening, robust strength measures, truncation, and parallel coarse-level treatment; performance measurements refer to each complete implementation.\cite{petsc}
+\costnote{Report setup, $C_g,C_o$, cycle cost, and outer iterations. Strongly nonsymmetric transport, saddle-point systems, and high-frequency indefinite waves often need specialized preconditioners; diffusion-AMG results do not directly generalize.}
+\coderef{sparse_linear_algebra/multilevel.py}
+\aiexercise{For seven-point Poisson, construct adjacent-aggregate $P_0$, smoothed $P$, and $P^TAP$. Compare correction of constant and oscillatory errors.}{Vary coefficient jumps and aggregation. Record complexity, setup, and PCG true residuals, checking symmetry and positive definiteness first.}
+\studyroute{Ruge--St\"uben interpolation formulas and smoothed-aggregation convergence theory are omitted. See \cite{saad,briggs,petsc}.}{algebraically smooth error; strength of connection; classical AMG; smoothed aggregation; near nullspace}

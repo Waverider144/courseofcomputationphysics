@@ -1,0 +1,134 @@
+\chapter{复杂几何与网格技术}\label{ch:21}
+\begin{chaptersummary}
+固定贴体网格直接表示物体边界，复杂运动与局部尺度变化则要求更灵活的几何组织。本章依次讨论浸没边界、树网格、ALE 和重叠网格，说明它们如何通过附加作用、共同子面、移动控制体与插值连接几何和演化。守恒转移与几何守恒律贯穿这些不同布局。
+\end{chaptersummary}
+\learninggoals{解释四类网格技术的状态与接口；由移动控制体推导相对通量；说明粗细转移、共享子面与重叠插值中的守恒要求。}
+\studyroute{正文围绕几何表示、界面传递与守恒组织网格方程；网格生成器、孔切搜索及边界强迫的完整实现留待进一步展开。}{immersed boundary; quadtree octree; AMR refluxing; ALE; geometric conservation law; overset}{对一个粗边与两条细边显式列出共同通量，再对一个移动控制体检验常数解，比较空间与几何守恒的要求。}
+\section{浸没边界与背景网格}
+浸没边界法把复杂物体放入简单背景网格，不要求网格贴合物体。在动量方程中加入边界作用：
+\[
+\rho\left(
+\frac{\partial\bm u}{\partial t}
++\bm u\cdot\nabla\bm u
+\right)
+=
+-\nabla p+\mu\nabla^2\bm u+\bm f_{\mathrm{IB}}.
+\]
+
+\begin{authornote}
+\textbf{潜在疑问：}
+“为什么不让网格贴合边界时，可以通过方程里的 \(\bm f_{\mathrm{IB}}\) 表达边界作用？”
+
+\textbf{作者补充：}
+贴体网格把物体表面直接表示为网格边界，边界条件可以在该边界上施加。浸没边界法允许几何表面穿过背景网格，于是需要借助附加力或修改附近离散方程，使数值解满足物体的影响。几何处理更灵活，但边界附近的精度和守恒性需要专门检验。
+
+\textbf{核心概念联系：}
+\[
+\text{body-fitted boundary condition}
+\longrightarrow
+\text{immersed forcing}
+\longrightarrow
+\text{background-grid computation}
+\]
+\end{authornote}
+
+连续强迫法通过光滑核在拉格朗日边界与欧拉网格之间传递力；离散强迫法直接修改边界附近离散方程。
+
+规则背景网格便于组织计算和处理复杂运动，壁面附近精度、通量守恒及薄结构则需要相应的边界离散与验证。
+
+\section{四叉树、八叉树与 AMR}
+二维四叉树将一个单元递归分成四个子单元，三维八叉树分成八个子单元。其核心是只在激波、剪切层、涡、界面或高误差区域投入高分辨率。
+
+\begin{authornote}
+\textbf{潜在疑问：}
+“为什么局部加密会立刻带来 2:1 平衡、非匹配界面和守恒转移这些工程约束？”
+
+\textbf{作者补充：}
+局部加密改变的不只是分辨率：粗细单元之间会出现新的邻接关系，界面通量必须在不同尺度的面之间保持相容。随时间变化的加密区域还要求重新构造空间投影与界面通量，使新旧自由度之间的转移满足守恒。
+
+\textbf{核心概念联系：}
+\[
+\text{local refinement}
+\longrightarrow
+\text{nonmatching interfaces}
+\longrightarrow
+\text{conservative transfer}
+\]
+\end{authornote}
+
+常见工程约束包括：
+\begin{itemize}
+  \item 相邻单元保持 2:1 层级平衡；
+  \item 处理粗细非匹配界面；
+  \item 加密和粗化时守恒地转移变量；
+  \item 自适应后重建接口投影与通量匹配。
+\end{itemize}
+
+\section{动网格、ALE 与几何守恒律}
+在任意拉格朗日--欧拉描述中，网格具有速度 \(\bm w\)。守恒方程写成
+\[
+\frac{\dd}{\dd t}\int_{\Omega(t)}U\dd V
++
+\int_{\partial\Omega(t)}
+[\bm F(U)-U\bm w]\cdot\bm n\dd S
+=0.
+\]
+
+\begin{authornote}
+\textbf{潜在疑问：}
+“为什么网格一运动，通量就从 \(\bm F(U)\) 变成 \(\bm F(U)-U\bm w\)？”
+
+\textbf{作者补充：}
+控制体运动时，守恒量穿过边界的变化不仅来自物质相对固定空间的运动，也来自边界自身扫过的体积。积分守恒律因此涉及物理通量与网格速度共同构成的相对通量。几何守恒律要求离散体积变化与网格扫过量一致，否则连均匀解也可能产生人为变化。
+
+\textbf{核心概念联系：}
+\[
+\text{fixed control volume}
+\longrightarrow
+\text{moving control volume}
+\longrightarrow
+\text{ALE flux}
+\]
+\end{authornote}
+
+动网格必须满足几何守恒律：若物理解为常数，仅仅移动网格不应制造虚假变化。
+
+网格运动可由弹簧类比、Laplace 平滑、线弹性、径向基函数或局部重构实现。运动过大时，需要重新划分网格。
+
+\section{重叠网格与非匹配耦合}
+重叠网格将多个独立网格块叠加，例如背景网格、贴体部件网格和随动局部网格。网格之间通过供体单元向接收单元插值。
+
+\begin{authornote}
+\textbf{潜在疑问：}
+“为什么多个网格叠在一起仍能形成一个计算域？插值耦合会牺牲什么结构？”
+
+\textbf{作者补充：}
+重叠网格用多个易于生成或运动的子网格共同覆盖计算区域。为避免重复求解，需标记被遮盖的单元，并在网格交界处从 donor 单元向 receiver 提供插值数据。插值建立了子网格之间的耦合，但普通插值不一定使两侧通量精确平衡，因此全局守恒性需要额外设计或检查。
+
+\textbf{核心概念联系：}
+\[
+\text{single conforming mesh}
+\longrightarrow
+\text{overlapping mesh blocks}
+\longrightarrow
+\text{interpolation coupling}
+\]
+\end{authornote}
+
+其优势是部件网格可独立生成，适合多个刚体的大范围相对运动。困难在于孔切、供体搜索、守恒插值和动态连通更新。
+
+
+\section{空间、时间与几何的一致性}\index{几何守恒律}
+粗细接口可使用 Mortar 组织共同子面，重叠网格则还需明确物理域的有效覆盖，
+避免重复计量守恒量。普通状态插值、通量匹配与守恒重映射分别承担不同任务。
+
+对移动单元，连续几何恒等式为
+\[
+\frac{\dd |K(t)|}{\dd t}
+=\int_{\partial K(t)}\bm w\cdot\bm n\dd S.
+\]
+离散体积变化与 ALE 通量中的网格扫过体积需采用一致时间积分。
+将 $U=U_0$ 代入移动控制体更新，即可检验均匀场是否保持。
+
+\aiexercise{令一个一维单元的左右端点分别以给定速度运动，从 ALE 积分式推导常数解更新，写出体积时间积分与网格通量必须满足的等式。}
+{画出树网格粗细交界与两块重叠网格，分别标出状态转移、有效控制体和共享通量。说明每种布局如何测量整体质量变化。}

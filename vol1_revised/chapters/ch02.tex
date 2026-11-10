@@ -1,0 +1,168 @@
+\chapter{从速度矩到连续介质方程}\label{ch:2}
+
+\begin{chaptersummary}
+上一章的分布函数保留完整速度信息。本章通过速度矩定义密度、平均速度、压力和能量，推导宏观守恒方程，再以本构关系补足未解应力与热流。这一过程为 Euler、Navier--Stokes 和有限体积守恒形式提供基础。宏观模型的适用范围由保留的矩和闭合假设共同决定。
+\end{chaptersummary}
+\learninggoals{推导守恒矩并辨认未闭合项；区分压力张量、黏性应力和热流；给出 Euler 与 Navier--Stokes 的适用假设。}
+\studyroute{这里略去能量矩的完整代数推导与输运系数的动理学计算。}{velocity moments; Chapman--Enskog expansion; constitutive closure}{从 $f$ 的前三类守恒矩出发，区分精确矩恒等式与 Newton 黏性、Fourier 热流所增加的假设。}
+
+\section{守恒矩与宏观观测量}\index{矩闭合}
+本章先取三维、单组分、单原子稀薄气体，弹性碰撞守恒质量、动量与能量，外力为 $m\bm b(\bm x,t)$。速度空间积分假设 $f$ 足够衰减。
+分布函数包含完整速度分布，宏观模型选择其中有限个加权积分。
+
+数密度、质量密度和宏观速度分别为
+\[
+n=\int f\dd\bm v,
+\qquad
+\rho=mn,
+\qquad
+\rho\bm u=m\int \bm v f\dd\bm v.
+\]
+
+定义相对速度
+\[
+\bm c=\bm v-\bm u.
+\]
+压力张量与热流为
+\[
+\bm P=m\int \bm c\bm c f\dd\bm v,
+\qquad
+\bm q=\frac{m}{2}\int |\bm c|^2\bm c f\dd\bm v.
+\]
+
+对动理学方程取零阶矩，利用碰撞守恒粒子数：
+\[
+\int Q(f,f)\dd\bm v=0,
+\]
+
+\begin{authornote}
+\textbf{潜在疑问：}
+“为什么宏观方程可以通过对速度变量取矩得到？取零阶矩、一阶矩的物理含义是什么？”
+
+\textbf{作者补充：}
+密度、平均速度和能量是完整速度分布的加权积分。这些矩直接连接守恒律、实验测量与宏观状态，因此成为连续介质模型的基本变量。有限矩也规定了描述的分辨能力：具有相同低阶矩的不同速度分布，在这一层次上对应相同的宏观状态。
+
+\textbf{核心概念联系：}
+\[
+f(\bm x,\bm v,t)
+\longrightarrow
+\text{moments}
+\longrightarrow
+\text{macroscopic observables}
+\]
+\end{authornote}
+
+得到连续性方程
+\[
+\boxed{
+\frac{\partial\rho}{\partial t}
++\nabla\cdot(\rho\bm u)=0
+}.
+\]
+
+其控制体形式为
+\[
+\frac{\dd}{\dd t}\int_\Omega \rho\dd V
+=
+-\int_{\partial\Omega}\rho\bm u\cdot\bm n\dd S.
+\]
+有限体积法正是从这一形式出发。
+
+取一阶矩得到动量方程
+\[
+\frac{\partial(\rho\bm u)}{\partial t}
++
+\nabla\cdot(\rho\bm u\bm u+\bm P)
+=
+\rho\bm b.
+\]
+
+\begin{askai}
+AI 展开问题：
+\begin{quote}
+从一般动理学方程出发，逐步对速度变量取一阶矩，推导
+\[
+\partial_t(\rho\bm u)+\nabla\cdot(\rho\bm u\bm u+\bm P)=\rho\bm b.
+\]
+请明确说明每一项的积分分部、边界衰减假设和物理含义。
+\end{quote}
+
+进一步展开：
+\begin{quote}
+把 \(\bm P=m\int \bm c\bm c f\dd\bm v\) 拆成各向同性压力和偏应力，说明它为什么不是简单标量。
+\end{quote}
+\end{askai}
+
+写成
+\[
+\bm P=p\bm I-\bm\tau,
+\]
+则
+\[
+\frac{\partial(\rho\bm u)}{\partial t}
++
+\nabla\cdot(\rho\bm u\bm u)
+=
+-\nabla p+\nabla\cdot\bm\tau+\rho\bm b.
+\]
+
+\section{本构闭合与连续介质模型}
+要封闭方程，必须给出应力与宏观变量之间的本构关系。Newton 流体满足
+\[
+\bm\tau
+=
+\mu\left[\nabla\bm u+(\nabla\bm u)^T\right]
++\lambda(\nabla\cdot\bm u)\bm I.
+\]
+
+\begin{authornote}
+\textbf{潜在疑问：}
+“为什么推到动量方程后还没有结束？本构关系为什么不是从前面的矩操作自动得到的？”
+
+\textbf{作者补充：}
+低阶矩的演化方程通常含有更高阶矩，例如动量方程中的应力和能量方程中的热流。若只求解有限个宏观变量，就必须用这些变量及其梯度近似尚未求解的量。本构关系正是这种额外的物理假设，其形式和适用范围取决于介质及所研究的尺度。
+
+\textbf{核心概念联系：}
+\[
+\text{moment equations}
+\longrightarrow
+\text{unclosed stresses and heat fluxes}
+\longrightarrow
+\text{constitutive closure}
+\]
+\end{authornote}
+
+
+不可压缩、常密度、常黏度情况下，
+\[
+\nabla\cdot\bm u=0,
+\]
+\[
+\rho\left(
+\frac{\partial\bm u}{\partial t}
++\bm u\cdot\nabla\bm u
+\right)
+=
+-\nabla p+\mu\nabla^2\bm u+\rho\bm b.
+\]
+
+其中惯性项负责搬运动量，压力项负责重新分配动量，黏性项负责平滑速度梯度。若忽略黏性和热传导，则得到 Euler 方程。
+
+取能量矩可得总能量方程
+\[
+\frac{\partial(\rho E)}{\partial t}
++
+\nabla\cdot[(\rho E+p)\bm u]
+=
+\nabla\cdot(\bm\tau\cdot\bm u)
+-\nabla\cdot\bm q
++\rho\bm b\cdot\bm u,
+\]
+其中 $e$ 为单位质量内能，单原子理想气体满足 $p=\rho k_BT/m$、$e=3k_BT/(2m)$。应力和热流的 Newton--Fourier 形式对应近局部平衡、短平均自由程尺度。
+\[
+E=e+\frac12|\bm u|^2,
+\qquad
+\bm q=-k\nabla T.
+\]
+
+从动理学到连续介质的本质，是只保留有限个矩，并用本构关系封闭更高阶矩。

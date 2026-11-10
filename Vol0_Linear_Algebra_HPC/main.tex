@@ -1,0 +1,56 @@
+\documentclass[11pt,openany]{ctexbook}
+\input{Vol0_Linear_Algebra_HPC/preamble}
+\title{数值线性代数与现代高性能计算\\[0.6em]\large Numerical Linear Algebra and Modern High-Performance Computing}
+\author{计算物理学简明教程\quad 第 0 卷}
+\date{2026 年 11 月}
+\begin{document}
+\frontmatter
+\maketitle
+\chapter*{阅读路线}\addcontentsline{toc}{chapter}{阅读路线}
+科学计算中的空间离散产生有限维算子，算子的结构约束求解算法，算法的数据依赖进一步约束机器上的执行方式。本卷围绕这条联系组织矩阵分解、Krylov 子空间、预条件、多重网格与性能分析。
+第一卷提供物理建模和空间离散，第二卷提供场方程的几何、约束与保结构离散。本卷以这些结果为输入，讨论如何可靠而高效地求解。
+\par
+前三章建立矩阵、残差和误差的共同语言；第二、三部分分别研究分解与投影；第四部分将它们组合为预条件与多层求解器；第五部分用 Roofline 分析算子实现、时间推进和并行通信。首次阅读可沿第 1、2、3、4、10、12、16、19、22、24、29 章建立主线，再回到各算法的条件和变体。
+\par
+每章给出学习目标、概念联系、最小算例和具体的 AI 展开问题。省略的证明、实现细节和检索关键词在相应位置列出。符号默认实数域；复数问题将转置替换为共轭转置。$N$ 通常表示代数未知量个数，网格每方向点数另记为 $n$。CPU 实验采用双精度；运行记录与代码位于本卷目录。性能估算、实际计时与未执行实验分别注明。
+\tableofcontents
+\mainmatter
+\part{从离散方程到矩阵系统}
+\input{Vol0_Linear_Algebra_HPC/chapters/part01_matrix_systems/ch01}
+\input{Vol0_Linear_Algebra_HPC/chapters/part01_matrix_systems/ch02}
+\input{Vol0_Linear_Algebra_HPC/chapters/part01_matrix_systems/ch03}
+\part{矩阵分解方法}
+\input{Vol0_Linear_Algebra_HPC/chapters/part02_factorization/ch04}
+\input{Vol0_Linear_Algebra_HPC/chapters/part02_factorization/ch05}
+\input{Vol0_Linear_Algebra_HPC/chapters/part02_factorization/ch06}
+\input{Vol0_Linear_Algebra_HPC/chapters/part02_factorization/ch07}
+\input{Vol0_Linear_Algebra_HPC/chapters/part02_factorization/ch08}
+\input{Vol0_Linear_Algebra_HPC/chapters/part02_factorization/ch09}
+\part{Krylov 子空间方法}
+\input{Vol0_Linear_Algebra_HPC/chapters/part03_krylov/ch10}
+\input{Vol0_Linear_Algebra_HPC/chapters/part03_krylov/ch11}
+\input{Vol0_Linear_Algebra_HPC/chapters/part03_krylov/ch12}
+\input{Vol0_Linear_Algebra_HPC/chapters/part03_krylov/ch13}
+\input{Vol0_Linear_Algebra_HPC/chapters/part03_krylov/ch14}
+\input{Vol0_Linear_Algebra_HPC/chapters/part03_krylov/ch15}
+\part{预条件与多层方法}
+\input{Vol0_Linear_Algebra_HPC/chapters/part04_preconditioning/ch16}
+\input{Vol0_Linear_Algebra_HPC/chapters/part04_preconditioning/ch17}
+\input{Vol0_Linear_Algebra_HPC/chapters/part04_preconditioning/ch18}
+\input{Vol0_Linear_Algebra_HPC/chapters/part04_preconditioning/ch19}
+\input{Vol0_Linear_Algebra_HPC/chapters/part04_preconditioning/ch20}
+\input{Vol0_Linear_Algebra_HPC/chapters/part04_preconditioning/ch21}
+\part{Roofline 驱动的现代高性能计算}
+\input{Vol0_Linear_Algebra_HPC/chapters/part05_roofline_hpc/ch22}
+\input{Vol0_Linear_Algebra_HPC/chapters/part05_roofline_hpc/ch23}
+\input{Vol0_Linear_Algebra_HPC/chapters/part05_roofline_hpc/ch24}
+\input{Vol0_Linear_Algebra_HPC/chapters/part05_roofline_hpc/ch25}
+\input{Vol0_Linear_Algebra_HPC/chapters/part05_roofline_hpc/ch26}
+\input{Vol0_Linear_Algebra_HPC/chapters/part05_roofline_hpc/ch27}
+\input{Vol0_Linear_Algebra_HPC/chapters/part05_roofline_hpc/ch28}
+\input{Vol0_Linear_Algebra_HPC/chapters/part05_roofline_hpc/ch29}
+\appendix
+\input{Vol0_Linear_Algebra_HPC/appendices/reproducibility}
+\backmatter
+\input{Vol0_Linear_Algebra_HPC/references/bibliography}
+\end{document}

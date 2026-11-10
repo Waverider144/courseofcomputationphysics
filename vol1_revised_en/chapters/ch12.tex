@@ -1,0 +1,92 @@
+\chapter{VCJH Correction Functions and Energy Stability}\label{ch:12}
+\begin{chaptersummary}
+FR endpoint conditions ensure conservation but leave freedom in the interior correction. A modified energy norm constrains this freedom for one-dimensional linear advection, producing the VCJH one-parameter family. With normalization, mass matrix, and quadrature fixed, its relationships with DG, particular SD constructions, and Huynh corrections can be stated precisely.
+\end{chaptersummary}
+\learninggoals{Write the parameterized VCJH corrections; derive positivity and the linear energy identity; identify DG and SD parameters under specified assumptions; assess parameters through spectra and errors.}
+\studyroute{The proof assumes one-dimensional constant-coefficient advection, stationary affine meshes, and exact polynomial integration. Nonlinear entropy, curved meshes, and diffusion extensions are further reading.}{VCJH correction function; energy stable flux reconstruction; modified Sobolev norm; SBP CPR}{For $p=1,2,3$, calculate correction endpoints, lifting matrices, and modified mass matrices, and verify the linear energy matrix identity.}
+
+\section{Parameterized Correction Functions}\index{VCJH methods}
+Let $p\ge1$, with standard Legendre polynomial $P_p$,
+whose leading coefficient is $a_p=(2p)!/[2^p(p!)^2]$.
+Use the normalization of~\cite{vincent2011}:
+\[
+\eta_p=\frac{c(2p+1)(a_pp!)^2}{2},
+\]
+\begin{equation}\label{eq:vcjh-functions}
+\begin{aligned}
+g_L(\xi)&=\frac{(-1)^p}{2}
+\left[P_p(\xi)-\frac{\eta_pP_{p-1}(\xi)+P_{p+1}(\xi)}{1+\eta_p}\right],\\
+g_R(\xi)&=\frac12
+\left[P_p(\xi)+\frac{\eta_pP_{p-1}(\xi)+P_{p+1}(\xi)}{1+\eta_p}\right].
+\end{aligned}
+\end{equation}
+The identities $P_k(1)=1$ and $P_k(-1)=(-1)^k$ give the four FR endpoint conditions directly.
+The parameter $c$ is dimensionless. Changing it preserves flux consistency while modifying the lifting into interior modes.
+
+\conceptbridge{Why introduce a modified energy with higher derivatives rather than check endpoint conditions alone?}
+{Endpoint conditions constrain only the integrated flux. An energy estimate must also control the pairing of interior modes with interface liftings. Adjusting the norm of the highest mode permits a lifting satisfying discrete integration by parts; positivity ensures that the estimate controls every degree of freedom.}
+{Conservative endpoint conditions $\longrightarrow$ interior lifting $\longrightarrow$ a positive modified energy.}
+
+\section{Modified Norm and Stable Parameter Range}
+In an exactly integrated polynomial basis, let $D$ be the reference derivative matrix and $M$ the mass matrix. Define
+\begin{equation}\label{eq:vcjh-norm}
+K_c=\frac c2(D^p)^{\mathsf T}MD^p,\qquad H_c=M+K_c.
+\end{equation}
+Then
+\[
+U^{\mathsf T}H_cU
+=\int_{-1}^1u_h^2\dd\xi
++\frac c2\int_{-1}^1(\partial_\xi^pu_h)^2\dd\xi.
+\]
+In a Legendre modal basis, only the highest-order diagonal entry changes:
+\[
+H_c=\diag\left(2,\frac23,\ldots,
+\frac{2}{2p+1}+c(a_pp!)^2\right).
+\]
+Hence
+\begin{equation}\label{eq:vcjh-bound}
+c>c_-:=-\frac{2}{(2p+1)(a_pp!)^2}
+\quad\Longleftrightarrow\quad H_c>0
+\quad\Longleftrightarrow\quad\eta_p>-1.
+\end{equation}
+Since $D^{p+1}=0$, $K_cD=0$. The derivative matrix of the corrections~\eqref{eq:vcjh-functions} satisfies
+\[
+C=H_c^{-1}R^{\mathsf T}B,\qquad
+H_cD+D^{\mathsf T}H_c=R^{\mathsf T}BR.
+\]
+This matrix interpretation is compatible with SBP--CPR constructions~\cite{ranocha2016}.
+
+\section{The Linear Energy Proof}
+For constant $a$, multiply the FR equation by $U_j^{\mathsf T}H_c$.
+Discrete integration by parts converts the volume term to endpoint trace squares, and the lifting inserts the shared flux.
+Summation over periodic elements gives
+\[
+\frac{\dd}{\dd t}\sum_j\frac{J_j}{2}U_j^{\mathsf T}H_cU_j
+=\sum_f(\widehat f-a\{u_h\})[u_h]
+=-\frac{|a|}{2}\sum_f[u_h]^2.
+\]
+The constant mode satisfies $K_c\bm1=0$, so this lifting also preserves the physical cell average.
+Negative parameters within~\eqref{eq:vcjh-bound} still define a positive norm.
+Near the lower bound, the highest-mode weight decreases; norm-equivalence constants, spectral radius, and errors must therefore also be assessed.
+
+\section{Special Parameters and Practical Selection}
+For the exact mass matrix and linear-advection setting used here:
+\begin{center}\small
+\begin{tabularx}{\textwidth}{@{}l>{\raggedright\arraybackslash}X@{}}
+\toprule
+Parameter & Specific relationship\\
+\midrule
+$c=0$ & $H_c=M$, recovering the exactly integrated DG lifting of Chapter~\ref{ch:11}.\\
+$\eta_p=p/(p+1)$ & A particular one-dimensional SD construction with interior flux points at the roots of $P_p$ and interface endpoints.\\
+$\eta_p=(p+1)/p$ & Huynh's $g_2$ correction; its relationship with a particular Lobatto-quadrature DGSEM additionally requires fixed quadrature and nodes.\\
+\bottomrule
+\end{tabularx}
+\end{center}
+These relationships use the specified correction functions, nodes, and quadrature.
+Changes in SD nodes, nonlinear flux interpolation, or dimension can be assessed through the same volume and lifting matrices.
+If a reference uses $\kappa$ with $K=\kappa(D^p)^{\mathsf T}MD^p$,
+then the present parameter is $c=2\kappa$.
+Parameter selection can compare dispersion at target wave numbers, available CFL numbers, and error tolerances. The linear energy range provides an analytically controlled starting point.
+
+\aiexercise{In a $p=2$ Legendre basis, construct $D,M,R,B$. Calculate $H_c,C$ for $c=0$, the SD parameter, and a negative stable parameter. Verify positivity, $H_cC=R^{\mathsf T}B$, and the modified-energy derivative.}
+{At fixed total degrees of freedom, upwind flux, and RK4 integration, measure smooth-wave errors and stable steps for these parameters. Report semidiscrete and fully discrete results separately, and identify nonlinear stability as further reading.}

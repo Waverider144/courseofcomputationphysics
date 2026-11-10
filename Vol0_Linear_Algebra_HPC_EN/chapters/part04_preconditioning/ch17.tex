@@ -1,0 +1,33 @@
+\chapter{Stationary Iteration and Smoothing}\label{v0ch:17}
+\begin{chaptersummary}
+Preconditioners can arise from simple iterations as well as factorizations. This chapter expresses Jacobi, Gauss--Seidel, and SOR as error-propagation operators, explaining why a slow standalone solver can be an effective smoother. Multigrid relies on assigning local iteration only the error components it removes well.
+\end{chaptersummary}
+\learninggoals{Form iteration matrices; use spectral radii for convergence; distinguish high-frequency smoothing from a complete solve.}
+\paragraph{Core Question}Why can a slow solver be an effective algorithmic component?
+
+\section{Matrix Splittings}
+For $A=M-N$, iterate
+$\bm x_{k+1}=M^{-1}(N\bm x_k+\bm b)$. The error matrix is
+$E=M^{-1}N=I-M^{-1}A$. Convergence for every initial error is equivalent to $\rho(E)<1$.
+With $A=D+L+U$:
+\[
+\begin{array}{c|c}
+\text{Jacobi}&M=D\\
+\text{Weighted Jacobi}&\bm x^+=\bm x+\omega D^{-1}\bm r\\
+\text{Gauss--Seidel}&M=D+L\\
+\text{SOR}&M=D/\omega+L
+\end{array}
+\]
+Gauss--Seidel converges for SPD matrices; SOR does so for SPD matrices with $0<\omega<2$. General matrices require additional conditions; sparsity alone is insufficient.
+\section{A Fourier Smoothing Example}
+For interior one-dimensional Poisson, analyze local periodic modes $e_i=e^{\mathrm i i\theta}$, ignoring physical-boundary effects on the local symbol. Weighted Jacobi has error amplification
+\[
+ \widehat E(\theta)=1-\omega(1-\cos\theta).
+\]
+With $\omega=2/3$, $|\widehat E|\le1/3$ for $\theta\in[\pi/2,\pi]$, while $\widehat E\to1$ as $\theta\to0$. Oscillatory error decays rapidly, but smooth error remains. Ordinary Jacobi can merely reverse the highest frequency's sign without damping it; relaxation is not automatically effective smoothing.
+\conceptbridge{Why do high and low frequencies need different treatments?}{Local updates compare nearby values. Oscillatory errors produce large residuals and are readily corrected; slowly varying errors have small fine-grid residuals and need long-range communication. Coarsening turns slow variation into a more tractable scale.}{Local relaxation $\longrightarrow$ remaining smooth error $\longrightarrow$ coarse-space correction.}
+\section{Implementation and Cost}
+Start with $e_i=\sin(\pi x_i)+0.3\sin(16\pi x_i)$ and apply weighted Jacobi to the homogeneous error equation. Project onto each component separately. Sequential GS reads updated values; Jacobi reads an old vector. Preserve this distinction in parallel implementations.
+\costnote{Jacobi is easily parallelized and usually bandwidth-sensitive; GS has dependencies. Multicolor, block, and Chebyshev smoothers change parallelism and frequency response, requiring operator-specific parameters.}
+\aiexercise{Derive $\widehat E(\theta)$ from three-point Poisson. Sweep $\omega$ and compare low- and high-frequency damping.}{Introduce anisotropic diffusion, explain point-smoothing failure, and propose line relaxation or semicoarsening.}
+\studyroute{The complete two-grid local Fourier symbol is omitted. See \cite{briggs,saad}.}{weighted Jacobi; smoothing factor; local Fourier analysis; line relaxation}

@@ -1,0 +1,97 @@
+\chapter{Yee-FDTD：离散结构与性能}\label{v0ch:24}
+\begin{chaptersummary}
+第二卷建立了 Maxwell 演化与约束的相容离散。本章沿 Yee 网格的自由度、交错时间和旋度结构，将拓扑恒等式落实为数组更新，再分析工作量与流量。由此，离散复形、相位关系和两相数据依赖成为性能优化的明确约束。
+\end{chaptersummary}
+\learninggoals{写出 Yee 更新与离散约束；区分关联矩阵和材料 Hodge；计算三种流量口径并检验色散与能量。}
+\paragraph{核心问题}怎样在保持 Maxwell 结构的同时识别 Yee 实现的性能瓶颈？
+
+\section{自由度、材料与网格}
+取静止、无色散各向同性介质：
+\[
+ \varepsilon\partial_t\bm E=\nabla\times\bm H-\bm j,\qquad
+ \partial_t\bm B=-\nabla\times\bm E,\qquad \bm B=\mu\bm H.
+\]
+$\varepsilon,\mu$ 显式保留在材料与波速关系中。立方格上 $E_x$ 位于 $(i+\tfrac12,j,k)$，$E_y,E_z$ 循环换位；$B_x$ 位于 $(i,j+\tfrac12,k+\tfrac12)$，其余同理。$E$ 在整数时间，$B$ 在半整数时间。
+
+\begin{figure}[H]\centering
+\begin{tikzpicture}[x={(4cm,0cm)},y={(1.4cm,1cm)},z={(0cm,3cm)},>=Stealth]
+\foreach \z in {0,1}{\draw[gray] (0,0,\z)--(1,0,\z)--(1,1,\z)--(0,1,\z)--cycle;}
+\foreach \x in {0,1}{\foreach \y in {0,1}{\draw[gray] (\x,\y,0)--(\x,\y,1);}}
+\draw[very thick,red,->](.18,0,0)--(.82,0,0) node[midway,below]{$E_x^n$};
+\draw[very thick,red,->](1,.18,0)--(1,.82,0) node[midway,right]{$E_y^n$};
+\draw[very thick,red,->](0,1,.18)--(0,1,.82) node[midway,left]{$E_z^n$};
+\fill[blue] (0,.5,.5) circle(1.8pt);
+\draw[blue,thick,->](0,.5,.5)--(.3,.5,.5);
+\node[blue,anchor=east] at (0,.5,.5) {$B_x^{n+1/2}$};
+\fill[blue] (.5,0,.5) circle(1.8pt);
+\draw[blue,thick,->](.5,0,.5)--(.5,.3,.5);
+\node[blue,anchor=north] at (.5,-.1,.42) {$B_y^{n+1/2}$};
+\fill[blue] (.5,.5,0) circle(1.8pt);
+\draw[blue,thick,->](.5,.5,0)--(.5,.5,.3);
+\node[blue,anchor=north] at (.58,.5,-.18) {$B_z^{n+1/2}$};
+\end{tikzpicture}
+\caption{单个立方胞元的代表性边电场与面磁场位置。箭头标记分量方向，不表示全部边面自由度。}
+\end{figure}
+
+点值分量可看作均匀网格上的采样；积分自由度则为边环量 $e_\ell=\int_\ell E$ 与面通量 $b_f=\int_f B$。边长、面积及材料因子把两种记法联系起来，不能将点值数组直接称为无量纲关联矩阵。
+\section{拓扑与矩阵自由更新}
+边界关联矩阵为 $G,C,D$，满足 $CG=0,DC=0$。在相容原始/对偶网格和边界配对下，可写
+\[
+ \dot{\bm b}=-C\bm e,\qquad
+ M_\varepsilon\dot{\bm e}=C^TM_{\mu^{-1}}\bm b-\bm j_h .
+\]
+$C$ 编码取向，$M_\varepsilon,M_{\mu^{-1}}$ 编码度量和材料；均匀正交 Yee 网格可采用对角材料作用。于是 $\partial_t(D\bm b)=0$。采用对偶散度 $D_e=-G^T$ 的取向约定，离散电荷为 $\bm q=D_eM_\varepsilon\bm e$，连续性更新需满足 $\dot{\bm q}=-D_e\bm j_h$；边界通量也必须相容。
+定义前向差分 $\delta_\alpha^+$ 和后向差分 $\delta_\alpha^-$，周期均匀网格上
+\[
+ B_x^{n+1/2}=B_x^{n-1/2}
+ -\Delta t(\delta_y^+E_z^n-\delta_z^+E_y^n),
+\]
+\[
+ E_x^{n+1}=E_x^n+\frac{\Delta t}{\varepsilon}
+ [\delta_y^-H_z^{n+1/2}-\delta_z^-H_y^{n+1/2}-j_x^{n+1/2}],
+\]
+其余循环换位。它是块稀疏算子作用，但无需装配 CSR；显式矩阵表示则便于小规模谱分析、隐式积分和不同离散算子的核对。基本执行顺序为
+\begin{quote}\ttfamily\small
+for each time step:\\
+\quad exchange required E halos\\
+\quad B\_half = B\_half - dt * curl\_forward(E)\\
+\quad exchange required B\_half halos\\
+\quad E = E + dt * curl\_backward(B\_half)
+\end{quote}
+\conceptbridge{为什么相同的旋度公式不能任意改成就地更新？}{两个旋度必须使用各自一致的时间层和空间取向。半步磁场依赖旧电场，整步电场依赖新磁场；覆盖尚未读取的数据会改变离散算子，破坏稳定性、色散和离散约束。}{交错自由度 $\longrightarrow$ 两相依赖图 $\longrightarrow$ 允许的融合与同步。}
+\section{可审核的工作量与流量}
+无源、真空、常系数且预先计算倒网格距时，每个分量更新：两次差、两次尺度乘、一次差、一次 $\Delta t$ 乘和一次加减，共 7 FLOPs；六分量整步为 42 FLOPs/胞元。FMA 仍按两 FLOPs 计。
+这一计数对应先计算各向差分再乘时间步的实现。各向同性等距网格可预合并 $\Delta t/h$，每分量变为三次相减、一次尺度乘和一次更新，共 5 FLOPs，整步 30 FLOPs；附带 CUDA 与 MPI 程序采用此形式。报告吞吐时按各自实现计数，不能给融合核沿用 42 FLOPs。
+双精度不含材料与源项时：
+\[
+\begin{array}{l|r|r}
+\text{模型}&\text{bytes/胞元整步}&I\ (\text{FLOP/byte})\\\hline
+\text{每分量四邻读+自身读+写}&288&42/288\\
+\text{每相输入各读一次、输出写一次}&144&42/144\\
+\text{整步六数组全驻留的读写下界}&96&42/96
+\end{array}
+\]
+三个数字分别对应指定复用假设下的流量模型。实际 DRAM 流量还包括缓存行为、写分配、临时数组、边界和系数访问；两相大数组实现需据工作集大小判断整步数据能否驻留。
+SoA 的六个连续数组适合让相邻线程访问相邻空间点。GPU 核可按 $B/E$ 分两次启动，必要时再拆分分量；寄存器、启动开销和全局同步共同决定取舍。shared memory 只有在减少实际重复搬运且不压低并行度时才有收益。
+\section{稳定性、色散与验收}
+真空波速 $c=(\varepsilon\mu)^{-1/2}$，均匀三维网格的条件为
+\[
+ c^2\Delta t^2(h_x^{-2}+h_y^{-2}+h_z^{-2})\le1.
+\]
+周期 Fourier 模满足
+\[
+ \frac{\sin^2(\omega_h\Delta t/2)}{c^2\Delta t^2}
+ =\sum_\alpha\frac{\sin^2(k_\alpha h_\alpha/2)}{h_\alpha^2}.
+\]
+CFL 控制数值增长，色散关系刻画相位传播。评估固定距离的传播误差时，应同时记录方向、分辨率和总步数。
+对周期真空归一化系统，一个精确算术守恒量是
+\[
+ {\cal H}^n=\frac12\norm{E^n}^2+
+ \frac12\langle B^{n-1/2},B^{n+1/2}\rangle
+\]
+（乘相应体积权重）。它是交错修正能量，不等同于把不同时刻的平方直接相加；稳定步长下其与物理能量的关系需要明确。
+\costnote{端到端实验记录初值相位、物理终止时间、误差、$\diverg_h B$、电荷残量、修正能量与推进时间。约束保持检查应同时包含非平凡随机场的离散旋度--散度测试，而不只测试单一横波。周期无耗散模式的放大因子在稳定区间内为单位模；边界、材料损耗与滤波可能引入额外耗散，需分别记录。}
+\coderef{fdtd/yee.py}
+\aiexercise{由本章分量位置推导 $B_x$ 和 $E_x$ 的邻点索引，逐项验证 $D C=0$；再解释面积和边长进入何处。}{从 Yee Fourier 更新推导离散色散及 CFL，比较修正交错能量与不同时刻平方和的变化。}
+\crossref{第二卷讨论几何与约束来源；这里的材料质量矩阵、离散流量和时间层为第 25、28、29 章提供实现接口。}
+\studyroute{略去 PML、色散材料、曲线网格 Hodge 和 PEC 边界细节。参考 \cite{yee,cuda}。}{Yee staggered grid; incidence matrix; discrete Hodge; numerical dispersion; modified energy}

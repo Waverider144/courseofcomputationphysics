@@ -1,0 +1,97 @@
+\chapter{Yee-FDTD: Discrete Structure and Performance}\label{v0ch:24}
+\begin{chaptersummary}
+Volume II established compatible discretizations of Maxwell evolution and constraints. Yee degrees of freedom, staggered time levels, and curl structure now turn topological identities into array updates and explicit work and traffic models. The discrete complex, phase relations, and two-phase dependencies define the constraints within which performance is optimized.
+\end{chaptersummary}
+\learninggoals{Write Yee updates and constraints; distinguish incidence from material Hodge operators; calculate three traffic models and check dispersion and energy.}
+\paragraph{Core Question}How can Yee bottlenecks be identified while preserving Maxwell structure?
+
+\section{Degrees of Freedom, Materials, and the Grid}
+For stationary, nondispersive isotropic media,
+\[
+ \varepsilon\partial_t\bm E=\nabla\times\bm H-\bm j,\qquad
+ \partial_t\bm B=-\nabla\times\bm E,\qquad \bm B=\mu\bm H.
+\]
+The coefficients $\varepsilon,\mu$ remain explicit in material and wave-speed relations. On a cubic grid, $E_x$ lies at $(i+\tfrac12,j,k)$, with $E_y,E_z$ obtained cyclically; $B_x$ lies at $(i,j+\tfrac12,k+\tfrac12)$, with the others cyclic. $E$ uses integer times and $B$ half-integer times.
+
+\begin{figure}[H]\centering
+\begin{tikzpicture}[x={(4cm,0cm)},y={(1.4cm,1cm)},z={(0cm,3cm)},>=Stealth]
+\foreach \z in {0,1}{\draw[gray] (0,0,\z)--(1,0,\z)--(1,1,\z)--(0,1,\z)--cycle;}
+\foreach \x in {0,1}{\foreach \y in {0,1}{\draw[gray] (\x,\y,0)--(\x,\y,1);}}
+\draw[very thick,red,->](.18,0,0)--(.82,0,0) node[midway,below]{$E_x^n$};
+\draw[very thick,red,->](1,.18,0)--(1,.82,0) node[midway,right]{$E_y^n$};
+\draw[very thick,red,->](0,1,.18)--(0,1,.82) node[midway,left]{$E_z^n$};
+\fill[blue] (0,.5,.5) circle(1.8pt);
+\draw[blue,thick,->](0,.5,.5)--(.3,.5,.5);
+\node[blue,anchor=east] at (0,.5,.5) {$B_x^{n+1/2}$};
+\fill[blue] (.5,0,.5) circle(1.8pt);
+\draw[blue,thick,->](.5,0,.5)--(.5,.3,.5);
+\node[blue,anchor=north] at (.5,-.1,.42) {$B_y^{n+1/2}$};
+\fill[blue] (.5,.5,0) circle(1.8pt);
+\draw[blue,thick,->](.5,.5,0)--(.5,.5,.3);
+\node[blue,anchor=north] at (.58,.5,-.18) {$B_z^{n+1/2}$};
+\end{tikzpicture}
+\caption{Representative edge electric and face magnetic components in a cubic cell. Arrows indicate component directions; not all edge/face unknowns are shown.}
+\end{figure}
+
+Point components are samples on a uniform grid. Integral unknowns are edge circulations $e_\ell=\int_\ell E$ and face fluxes $b_f=\int_f B$. Lengths, areas, and materials connect the representations; point arrays are not dimensionless incidence matrices.
+\section{Topology and Matrix-Free Updates}
+Incidence matrices $G,C,D$ satisfy $CG=0,DC=0$. With compatible primal/dual grids and boundary pairing,
+\[
+ \dot{\bm b}=-C\bm e,\qquad
+ M_\varepsilon\dot{\bm e}=C^TM_{\mu^{-1}}\bm b-\bm j_h .
+\]
+$C$ encodes orientation; $M_\varepsilon,M_{\mu^{-1}}$ encode metric and material data. Uniform orthogonal Yee grids admit diagonal material actions. Thus $\partial_t(D\bm b)=0$. With dual-divergence convention $D_e=-G^T$, charge is $\bm q=D_eM_\varepsilon\bm e$ and continuity requires $\dot{\bm q}=-D_e\bm j_h$, with compatible boundary fluxes.
+Define forward differences $\delta_\alpha^+$ and backward differences $\delta_\alpha^-$. On a periodic uniform grid,
+\[
+ B_x^{n+1/2}=B_x^{n-1/2}
+ -\Delta t(\delta_y^+E_z^n-\delta_z^+E_y^n),
+\]
+\[
+ E_x^{n+1}=E_x^n+\frac{\Delta t}{\varepsilon}
+ [\delta_y^-H_z^{n+1/2}-\delta_z^-H_y^{n+1/2}-j_x^{n+1/2}],
+\]
+with cyclic counterparts. This is a block-sparse action without CSR assembly. Explicit matrices remain useful for small spectral checks, implicit integration, and operator comparisons. The execution order is
+\begin{quote}\ttfamily\small
+for each time step:\\
+\quad exchange required E halos\\
+\quad B\_half = B\_half - dt * curl\_forward(E)\\
+\quad exchange required B\_half halos\\
+\quad E = E + dt * curl\_backward(B\_half)
+\end{quote}
+\conceptbridge{Why can curl updates not be changed arbitrarily to in-place operations?}{Both curls must retain consistent time levels and spatial orientation. The magnetic half-step reads old electric fields; the electric step reads new magnetic fields. Overwriting unread values changes the operator, stability, dispersion, and constraints.}{Staggered unknowns $\longrightarrow$ two-phase dependency graph $\longrightarrow$ admissible fusion and synchronization.}
+\section{Auditable Work and Traffic}
+For source-free, constant-coefficient vacuum with precomputed inverse spacings, each component uses two differences, two scalings, a subtraction, a $\Delta t$ multiplication, and an update: 7 FLOPs, or 42 per six-component cell-step. An FMA counts as two FLOPs.
+This counts separately formed directional differences. On an isotropic equal-spacing grid, precombining $\Delta t/h$ gives three subtractions, one scaling, and one update per component: 5 FLOPs, or 30 per cell-step. The CUDA/MPI code uses this form. Count the implemented work; do not assign 42 FLOPs to the fused kernel.
+For double precision, excluding materials and sources:
+\[
+\begin{array}{l|r|r}
+\text{Model}&\text{bytes/cell-step}&I\ (\text{FLOP/byte})\\\hline
+\text{Four neighbors+self read+write}&288&42/288\\
+\text{Ideal reuse within each phase}&144&42/144\\
+\text{Six fields resident for full step}&96&42/96
+\end{array}
+\]
+The three values describe traffic under specified reuse assumptions. Actual DRAM traffic also depends on caches, write allocation, temporaries, boundaries, and coefficient access. For large two-phase arrays, working-set size determines whether whole-step residency is feasible.
+Six SoA arrays support contiguous spatial access by neighboring threads. GPU execution can use separate $B/E$ launches, further split by component if needed. Registers, launch cost, and global synchronization determine the tradeoff. Shared memory helps only when it reduces actual repeated movement without unduly reducing parallelism.
+\section{Stability, Dispersion, and Acceptance}
+With vacuum wave speed $c=(\varepsilon\mu)^{-1/2}$, the uniform three-dimensional condition is
+\[
+ c^2\Delta t^2(h_x^{-2}+h_y^{-2}+h_z^{-2})\le1.
+\]
+Periodic Fourier modes satisfy
+\[
+ \frac{\sin^2(\omega_h\Delta t/2)}{c^2\Delta t^2}
+ =\sum_\alpha\frac{\sin^2(k_\alpha h_\alpha/2)}{h_\alpha^2}.
+\]
+CFL controls numerical growth, while the dispersion relation describes phase propagation. Evaluate fixed-distance propagation errors together with direction, resolution, and total step count.
+For normalized periodic vacuum, an exact-arithmetic invariant is
+\[
+ {\cal H}^n=\frac12\norm{E^n}^2+
+ \frac12\langle B^{n-1/2},B^{n+1/2}\rangle
+\]
+with the appropriate volume weights. This is a modified staggered energy, not a sum of squares at unrelated times. Its relation to physical energy under stable time steps must be specified.
+\costnote{Record initial phase, final physical time, error, $\diverg_h B$, charge residual, modified energy, and advance time. Include nontrivial random-field curl--divergence checks, not just a transverse wave. Periodic lossless modes have unit-modulus amplification in the stable range; boundaries, material losses, and filtering may add dissipation and require separate records.}
+\coderef{fdtd/yee.py}
+\aiexercise{Derive neighboring indices for $B_x$ and $E_x$ from their locations. Verify $D C=0$ term by term and identify the length/area factors.}{Derive Yee dispersion and CFL from Fourier updates. Compare modified staggered energy with sums of squares at different times.}
+\crossref{Volume II explains geometry and constraints; the material matrices, traffic, and time levels here support Chapters 25, 28, and 29.}
+\studyroute{PML, dispersive materials, curvilinear Hodge operators, and PEC details are omitted. See \cite{yee,cuda}.}{Yee staggered grid; incidence matrix; discrete Hodge; numerical dispersion; modified energy}

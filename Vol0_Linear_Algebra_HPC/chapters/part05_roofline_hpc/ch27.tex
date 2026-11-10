@@ -1,0 +1,28 @@
+\chapter{CPU 与 GPU 并行吞吐}\label{v0ch:27}
+\begin{chaptersummary}
+内存布局决定单个执行流的效率，并行化还需要足够独立工作与资源供给。本章分别讨论 CPU 线程与 GPU SIMT，把占用率、事务合并和设备常驻连接到具体算子。核心是同时分析吞吐、依赖、启动与迁移成本，并用端到端计时验收加速。
+\end{chaptersummary}
+\learninggoals{解释 NUMA 与伪共享；区分 SIMD/SIMT；评估 coalescing、occupancy 和传输摊销。}
+\paragraph{核心问题}更多线程或更高占用率，为什么不必然缩短时间？
+
+\section{CPU 线程与存储归属}
+多核并行将单元、行或网格块分配到线程；OpenMP 循环需要无冲突写入或显式同步。线程绑定与 first touch 决定 NUMA 页面归属，跨插槽访问会改变带宽和延迟。不同线程写同一缓存行的不同变量仍会产生伪共享，可用分块和适当填充分离热点。单核 SIMD 与多核线程是可组合层次。
+混合核心处理器的线程性能、绑核策略和电源状态会影响短时实验。因此本卷记录 CPU 型号、可用逻辑处理器与 BLAS 线程配置；持续全核吞吐另由对应负载标定。
+\section{GPU 的执行资源}
+CUDA 将线程组成 block，block 调度到 SM，warp 以 SIMT 执行。\cite{cuda}
+连续线程访问连续元素有利于合并全局内存事务；分支分歧、非规则 gather 和不足并行度会降低利用。寄存器和 shared memory 限制同时驻留的 block/warp，occupancy 是资源驻留比例，不是性能本身。提高 occupancy 若牺牲数据复用或增加 spill，可能无益。
+SpMV 的短行与长行负载不同；DG 单元可批量映射为小矩阵核；Yee 与 LBM 宜先设计空间连续索引，再讨论共享缓存。kernel 启动具有固定开销，小问题可能由启动主导。
+\section{迁移、异步与设备常驻}
+\[
+ T_{\rm accelerator}=T_{\rm H2D}+T_{\rm kernels}
+ +T_{\rm D2H}+T_{\rm synchronization}.
+\]
+长时间推进应尽量保留场、几何和预条件数据在设备上。异步拷贝与计算重叠需要支持条件、合适流和缓冲管理；异步调用返回时间不等于核完成时间。使用设备事件或显式同步计时，分别报告首次启动、稳态核和包含传输的总时间。
+统一内存提供共享地址与按需迁移机制，但不消除主机与设备之间的数据移动；缺页、迁移粒度及驻留位置仍影响成本。显式预取和适当的数据归属可改善某些访问模式，需与显式传输实测比较。
+\conceptbridge{为什么用 CPU 时钟测一次异步调用会得到虚假的巨大加速？}{主机调用常只把工作入队，实际计算稍后在设备执行。结束计时前必须等待对应工作完成；传输和初始化是否计入也需明确。}{主机提交 $\longrightarrow$ 设备执行 $\longrightarrow$ 完成同步与有效计时。}
+\section{可复现实验接口}
+附带 CUDA 程序比较单分量 AoS/SoA 访问，执行两相周期 Yee 更新，并在主机复核结果。程序分别记录编译、设备可用性与数值验证状态；计时在设备执行后生成。完整实验还应记录型号、驱动、精度、block 配置、寄存器、设备带宽和传输范围。
+\costnote{GPU 优势取决于工作规模与驻留时间；稀疏三角依赖、全局归约或小规模核可能限制加速。CPU 优化也需避免 BLAS 线程与外层线程过度订阅。}
+\coderef{gpu/yee_layout.cu}
+\aiexercise{为 SoA 与 AoS 的 $E_x$ 更新列出一个 warp 中的地址序列，估计缓存行或事务利用，再指出哪些量必须用 profiler 验证。}{给出包含传输、预热、重复执行与同步的计时方案，并推导需要多少时间步才能摊销一次设备迁移。}
+\studyroute{略去特定 GPU 的指令流水与自动调优。参考 \cite{cuda}。}{OpenMP; NUMA first touch; false sharing; SIMT; coalescing; occupancy; device residency}

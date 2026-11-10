@@ -1,0 +1,48 @@
+\chapter{时间推进与总求解成本}\label{v0ch:25}
+\begin{chaptersummary}
+空间算子的吞吐给出单次调用成本，时间推进则决定调用次数与隐式求解工作。本章在统一成本框架中比较 RK、交错积分、ADER、CERK、LTS 和 IMEX，联系稳定性、相位精度与结构保持。给定目标误差和终止时间后，步长、阶段数、求解与通信才能共同确定总成本。
+\end{chaptersummary}
+\learninggoals{连接半离散谱与稳定域；区分保辛与能量守恒；解释高阶、局部步进与刚性分拆的成本。}
+\paragraph{核心问题}一次空间算子很快，为什么完整模拟仍可能很慢？
+
+\section{线法与稳定域}
+空间离散得到 $M\dot{\bm u}=\bm R(\bm u)$；显式 RK 每阶段求 $M^{-1}\bm R$，局部或对角质量矩阵使其便宜。对 $\dot y=\lambda y$，一步为 $y^{n+1}=R(z)y^n$，$z=\Delta t\lambda$，绝对稳定要求 $|R(z)|\le1$。经典 RK4 的
+$R(z)=1+z+z^2/2+z^3/6+z^4/24$。半离散算子的谱、非正规性及能量估计共同影响可用步长。
+纯虚 $\lambda$ 下，前向 Euler 的 $|1+\mathrm i\omega\Delta t|>1$ 导致模态增长。这说明时间积分器的稳定域也是完整能量分析的一部分。
+\section{交错、保辛与相位}
+Yee/leapfrog 对适当分裂系统交错更新，具有条件稳定性。Störmer--Verlet 对可分 Hamilton 系统是二阶保辛方法。隐式中点
+\[
+ \frac{\bm u^{n+1}-\bm u^n}{\Delta t}
+ =A\frac{\bm u^{n+1}+\bm u^n}{2}
+\]
+在 $A^TQ+QA=0$、$Q$ 固定 SPD 时精确保持离散二次能量；它对一般 Hamilton 系统保辛，但一般保辛不等于精确保持原 Hamilton 量。
+对 $\lambda=\mathrm i\omega$，中点的相位频率为
+$\omega_h=2\arctan(\omega\Delta t/2)/\Delta t$。模长稳定仍可累积相位误差；每步线性解不精确时，守恒性质也会受到影响。
+\section{ADER、CERK 与 LTS}
+ADER 通过单元局部时空预测构造高阶时间表示，再以界面时空通量校正；预测计算可提高局部复用，但代价、稳定性和阶数依具体实现而定。
+CERK 指连续显式 Runge--Kutta：除阶段值外构造步内近似
+\[
+ \bm u(t_n+\theta\Delta t)
+ \approx\bm u_n+\Delta t\sum_i b_i(\theta)\bm k_i,\quad0\le\theta\le1.
+\]
+步内精度由连续扩展的阶条件决定，终点精度则由 RK 更新的阶条件决定；两者在耦合与输出时分别检查。
+LTS 将不同尺寸或局部波速的单元分层步进。相邻单元必须共享同一个时间积分通量，细步累积与粗步校正一致，才可保持守恒。插值、通量寄存器、调度和负载不均是额外成本。
+\section{IMEX 与刚性源项}
+分拆 $\dot{\bm u}=F(\bm u)+G(\bm u)$，显式处理传播，隐式处理刚性源项。加性 RK 的阶段为
+\[
+ U_i=\bm u^n+\Delta t\sum_{j<i}\widetilde a_{ij}F(U_j)
+                  +\Delta t\sum_{j\le i}a_{ij}G(U_j),
+\]
+终点分别使用显隐权重。完整阶数与稳定性取决于成对 tableau 及耦合条件。
+导电 Maxwell 中可令 $G_E=-\sigma E/\varepsilon$。一阶分拆示例为
+\[
+ E^{n+1}=\frac{E^n+\Delta t\,(\curl H)^n/\varepsilon}
+ {1+\Delta t\,\sigma/\varepsilon}.
+\]
+它说明局部刚性阻尼可廉价隐式处理；若传播使用前向 Euler，$\sigma=0$ 时仍不适合纯波传播。实际选择应使用与双曲显式部分稳定域相容的 IMEX 对。全局扩散或耦合源项的隐式阶段可能重新引入大规模线性求解。
+\conceptbridge{高阶或隐式方法为何不自动减少总成本？}{高阶改变每步阶段数和误差常数，隐式改变稳定限制却引入求解成本；局部时间步又改变调度与通信。必须在相同误差约束下同时确定可用步长、步数和每步执行图。}{稳定与精度要求 $\longrightarrow$ 可用时间步 $\longrightarrow$ 阶段、求解和通信总成本。}
+\section{最小比较}
+对周期正弦输运比较 RK4、二阶方法和交错波动更新；对 $\dot y=\mathrm i\omega y-\sigma y$ 比较显式与 IMEX 的稳定域及相位。测试目标是给定终止时间的误差，而非只画 $|R|$。
+\costnote{$T_{\rm total}=T_{\rm setup}+N_tT_{\rm step}+T_{\rm output}$，其中 $T_{\rm step}$ 包含全部阶段、隐式求解与通信。ADER 和 LTS 以额外局部工作换取减少全局更新的机会；CERK 提供时间对齐状态，接口通量与组合稳定域则分别控制守恒和稳定性。}
+\aiexercise{从中点放大因子推导相位频率，量化传播一百周期后的相位误差，并与 RK4 比较。}{对两个相邻不同步长单元写出共享通量积分和细步累积，指出只插值边界值为何不足以保证守恒。}
+\studyroute{略去 ADER 预测器构造、CERK 阶条件和高阶 IMEX tableau 推导。接口见第二卷时间推进章及 \cite{hesthaven,ader,cerk,imex}。}{method of lines; symplectic integrator; ADER; continuous explicit Runge Kutta; conservative LTS; IMEX additive RK}

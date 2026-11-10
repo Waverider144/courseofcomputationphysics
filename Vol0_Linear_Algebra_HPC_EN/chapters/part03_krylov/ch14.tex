@@ -1,0 +1,34 @@
+\chapter{BiCG and BiCGSTAB}\label{v0ch:14}
+\begin{chaptersummary}
+GMRES basis storage and orthogonalization can be expensive for nonsymmetric systems. This chapter introduces BiCG through two-sided spaces and BiCGSTAB through local residual smoothing. Short recurrences reduce storage but introduce nonmonotone convergence and breakdown risks. Selection must account for memory, matrix structure, and failure handling.
+\end{chaptersummary}
+\learninggoals{Interpret shadow residuals and biorthogonality; execute BiCGSTAB; distinguish breakdown from convergence.}
+\paragraph{Core Question}Can nonsymmetric systems retain short recurrences, and at what cost?
+
+\section{Two-Sided Projection}
+BiCG builds $\K_k(A,\bm r_0)$ and $\K_k(A^T,\widetilde{\bm r}_0)$, with biorthogonal residuals and biconjugate directions. The shadow residual must satisfy $\widetilde{\bm r}_0^T\bm r_0\ne0$. The method usually needs both $A$ and $A^T$, and crucial inner products can vanish before the true residual does.
+BiCGSTAB multiplies the BiCG residual polynomial by local linear factors, avoiding explicit $A^T$ action and reducing some oscillations. It does not guarantee residual decrease at every step.
+\section{An Executable Recurrence}
+For a fixed shadow $\widetilde{\bm r}$, initialize $\bm p=\bm v=0$,
+$\rho_{\rm old}=\alpha=\omega=1$. At each step compute
+\[
+ \rho=\widetilde{\bm r}^T\bm r,\quad
+ \beta=(\rho/\rho_{\rm old})(\alpha/\omega),\quad
+ \bm p=\bm r+\beta(\bm p-\omega\bm v),\quad
+ \bm v=A\bm p,\quad \alpha=\rho/(\widetilde{\bm r}^T\bm v),
+\]
+\[
+ \bm s=\bm r-\alpha\bm v,\qquad
+ \bm t=A\bm s,\qquad
+ \omega=\frac{\bm t^T\bm s}{\bm t^T\bm t},\qquad
+ \bm x\leftarrow\bm x+\alpha\bm p+\omega\bm s,\quad
+ \bm r\leftarrow\bm s-\omega\bm t.
+\]
+If $\bm s$ already meets tolerance, update by $\alpha\bm p$ and stop before a $0/0$. Check $\rho$, $\widetilde{\bm r}^T\bm v$, $\bm t^T\bm t$, and $\omega$ for breakdown. With right preconditioning, transform actual directions by $M^{-1}$ and use those directions in solution updates; replacing only one matrix product is insufficient.
+\conceptbridge{What does the short recurrence save, and what does it give up?}{GMRES stores its current basis and minimizes over the whole current search space. BiCGSTAB retains few vectors through special polynomial recurrences, giving up that stepwise minimum-residual property and depending on potentially degenerate inner products.}{Full-basis minimization $\longrightarrow$ short-recurrence selection $\longrightarrow$ storage savings and breakdown risks.}
+\section{A Minimal Experiment}
+Use a one-dimensional upwind advection--diffusion tridiagonal matrix, prescribe $\bm x_*=\bm1$, and set $\bm b=A\bm x_*$. Compare GMRES and BiCGSTAB true-residual histories, operator counts, and times. Vary diffusion and right-hand sides to probe nonnormality and residual directions.
+\costnote{A typical step uses two matrix and preconditioner applications with $O(N)$ basis storage. Per-step cost and observed convergence determine total work. On failure, record the return code and true residual before adjusting the preconditioner, restarting the shadow vector, or switching to GMRES.}
+\coderef{sparse_linear_algebra/solvers.py}
+\aiexercise{For $A=\left[\begin{smallmatrix}3&1\\0&2\end{smallmatrix}\right]$ and $\bm b=(1,1)^T$, calculate the first step and identify the local residual minimized by $\omega$.}{Construct a near-breakdown example. Use scale-aware denominator checks and distinguish early convergence from genuine failure.}
+\studyroute{Full two-sided BiCG derivation and stabilized-polynomial variants are omitted. See \cite{saad,templates}.}{BiCG; biorthogonality; shadow residual; BiCGSTAB; breakdown}

@@ -1,0 +1,29 @@
+\chapter{LU-SGS 与近似分解}\label{v0ch:9}
+\begin{chaptersummary}
+不完全分解通过截断控制成本，LU-SGS 则从前后扫掠构造近似因子。本章将这一形式联系到对称 Gauss--Seidel，并比较固定迭代、预条件和伪时间更新三种用途。同一个扫掠算子在不同外层机制中承担不同任务，其收敛条件也随之明确。
+\end{chaptersummary}
+\learninggoals{展开 SGS 近似因子；实现前后扫掠；识别 CFD 对角近似与线性代数条件。}
+\paragraph{核心问题}两次局部扫掠为何能够近似隐式全局耦合？
+
+\section{近似因子与两次三角求解}
+约定 $A=D+L+U$，$L,U$ 含实际条目的符号。假设 $D$ 可逆，定义
+\[
+ M=(D+L)D^{-1}(D+U)
+   =A+LD^{-1}U.
+\]
+解 $M\delta\bm x=\bm r$ 等价于
+\[
+ (D+L)\bm y=\bm r,\qquad
+ (D+U)\delta\bm x=D\bm y.
+\]
+于是无需形成乘积 $M$。若 $A$ 对称且 $D$ 正定，则 $U=L^T$，$M$ 为 SPD；用于标准 PCG 还要求整个预条件应用固定且对称。
+\section{迭代、预条件与伪时间}
+固定迭代 $\bm x_{k+1}=\bm x_k+M^{-1}(\bm b-A\bm x_k)$ 的误差矩阵为 $I-M^{-1}A$，谱半径小于 1 时收敛。作为预条件器时，同一个逆作用由外层 Krylov 方法组合，修正系数通过投影确定。
+CFD 中 LU-SGS 常对 $\Delta t^{-1}M_t+J$ 使用近似对角块及近似 Jacobian 分裂；伪时间用于逼近稳态残量为零，伪步长不是实际物理时间分辨率。不同实现的对角项和边界处理必须明确。
+\conceptbridge{名称中含 LU，为什么它通常不是原系统的精确 LU？}{这里先选择容易扫掠的三角部分，再用乘积近似整个算子；展开后多出的交叉项说明近似发生在哪里。精确 LU 则通过消元计算因子，使乘积严格等于置换后的矩阵。}{隐式耦合 $\longrightarrow$ 可扫掠近似 $\longrightarrow$ 误差由外层机制修正。}
+\section{三点验证}
+对 $A=\operatorname{tridiag}(-1,2,-1)$ 的三阶问题，显式计算 $LD^{-1}U$，再比较一次 $M^{-1}\bm r$ 与 $A^{-1}\bm r$。顺序扫掠利用已更新的相邻值；多色或块 Jacobi 并行化会改变算子，需重新检查效果。
+\costnote{每次作用约为两次稀疏三角求解，存储近似 $O(\nnz A)$。串行依赖限制并行吞吐，局部块或分域可提高并行度但通常削弱全局耦合处理。}
+\aiexercise{对三阶 Poisson 手算 $M$、$M^{-1}\bm r$ 和误差迭代矩阵，区分一次预条件作用与固定迭代的收敛。}{将扫掠改为红黑两色或分块版本，判断何处改变了矩阵分裂，并比较外层 GMRES 次数。}
+\crossref{第 17 章给出平稳迭代统一形式，第 18 章讨论分域并行。}
+\studyroute{略去具体可压缩流 Jacobian 分裂与伪时间参数估计。参考 \cite{saad}。}{LU-SGS; symmetric Gauss Seidel; approximate factorization; pseudo time stepping}

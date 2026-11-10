@@ -1,0 +1,31 @@
+\chapter{Cholesky 与 LDL\textsuperscript{T} 分解}\label{v0ch:6}
+\begin{chaptersummary}
+上一章表明精确分解的成本由结构决定。对称性与正定性还能进一步减少工作和存储，本章因此引入 Cholesky；当正定性失效时，转向允许块主元的 LDL\textsuperscript{T}。区分这两种情形，为后面的 CG、MINRES 和不完全 Cholesky 建立共同条件。
+\end{chaptersummary}
+\learninggoals{推导 Cholesky 递推；识别不定系统的块主元；区分无主元与带置换分解。}
+\paragraph{核心问题}对称性可以复用哪些计算，而正定性又额外保证什么？
+
+\section{Cholesky 的递推与算例}
+对实 SPD 矩阵，存在对角为正的下三角 $L$ 使 $A=LL^T$。
+由条目等式得到
+\[
+ \ell_{jj}=\sqrt{a_{jj}-\sum_{k<j}\ell_{jk}^2},\qquad
+ \ell_{ij}=\frac{a_{ij}-\sum_{k<j}\ell_{ik}\ell_{jk}}{\ell_{jj}}.
+\]
+SPD 保证每步 Schur 补仍正定，因此根号内为正。取
+$A=\left[\begin{smallmatrix}4&2\\2&3\end{smallmatrix}\right]$，有
+$L=\left[\begin{smallmatrix}2&0\\1&\sqrt2\end{smallmatrix}\right]$。
+求解用 $L\bm y=\bm b$、$L^T\bm x=\bm y$。稠密工作约 $N^3/3$ FLOPs，只需存一半三角；稀疏时仍需排序与填充分析。
+\section{不定问题与块对角主元}
+一般实对称不定系统采用
+\[
+ PAP^T=LDL^T,
+\]
+其中 $L$ 单位下三角，$D$ 由 $1\times1$ 和 $2\times2$ 块组成。矩阵
+$\left[\begin{smallmatrix}0&1\\1&0\end{smallmatrix}\right]$ 可逆，却无法以非零首个标量主元执行无交换 LDL\textsuperscript{T}；直接把整个矩阵作为一个二阶块即可。稳定实现需要对称主元策略。
+\conceptbridge{把 Cholesky 的平方根改成带符号数，为什么还不够？}{不定性不仅意味着负主元，还允许非零耦合与零对角共存。标量主元可能不存在或过小，因此要同时交换行列并允许二阶块。鞍点系统的约束变量正是常见来源。}{正能量消元 $\longrightarrow$ 不定耦合 $\longrightarrow$ 对称块主元。}
+\section{物理零空间与求解策略}
+半正定矩阵若含刚体模态、常数模态或规范自由度，应先施加约束或在兼容子空间求解；直接补极小对角项会改变问题，需说明其数学作用。鞍点系统的块消元还会出现 Schur 补，可用作第 18、21 章的预条件接口。
+\costnote{Cholesky 用于 SPD 系统；对称不定分解则通过主元交换维持数值稳定，并可能引入额外填充。结构检查应落实到实际离散通量、边界处理和预条件作用。}
+\aiexercise{对本章 SPD 二阶矩阵完成 Cholesky 并解右端 $(1,1)^T$；对零对角可逆矩阵说明标量 LDL\textsuperscript{T} 的失败位置。}{构造带常数零空间的 Neumann Poisson 矩阵，检查右端兼容条件，再分别固定一个自由度与加入零均值约束。}
+\studyroute{略去 Bunch--Kaufman 主元选择及稀疏超节点细节。参考 \cite{golub}。}{Cholesky; symmetric indefinite; block LDLT; saddle point; nullspace}

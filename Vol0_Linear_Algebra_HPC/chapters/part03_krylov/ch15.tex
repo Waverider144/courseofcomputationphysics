@@ -1,0 +1,33 @@
+\chapter{Krylov 方法的选择与扩展}\label{v0ch:15}
+\begin{chaptersummary}
+前几章建立了 Krylov 方法的共同空间与主要递推。本章按矩阵结构、投影目标和预条件变化组织方法选择，进一步引入对称不定、双侧投影、灵活预条件与多右端问题。掌握这些区别，才能将具体算法放入合适的外层求解流程。
+\end{chaptersummary}
+\learninggoals{匹配 MINRES、FOM、QMR、TFQMR 与 FGMRES 的条件；解释块 Krylov 与回收。}
+\paragraph{核心问题}算法族的差别来自什么结构，何时需要更换外层方法？
+
+\section{结构与投影的选择表}
+\begin{center}\small
+\begin{tabularx}{\textwidth}{lXX}
+\toprule 方法&主要结构与目标&需要关注\\\midrule
+MINRES&实对称，可不定；最小残差&标准预条件需固定 SPD，不能用任意不定预条件\\
+FOM&Arnoldi 基上的 Galerkin 条件&小型投影系统可能奇异，残差不保证最小\\
+QMR&双侧 Lanczos 的准最小残差&通常需转置作用，仍有双侧失效风险\\
+TFQMR&避免显式转置的准最小残差&短递推及监测量不同于 GMRES\\
+FGMRES&允许变化或非线性预条件作用&保存每个实际修正方向，存储增加\\
+块 Krylov&同时处理多个相关右端&块秩亏、正交化和内存成本\\\bottomrule
+\end{tabularx}
+\end{center}
+对称半正定或奇异系统还需兼容性与零空间处理；表中可逆情形的结论不能直接替代这些条件。
+\section{FGMRES 的实际方向}
+右预条件第 $j$ 步取 $\bm z_j=M_j^{-1}\bm v_j$，对 $A\bm z_j$ 正交化，得到
+\[
+ AZ_m=V_{m+1}\bar H_m,\qquad
+ \bm x_m=\bm x_0+Z_m\bm y_m.
+\]
+固定线性预条件时可将 $Z_m$ 解释为同一逆作用下的基；变精度内层迭代、随步变化的 AMG 或非线性平滑通常不能如此处理。FGMRES 保存实际 $\bm z_j$，使当前投影关系仍有意义。\cite{petsc}
+\conceptbridge{内层每次都解近似相同的问题，为什么外层要 flexible？}{由残差相关停止条件生成的内层解不一定是同一个固定线性映射。外层若继续假设固定预条件，其基与更新关系会不一致。灵活方法保留真正执行过的方向。}{变化的内层作用 $\longrightarrow$ 实际方向集合 $\longrightarrow$ 灵活投影。}
+\section{工程组合与最小案例}
+对称不定二阶矩阵比较 MINRES 与 GMRES；对一个 Poisson 系统让预条件每步交替使用一、两次松弛，写出前两步 $Z_m$。多个右端可用块方法共享谱信息，连续时间步或参数扫描也可用回收子空间，但需核算额外存储和更新成本。
+\costnote{先验证矩阵结构，再确定预条件是否固定且对称，最后比较算子次数、归约与存储。返回码、真实残差和物理误差共同构成最终验收记录。}
+\aiexercise{对一个对称不定二阶系统写出 MINRES 与 CG 的第一步，说明为何前者可用而后者的正定性论证失效。}{从 $AZ_m=V_{m+1}\bar H_m$ 推导 FGMRES 小型最小二乘，并解释为什么解更新使用 $Z_m$ 而不是 $V_m$。}
+\studyroute{略去 Lanczos 双正交推导、块秩揭示与回收算法。参考 \cite{saad,templates,petsc}。}{MINRES; FOM; QMR; TFQMR; flexible GMRES; block Krylov; recycling}

@@ -1,0 +1,29 @@
+\chapter{Distributed Computing and Communication Cost}\label{v0ch:28}
+\begin{chaptersummary}
+As single-node computation accelerates, halo exchange, global dot products, and coarse-level communication enter the critical path. Message latency and volume complement compute and memory Roofline analysis, explaining scaling, progress, and overlap. Operator dependencies identify communication that can be hidden; timing establishes whether that overlap is realized.
+\end{chaptersummary}
+\learninggoals{Build an alpha--beta model; distinguish halos and allreduce; explain overlap, pipelining, and coarse-level bottlenecks.}
+\paragraph{Core Question}Why does speedup saturate even when local computation is fast?
+
+\section{Communication and Scaling}
+A communication phase may be approximated by
+\[
+ T_{\rm comm}\approx n_{\rm msg}\alpha+V/B_{\rm net},
+\]
+where $\alpha$ is effective message-start latency, $V$ the explicitly defined volume, and $B_{\rm net}$ effective bandwidth. Protocol, topology, congestion, and concurrency affect parameters. Nonoverlapped costs add; ideal overlap suggests a more optimistic lower bound:
+\[
+ T\gtrsim\max(F/P_{\rm peak},Q/B_{\rm mem},T_{\rm comm}).
+\]
+This estimate describes a resource lower bound under ideal overlap; communication progress, contention, and dependency chains determine the realized time.
+Strong scaling fixes global size. As local cubic side $\ell$ decreases, volume work is $O(\ell^3)$ and face exchange $O(\ell^2)$, increasing surface-to-volume ratio. Weak scaling fixes local work but still encounters global reductions, network effects, and coarse levels.
+\section{Halos, Reductions, and Overlap}
+Regular stencils exchange neighboring faces; FVM/DG exchange face values or traces, with higher order increasing face data and local work. Yee exchanges follow magnetic/electric phase dependencies. Krylov adds dot-product allreduces to operator halos. Short CG recurrences retain global synchronization; GMRES orthogonalization can add reductions.
+Post nonblocking receives/sends, compute halo-independent interiors, wait, then update boundaries. Actual progress and overlap depend on MPI and runtime configuration and require measurement.\cite{mpi}
+Pipelined Krylov overlaps reductions with computation. Communication-avoiding block or s-step schemes reduce synchronization but may increase basis ill-conditioning, work, and residual drift. Numerical stability requires simultaneous checks.
+\conceptbridge{Why can equal communication volumes have different costs?}{Many small messages are latency-sensitive; fewer large messages are more bandwidth-sensitive. Critical-path placement, progress, and contention also differ. Bytes alone do not describe these dependencies.}{Message counts and sizes $\longrightarrow$ progress and dependencies $\longrightarrow$ critical-path time.}
+\section{A Minimal MPI Experiment}
+The program partitions a three-dimensional periodic field in one direction, exchanges faces using \texttt{Sendrecv} or \texttt{Irecv/Isend+Waitall}, and checks the seven-point operator on a global Fourier mode. Records include ranks, local size, maximum-rank time, and error. Single-host runs verify MPI semantics; cross-node runs measure network scaling. Multidimensional partitioning additionally requires six-face exchange and a partition strategy.
+\costnote{AMG coarse levels have shrinking local work and increasing communication ratios, sometimes requiring process aggregation. Time operators, preconditioners, reductions, and I/O separately. Strong-scaling comparisons use the slowest rank.}
+\coderef{mpi/halo.cpp}
+\aiexercise{For an $n^3$ grid split into $p$ approximately cubic subdomains, derive local work, six-face halo bytes, and surface-to-volume ratio.}{Draw a nonblocking halo event graph, marking overlappable interiors and dependent boundaries. Design a test of actual progress.}
+\studyroute{Network-topology models, pipelined-Krylov error analysis, and cross-node tuning are omitted. See \cite{mpi,petsc}.}{alpha beta model; strong scaling; weak scaling; halo exchange; allreduce; pipelined Krylov; MPI progress}

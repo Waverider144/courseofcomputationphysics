@@ -1,0 +1,77 @@
+\chapter{稀薄气体动力学与非平衡闭合}\label{ch:17}
+\begin{chaptersummary}
+第一、二章通过速度矩把动理学联系到连续介质；当非平衡增强时，需要重新选择保留的状态与闭合。本章按 Knudsen 数比较 Chapman--Enskog、Grad 和简化碰撞模型，再以 DSMC 展示对 Boltzmann 动力学的随机粒子近似。由此可以分别追踪模型、闭合与采样误差。
+\end{chaptersummary}
+\learninggoals{区分 Chapman--Enskog 与有限矩闭合；解释 Grad 13 矩和 ES--BGK 的自由度；用局部尺度评估连续介质适用性；辨认 DSMC 采样误差。}
+\studyroute{略去高阶矩系统的双曲性证明、一般 H 定理和 DSMC 碰撞采样的完整构造；输运系数按具体碰撞核计算。}{Grad 13 moment; Chapman--Enskog; ES BGK; Knudsen layer; DSMC}{用平面 Couette 流比较 Newton 应力、Grad 应力和动理学分布，指出 Knudsen 层中的边界数据和体域闭合分别缺少什么。}
+
+\section{Knudsen 数与非平衡信息}\index{稀薄气体}
+$\mathrm{Kn}=\lambda/L$ 比较平均自由程与宏观尺度。
+常用的连续、滑移、过渡和自由分子区间是建模指南，
+局部梯度、壁面层和目标精度还会改变具体模型的适用性。
+例如 $L_T=T/|\nabla T|$ 可形成温度梯度 Knudsen 数 $\lambda/L_T$。
+即使整体 $\lambda/L$ 很小，激波和壁面附近也可能需要非平衡描述。
+
+\section{渐近流形与矩系统的两条闭合路径}
+Chapman--Enskog 展开在小 Knudsen 数下写作
+\[
+f=M[n,\bm u,T]+\mathrm{Kn}\,f^{(1)}
++\mathrm{Kn}^2f^{(2)}+\cdots.
+\]
+非平衡修正的守恒矩取零，使 $n,\bm u,T$ 由 Maxwellian 参数定义。
+第一修正经速度积分给出 Newton 应力与 Fourier 热流；
+输运系数依赖线性化碰撞算子。
+
+Grad 方法则直接保留更高矩作为独立演化量。
+三维单原子气体的 13 矩由
+$n$、$\bm u$、$T$、五个无迹应力分量与三个热流分量组成。
+一种相应的分布表示结构为
+\[
+f_{13}=M\left[1+
+A_{ij}\left(c_ic_j-\tfrac13|\bm c|^2\delta_{ij}\right)
++B_i c_i(|\bm c|^2-5\theta)\right],
+\qquad \theta=k_BT/m.
+\]
+$A_{ij}$ 对称无迹，$A,B$ 由指定应力与热流确定。
+将该表示代入更高矩，形成有限矩闭合~\cite{grad1949}。
+多项式修正可能在速度尾部变负，系统的可实现性与双曲性需要专门检查；
+正则化矩模型按其适用范围另行选择。
+
+\conceptbridge{为何同样求应力和热流，渐近闭合与 Grad 闭合会给出不同模型？}
+{渐近闭合以小 Knudsen 数约束非平衡分布，使应力与热流成为宏观梯度的函数。
+Grad 模型将这些矩保留为独立变量，再补足其方程中的更高矩。
+两者选择的状态空间和时间尺度不同，误差与适用区域也相应不同。}
+{小参数渐近关系 / 独立高阶矩 $\longrightarrow$ 两类闭合模型。}
+
+\section{BGK 与 ES--BGK}
+连续 BGK 以 Maxwellian 为松弛目标，保持质量、动量和能量；
+其单一松弛时间把不同输运过程联系起来，标准单原子模型给出 $\mathrm{Pr}=1$。
+ES--BGK 使用各向异性高斯：
+\[
+G_\chi=\frac{n}{(2\pi)^{3/2}\sqrt{\det\mathcal T_\chi}}
+\exp\left(-\frac12\bm c^{\mathsf T}\mathcal T_\chi^{-1}\bm c\right),
+\]
+\[
+\mathcal T_\chi=(1-\chi)\theta I+\chi\Theta,\qquad
+\Theta=\bm P/\rho,\qquad
+C[f]=\frac{G_\chi-f}{\tau_c}.
+\]
+$\tr\Theta=3\theta$ 保持能量，协方差必须正定。
+该参数化允许调节 $\mathrm{Pr}=1/(1-\chi)$；
+单原子气体常用 $\chi=-1/2$ 对应 $\mathrm{Pr}=2/3$，
+并需按该碰撞频率定义匹配黏度~\cite{holway1966}。
+离散速度、求积或时间推进改变后，还应检查碰撞守恒矩及熵性质。
+
+\section{DSMC 与误差分层}
+DSMC 用带权模拟粒子表示分布，在小单元中交替自由迁移与随机碰撞。
+碰撞对和散射角按 Boltzmann 碰撞核抽样；
+边界入射粒子由壁面或入口分布产生~\cite{bird1994}。
+有限粒子数引入统计波动，单元大小和时间步长带来数值偏差。
+解析平均自由程、碰撞时间和局部梯度是相应精化目标。
+
+比较连续介质与动理学模型时，可先固定碰撞物理，
+再分别减小网格、步长和抽样误差。
+这样才能将模型闭合误差与数值误差区分开。
+
+\aiexercise{取标准正态密度乘以 $1+\alpha H_3(v)$，其中 $H_3(v)=v^3-3v$。说明任意非零 $\alpha$ 为何可能使速度尾部取负。再计算其零、一、二阶矩，解释低阶矩匹配与正性之间的关系。}
+{设计一组 Couette 流比较：分别改变 Knudsen 数、速度空间分辨率和 DSMC 样本数，测量滑移速度与应力。区分闭合误差、边界模型误差和抽样误差。}

@@ -1,0 +1,168 @@
+\chapter{From Velocity Moments to Continuum Equations}\label{ch:2}
+
+\begin{chaptersummary}
+The distribution function in the preceding chapter retains the full velocity dependence. This chapter defines density, mean velocity, pressure, and energy through velocity moments, derives macroscopic conservation equations, and supplies unresolved stress and heat flux through constitutive relations. This provides the basis for Euler and Navier--Stokes models and finite-volume conservation. The retained moments and closure assumptions jointly determine the range of validity.
+\end{chaptersummary}
+\learninggoals{Derive conserved moments and identify unclosed terms; distinguish the pressure tensor, viscous stress, and heat flux; state the assumptions behind Euler and Navier--Stokes models.}
+\studyroute{The full algebra of the energy moment and kinetic calculations of transport coefficients are omitted.}{velocity moments; Chapman--Enskog expansion; constitutive closure}{Starting from the three classes of conserved moments of $f$, distinguish exact moment identities from the additional assumptions in Newtonian viscosity and Fourier heat flux.}
+
+\section{Conserved Moments and Macroscopic Observables}\index{Moment closure}
+Consider a three-dimensional, single-species, monatomic dilute gas. Elastic collisions conserve mass, momentum, and energy; the external force is $m\bm b(\bm x,t)$. Assume sufficient decay of $f$ for velocity-space integration.
+A distribution contains the full velocity dependence; a macroscopic model selects finitely many weighted integrals.
+
+Number density, mass density, and macroscopic velocity are
+\[
+n=\int f\dd\bm v,
+\qquad
+\rho=mn,
+\qquad
+\rho\bm u=m\int \bm v f\dd\bm v.
+\]
+
+Define the peculiar velocity
+\[
+\bm c=\bm v-\bm u.
+\]
+The pressure tensor and heat flux are
+\[
+\bm P=m\int \bm c\bm c f\dd\bm v,
+\qquad
+\bm q=\frac{m}{2}\int |\bm c|^2\bm c f\dd\bm v.
+\]
+
+Taking the zeroth velocity moment and using particle-number conservation in collisions gives
+\[
+\int Q(f,f)\dd\bm v=0,
+\]
+
+\begin{authornote}
+\textbf{Potential Question:}
+"Why do velocity moments produce macroscopic equations? What do the zeroth and first moments measure physically?"
+
+\textbf{Author Supplement:}
+Density, mean velocity, and energy are weighted integrals of the full velocity distribution. Their direct connections to conservation laws, measurements, and macroscopic states make them natural continuum variables. A finite moment set also sets the descriptive resolution: different distributions with identical retained moments represent the same macroscopic state.
+
+\textbf{Core Conceptual Connection:}
+\[
+f(\bm x,\bm v,t)
+\longrightarrow
+\text{moments}
+\longrightarrow
+\text{macroscopic observables}
+\]
+\end{authornote}
+
+This gives the continuity equation:
+\[
+\boxed{
+\frac{\partial\rho}{\partial t}
++\nabla\cdot(\rho\bm u)=0
+}.
+\]
+
+Its control-volume form is
+\[
+\frac{\dd}{\dd t}\int_\Omega \rho\dd V
+=
+-\int_{\partial\Omega}\rho\bm u\cdot\bm n\dd S.
+\]
+which is the starting point of finite-volume methods.
+
+The first moment gives the momentum equation:
+\[
+\frac{\partial(\rho\bm u)}{\partial t}
++
+\nabla\cdot(\rho\bm u\bm u+\bm P)
+=
+\rho\bm b.
+\]
+
+\begin{askai}
+Ask AI:
+\begin{quote}
+Starting from the general kinetic equation, take the first velocity moment step by step and derive
+\[
+\partial_t(\rho\bm u)+\nabla\cdot(\rho\bm u\bm u+\bm P)=\rho\bm b.
+\]
+Explain every integration by parts, the required decay at infinity, and the physical meaning of each term.
+\end{quote}
+
+Follow-up:
+\begin{quote}
+Decompose \(\bm P=m\int \bm c\bm c f\dd\bm v\) into isotropic pressure and deviatoric stress, and explain why it is not simply a scalar.
+\end{quote}
+\end{askai}
+
+Writing
+\[
+\bm P=p\bm I-\bm\tau,
+\]
+gives
+\[
+\frac{\partial(\rho\bm u)}{\partial t}
++
+\nabla\cdot(\rho\bm u\bm u)
+=
+-\nabla p+\nabla\cdot\bm\tau+\rho\bm b.
+\]
+
+\section{Constitutive Closure and Continuum Models}
+Closure requires a constitutive relation between stress and macroscopic variables. A Newtonian fluid satisfies
+\[
+\bm\tau
+=
+\mu\left[\nabla\bm u+(\nabla\bm u)^T\right]
++\lambda(\nabla\cdot\bm u)\bm I.
+\]
+
+\begin{authornote}
+\textbf{Potential Question:}
+"Why is the momentum equation not the end of the derivation? Why does taking moments not automatically supply a constitutive law?"
+
+\textbf{Author Supplement:}
+Lower-order moment equations generally contain higher-order moments, including stress in the momentum equation and heat flux in the energy equation. A model with finitely many macroscopic unknowns must approximate these unresolved quantities using the retained variables and their gradients. Constitutive relations supply this additional physical assumption; their form and validity depend on the medium and the scales under study.
+
+\textbf{Core Conceptual Connection:}
+\[
+\text{moment equations}
+\longrightarrow
+\text{unclosed stresses and heat fluxes}
+\longrightarrow
+\text{constitutive closure}
+\]
+\end{authornote}
+
+
+For incompressible flow with constant density and viscosity,
+\[
+\nabla\cdot\bm u=0,
+\]
+\[
+\rho\left(
+\frac{\partial\bm u}{\partial t}
++\bm u\cdot\nabla\bm u
+\right)
+=
+-\nabla p+\mu\nabla^2\bm u+\rho\bm b.
+\]
+
+The inertial term transports momentum, pressure redistributes it, and viscosity smooths velocity gradients. Neglecting viscosity and heat conduction gives the Euler equations.
+
+The energy moment gives the total-energy equation:
+\[
+\frac{\partial(\rho E)}{\partial t}
++
+\nabla\cdot[(\rho E+p)\bm u]
+=
+\nabla\cdot(\bm\tau\cdot\bm u)
+-\nabla\cdot\bm q
++\rho\bm b\cdot\bm u,
+\]
+Here $e$ is internal energy per unit mass. A monatomic ideal gas satisfies $p=\rho k_BT/m$ and $e=3k_BT/(2m)$. Newtonian stress and Fourier heat flux correspond to near-local-equilibrium conditions and scales long compared with the mean free path.
+\[
+E=e+\frac12|\bm u|^2,
+\qquad
+\bm q=-k\nabla T.
+\]
+
+The transition from kinetics to a continuum model retains finitely many moments and closes higher-order moments through constitutive relations.

@@ -1,0 +1,78 @@
+\chapter{MHD and Plasma Fluid Models}\label{ch:18}
+\begin{chaptersummary}
+Maxwell and species-kinetic descriptions contain charge separation and electron and ion time scales. MHD uses low-frequency, quasineutral, and scale orderings to form a single-fluid model, closed by pressure, heat flux, and Ohm relations. This chapter gives conservative ideal MHD, then uses resistivity and pressure anisotropy to show how physical closure changes energy exchange and numerical constraints.
+\end{chaptersummary}
+\learninggoals{State ideal-MHD unknowns and assumptions; check total energy and magnetic divergence; distinguish electrical resistivity from magnetic diffusivity; explain pressure-tensor closure and its scales of validity.}
+\studyroute{The full asymptotic derivation of generalized Ohm's law from two-fluid equations, transport-coefficient tables, and anisotropic-instability dispersion calculations are omitted.}{ideal MHD; resistive MHD; generalized Ohm law; gyrotropic pressure; CGL closure}{Derive total-energy flux from ideal-MHD momentum, induction, and internal-energy equations. Check magnetic pressure and tension, identifying every use of the magnetic-divergence constraint.}
+
+\section{The Low-Frequency Single-Fluid State}\index{MHD}
+Use SI units and single-fluid variables $\rho,\bm u,p,\bm B$.
+Quasineutrality makes bulk charge density relatively small. Low-frequency ordering neglects displacement current, giving
+\[
+\bm J=\frac1{\mu_0}\nabla\times\bm B,\qquad
+\partial_t\bm B=-\nabla\times\bm E.
+\]
+Ideal Ohm's law is $\bm E+\bm u\times\bm B=0$.
+Its validity also requires Hall, electron-pressure-gradient, and electron-inertia terms to be relatively small;
+the ion inertial length relative to the target length, for example, must satisfy the chosen ordering.
+Assume isotropic pressure with ideal-gas closure $p=(\gamma-1)\rho e$.
+
+\section{The Conservative Ideal-MHD System}
+Define
+\[
+\mathcal E=\rho e+\tfrac12\rho|\bm u|^2+\frac{|\bm B|^2}{2\mu_0},
+\qquad p_t=p+\frac{|\bm B|^2}{2\mu_0}.
+\]
+Without external forces, viscosity, or heat conduction,
+\begin{equation}\label{eq:ideal-mhd}
+\begin{aligned}
+\partial_t\rho+\nabla\cdot(\rho\bm u)&=0,\\
+\partial_t(\rho\bm u)+\nabla\cdot
+\left(\rho\bm u\bm u+p_tI-\frac{\bm B\bm B}{\mu_0}\right)&=0,\\
+\partial_t\bm B-\nabla\times(\bm u\times\bm B)&=0,\\
+\partial_t\mathcal E+\nabla\cdot
+\left[(\mathcal E+p_t)\bm u-\frac{(\bm u\cdot\bm B)\bm B}{\mu_0}\right]&=0,
+\end{aligned}
+\end{equation}
+with $\nabla\cdot\bm B=0$.
+The magnetic-pressure and tension form uses this constraint; its continuous propagation follows from $\nabla\cdot\nabla\times=0$.
+A discrete design should verify cell conservation, magnetic divergence, positive density, and positive internal energy.
+
+\conceptbridge{Why retain magnetic divergence and closure conditions separately after writing conservative MHD?}
+{Conservation equations describe flux exchange among state variables; magnetic divergence restricts admissible magnetic fields.
+Pressure and Ohm relations encode scale and transport assumptions. These conditions constrain states, evolution, and unresolved physics in different ways,
+and therefore require distinct discrete verification measures.}
+{Low-frequency reduction $\longrightarrow$ single-fluid conservation + magnetic constraint + physical closure.}
+
+\section{Resistivity, Diffusion, and Energy Conversion}
+For electrical resistivity $\eta_e\ge0$,
+\[
+\bm E+\bm u\times\bm B=\eta_e\bm J.
+\]
+if $\eta_e,\mu_0$ are constant and $\nabla\cdot\bm B=0$,
+\[
+\partial_t\bm B=\nabla\times(\bm u\times\bm B)
++\eta_m\Delta\bm B,\qquad \eta_m=\eta_e/\mu_0.
+\]
+$\eta_e$ has units $\Omega\cdot\mathrm m$, while $\eta_m$ has units $\mathrm m^2/\mathrm s$.
+Magnetic energy loses $\eta_e|\bm J|^2$ through Ohmic dissipation, and internal energy gains the same Joule heat;
+total energy also requires a Poynting flux compatible with the resistive electric field.
+Explicit magnetic diffusion typically imposes an $O(h^2/\eta_m)$ step restriction. Propagation and diffusion scales can motivate IMEX treatment.
+
+\section{Pressure Anisotropy and Transport Closure}
+In a strong magnetic field, write
+\[
+\bm P=p_\perp I+(p_\parallel-p_\perp)\bm b\bm b+\bm\Pi_{\mathrm{ng}},
+\qquad \bm b=\bm B/|\bm B|.
+\]
+Here $\bm\Pi_{\mathrm{ng}}$ is nongyrotropic; heat flux may also be decomposed into parallel and perpendicular components.
+In the collisionless double-adiabatic approximation, neglecting heat flux and finite-Larmor-radius effects,
+\[
+\frac{D}{Dt}\left(\frac{p_\perp}{\rho|\bm B|}\right)=0,\qquad
+\frac{D}{Dt}\left(\frac{p_\parallel|\bm B|^2}{\rho^3}\right)=0.
+\]
+The CGL relations connect parallel and perpendicular pressures to density and magnetic field, closing pressure under the double-adiabatic ordering.
+Collisional transport and nonlocal heat flux require corresponding models and may change well-posedness and instability thresholds~\cite{cgl1956}.
+
+\aiexercise{For constant-resistivity MHD in a periodic domain, calculate magnetic-energy loss and internal-energy Joule heating separately. Prove cancellation of the volume conversion terms and write the boundary energy flux.}
+{Superpose a small Alfv\'en wave on an equilibrium magnetic field and measure wave speed, phase, and discrete magnetic divergence. Introduce parallel and perpendicular pressures and identify the equations that must change from isotropic closure.}

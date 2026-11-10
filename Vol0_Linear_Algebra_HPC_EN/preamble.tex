@@ -1,0 +1,42 @@
+\usepackage{fontspec}
+\setmainfont{Latin Modern Roman}
+\setsansfont{Latin Modern Sans}
+\setmonofont{Latin Modern Mono}
+\usepackage[english]{babel}
+\usepackage[a4paper,margin=2.4cm,headheight=16pt]{geometry}
+\usepackage{amsmath,amssymb,bm,mathtools,amsthm}
+\usepackage{booktabs,array,longtable,tabularx}
+\usepackage{graphicx,tikz,pgfplots}
+\usetikzlibrary{arrows.meta,calc}
+\pgfplotsset{compat=1.18}
+\usepackage{fancyhdr,enumitem,float,placeins,microtype,needspace}
+\usepackage[most]{tcolorbox}
+\usepackage[colorlinks,linkcolor=blue!45!black,citecolor=green!35!black,urlcolor=blue!55!black]{hyperref}
+\usepackage{xurl}
+\setlength{\emergencystretch}{3em}
+\setlist{nosep,leftmargin=2em}
+\raggedbottom
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\nouppercase{\leftmark}}
+\fancyfoot[C]{\thepage}
+\newcommand{\dd}{\mathop{}\!\mathrm d}
+\newcommand{\R}{\mathbb R}
+\newcommand{\K}{\mathcal K}
+\newcommand{\norm}[1]{\left\lVert #1\right\rVert}
+\DeclareMathOperator{\diag}{diag}
+\DeclareMathOperator{\tr}{tr}
+\DeclareMathOperator{\nnz}{nnz}
+\DeclareMathOperator{\curl}{curl}
+\DeclareMathOperator{\diverg}{div}
+\pdfstringdefDisableCommands{\def\textsuperscript#1{#1}}
+\newtcolorbox{chaptersummary}{colback=blue!3,colframe=blue!45!black,title=Chapter Overview,fonttitle=\bfseries,arc=1mm}
+\newtcolorbox{authornote}{colback=yellow!7,colframe=orange!70!black,title=Potential Conceptual Jump,fonttitle=\bfseries,arc=1mm}
+\newtcolorbox{askai}{colback=violet!3,colframe=violet!50!black,title=Ask AI,fonttitle=\bfseries,arc=1mm}
+\newcommand{\learninggoals}[1]{\paragraph{Learning Objectives}#1}
+\newcommand{\studyroute}[2]{\paragraph{Further Detail and Search}#1\par\textbf{Keywords: }#2}
+\newcommand{\conceptbridge}[3]{\begin{authornote}\textbf{Potential Question: }#1\par\textbf{Author Supplement: }#2\par\textbf{Core Conceptual Connection: }#3\end{authornote}}
+\newcommand{\aiexercise}[2]{\begin{askai}\textbf{Ask AI: }#1\par\textbf{Follow-up: }#2\end{askai}}
+\newcommand{\costnote}[1]{\paragraph{Cost and Applicability}#1}
+\newcommand{\crossref}[1]{\paragraph{Connections}#1}
+\newcommand{\coderef}[1]{\paragraph{Computational Example}Shared companion code in \path{Vol0_Linear_Algebra_HPC/code_examples/}:\par{\small\raggedright\nolinkurl{#1}\par}}

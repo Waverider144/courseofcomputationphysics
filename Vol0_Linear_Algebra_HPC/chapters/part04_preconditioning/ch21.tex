@@ -1,0 +1,33 @@
+\chapter{求解器组合与工程选型}\label{v0ch:21}
+\begin{chaptersummary}
+分解、Krylov 投影、局部修正与多层方法已构成求解器的基本部件。本章按矩阵结构、容差、复用方式和硬件成本组织这些部件，形成完整求解流程。随后进入 Roofline 分析时，评价对象将从单次算子调用扩展到达到目标误差和物理终止时间的全部计算。
+\end{chaptersummary}
+\learninggoals{按矩阵结构选择组合；记录 setup 与 solve；分配离散、线性和非线性误差预算。}
+\paragraph{核心问题}如何把算法部件组成可验证、可复用且可比较的求解器？
+
+\section{组合的条件}
+\begin{center}\small
+\begin{tabularx}{\textwidth}{lXX}
+\toprule 系统&候选组合&必须核验\\\midrule
+SPD 扩散&CG+IC，CG+对称 MG/AMG&固定 SPD 逆作用，零空间处理\\
+对称不定&MINRES+SPD 块预条件&对称性与预条件正定性\\
+非对称输运扩散&GMRES+ILU/AMG&重启、非正规性、真实残差\\
+变化内层求解&FGMRES+变化 MG/局部解&保留实际方向及内层成本\\
+多右端中等规模&稀疏直接法或回收 Krylov&构造摊销、内存与数值秩\\\bottomrule
+\end{tabularx}
+\end{center}
+表中各组合以相应矩阵结构为前提；AMG 的粗空间与平滑器还应匹配具体问题的难消除模式。
+\section{容差与非线性外迭代}
+Newton 步 $J_k\delta\bm u_k=-\bm F(\bm u_k)$ 可采用
+\[
+ \norm{J_k\delta\bm u_k+\bm F(\bm u_k)}
+ \le\eta_k\norm{\bm F(\bm u_k)}.
+\]
+前期采用较松的内层容差，接近解时再减小 $\eta_k$，可将线性工作量与外层收敛需求匹配；线搜索或信赖域负责相应的全局化。容差最终依据离散误差与目标量确定，软件默认值则作为初始配置。
+\conceptbridge{为什么每个线性系统都解得更准，整体反而未必更好？}{非线性早期 Jacobian 仅近似当前局部行为，过准的线性解不消除模型线性化误差；演化问题还存在时间与空间误差。总预算应分配到真正控制结果的误差源。}{总体目标误差 $\longrightarrow$ 分层容差 $\longrightarrow$ 总求解时间。}
+\section{最小选型实验}
+同一组 Poisson 与对流扩散矩阵，比较直接法、无预条件 Krylov、ILU-GMRES 和两层预条件。每项先检查条件及最终误差，再记录构造时间、应用时间、次数、因子或层次存储；对十个右端重复，判断构造复用是否改变排序。
+\costnote{总时间包含装配、排序、预条件构造、每步算子、正交化、通信及最终验证。硬件上三角求解、SpMV、点积和稠密小块具有不同性能特征，下一部分分别分析。}
+\coderef{sparse_linear_algebra/solvers.py; sparse_linear_algebra/multilevel.py}
+\aiexercise{为二维 Poisson 和非对称对流扩散各写一份选型记录：结构证据、方法条件、容差理由、构造成本及失败回退路径。}{用测得的 setup 和 solve 时间建立多右端摊销图，区分迭代数最少和总时间最短。}
+\studyroute{略去复杂耦合 PDE 的专用块预条件与非线性全局收敛理论。参考 \cite{saad,petsc}。}{solver configuration; setup amortization; inexact Newton; tolerance budget; time to solution}

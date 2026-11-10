@@ -1,0 +1,78 @@
+\chapter{MHD 与等离子体流体模型}\label{ch:18}
+\begin{chaptersummary}
+Maxwell 与物种动理学描述包含电荷分离、电子及离子时间尺度。MHD 利用低频、准中性与尺度排序形成单流体模型，再通过压力、热流和 Ohm 关系闭合。本章给出理想 MHD 的守恒形式，并以电阻和压力各向异性说明物理闭合如何改变能量与数值约束。
+\end{chaptersummary}
+\learninggoals{列出理想 MHD 的未知量与假设；核对总能量和磁散度；区分电阻率与磁扩散率；解释压力张量闭合及其适用尺度。}
+\studyroute{略去从双流体到广义 Ohm 定律的完整渐近推导、输运系数表及各向异性不稳定性的色散计算。}{ideal MHD; resistive MHD; generalized Ohm law; gyrotropic pressure; CGL closure}{从理想 MHD 的动量、感应和内能方程推导总能量通量，逐项核对磁压与磁张力，并说明使用磁散度约束的位置。}
+
+\section{低频单流体状态}\index{MHD}
+本章使用 SI 单位，取 $\rho,\bm u,p,\bm B$ 为单流体变量。
+准中性使主体电荷密度相对较小；低频排序下忽略位移电流，得到
+\[
+\bm J=\frac1{\mu_0}\nabla\times\bm B,\qquad
+\partial_t\bm B=-\nabla\times\bm E.
+\]
+理想 Ohm 关系为 $\bm E+\bm u\times\bm B=0$。
+其适用尺度还需使 Hall、电子压力梯度和电子惯性等项相对较小；
+例如离子惯性长度与目标长度之比必须与所选排序相容。
+压强取各向同性，并给定理想气体闭合 $p=(\gamma-1)\rho e$。
+
+\section{理想 MHD 的守恒系统}
+令
+\[
+\mathcal E=\rho e+\tfrac12\rho|\bm u|^2+\frac{|\bm B|^2}{2\mu_0},
+\qquad p_t=p+\frac{|\bm B|^2}{2\mu_0}.
+\]
+无外力、黏性和热传导时，
+\begin{equation}\label{eq:ideal-mhd}
+\begin{aligned}
+\partial_t\rho+\nabla\cdot(\rho\bm u)&=0,\\
+\partial_t(\rho\bm u)+\nabla\cdot
+\left(\rho\bm u\bm u+p_tI-\frac{\bm B\bm B}{\mu_0}\right)&=0,\\
+\partial_t\bm B-\nabla\times(\bm u\times\bm B)&=0,\\
+\partial_t\mathcal E+\nabla\cdot
+\left[(\mathcal E+p_t)\bm u-\frac{(\bm u\cdot\bm B)\bm B}{\mu_0}\right]&=0,
+\end{aligned}
+\end{equation}
+并要求 $\nabla\cdot\bm B=0$。
+磁压与磁张力形式使用该约束；连续传播依赖 $\nabla\cdot\nabla\times=0$。
+离散设计需同时验证单元守恒、磁散度、正密度与正内能。
+
+\conceptbridge{为何写出守恒型 MHD 后，还要保留独立的磁散度与闭合条件？}
+{守恒方程描述各状态量的通量交换；磁散度限定允许的磁场。
+压力和 Ohm 关系则来自尺度与输运假设。三者分别约束状态、演化与未解物理，
+并在离散后对应不同的验证指标。}
+{低频约化 $\longrightarrow$ 单流体守恒系统 + 磁约束 + 物理闭合。}
+
+\section{电阻、扩散与能量转换}
+取电阻率 $\eta_e\ge0$，
+\[
+\bm E+\bm u\times\bm B=\eta_e\bm J.
+\]
+在 $\eta_e,\mu_0$ 为常数且 $\nabla\cdot\bm B=0$ 时，
+\[
+\partial_t\bm B=\nabla\times(\bm u\times\bm B)
++\eta_m\Delta\bm B,\qquad \eta_m=\eta_e/\mu_0.
+\]
+$\eta_e$ 的单位为 $\Omega\cdot\mathrm m$，$\eta_m$ 的单位为 $\mathrm m^2/\mathrm s$。
+磁能的 Ohmic 损耗为 $\eta_e|\bm J|^2$，内能获得同样的焦耳热；
+总能量还需使用与电阻电场相容的 Poynting 通量。
+显式磁扩散通常给出 $O(h^2/\eta_m)$ 步长限制，可按传播与扩散尺度选择 IMEX。
+
+\section{压力各向异性与输运闭合}
+强磁场中可写
+\[
+\bm P=p_\perp I+(p_\parallel-p_\perp)\bm b\bm b+\bm\Pi_{\mathrm{ng}},
+\qquad \bm b=\bm B/|\bm B|.
+\]
+$\bm\Pi_{\mathrm{ng}}$ 为非回旋对称部分；热流也可区分平行与垂直分量。
+在碰撞可忽略、热流与有限回旋半径作用可忽略的双绝热近似中，
+\[
+\frac{D}{Dt}\left(\frac{p_\perp}{\rho|\bm B|}\right)=0,\qquad
+\frac{D}{Dt}\left(\frac{p_\parallel|\bm B|^2}{\rho^3}\right)=0.
+\]
+CGL 关系将平行与垂直压力分别联系到密度和磁场，构成上述双绝热排序下的压力闭合。
+碰撞输运或非局域热流需使用对应的模型，且可能改变适定性和不稳定性阈值~\cite{cgl1956}。
+
+\aiexercise{在周期区域内，对常电阻率 MHD 分别计算磁能损耗与内能焦耳热，证明体积转换项相抵，并写出边界能量通量。}
+{对平衡磁场叠加小幅 Alfv\'en 波，测波速、相位和离散磁散度。再引入平行与垂直压力，列出原有各向同性闭合中需要改变的方程。}

@@ -1,0 +1,53 @@
+\chapter{Meshes as the Interface between Geometry and Discrete Operators}\label{ch:20}
+\begin{chaptersummary}
+After model and space selection, the mesh introduces physical geometry, boundaries, and local scales into the operator. Reference-element mappings explain how shape and size change gradients, integration, and interface pairings, leading to curved geometry and conservation checks. These compatibility requirements provide the common foundation for the next chapter's mesh techniques.
+\end{chaptersummary}
+\learninggoals{Transform gradients and integrals from reference to physical elements; distinguish geometric and approximation errors; explain how shape, adjacency, and boundary representation affect spatial operators.}
+\studyroute{Higher-dimensional mesh generation, geometric-approximation error proofs, and matrix implementation are omitted. This chapter retains operator structure; algebraic solvers and parallel data layout are developed in Volume~0.}{element mapping; mesh quality; curved element; metric identity; discrete geometric conservation}{Compare Jacobians and linear finite-element stiffness matrices for an equilateral and a slender triangle, identifying the geometric factor that amplifies gradients.}
+\section{Geometry, Adjacency, and Discrete Coupling}\index{Mesh geometry}
+Meshes determine geometric representation error, local discretization error, stability restrictions, and matrix nonzero patterns. Geometry handling and mesh-quality control are central computational tasks.
+
+\begin{authornote}
+\textbf{Potential Question:}
+"Why does a mesh affect matrix structure, stability restrictions, and solver behavior as well as geometric shape?"
+
+\textbf{Author Supplement:}
+A mesh defines not only sampling locations but also information exchange between elements. Adjacency determines discrete coupling; element shapes and sizes enter derivatives, integrals, and time-step estimates; boundary representation affects boundary-condition enforcement. The same continuous equation therefore produces different couplings and errors on different meshes.
+
+\textbf{Core Conceptual Connection:}
+\[
+\text{mesh geometry}
+\longrightarrow
+\text{discrete coupling}
+\longrightarrow
+\text{matrix and solver behavior}
+\]
+\end{authornote}
+
+A body-fitted mesh aligns its boundary with the physical surface. Boundary conditions are imposed directly, and wall layers can be resolved, but complex geometry and large motion complicate generation and quality control.
+
+\section{Reference Mappings and Geometric Scales}
+Let $x=F_K(\xi)$ with invertible $A_K=\partial F_K/\partial\xi$. Then
+\[
+\nabla_xu=A_K^{-\mathsf T}\nabla_\xi\widehat u,\qquad
+\dd x=|\det A_K|\dd\xi.
+\]
+A Poisson stiffness entry becomes
+\[
+K_{ij}^{(K)}
+=\int_{\widehat K}(\nabla_\xi\phi_i)^{\mathsf T}
+A_K^{-1}A_K^{-\mathsf T}\nabla_\xi\phi_j\,|\det A_K|\dd\xi.
+\]
+Slender or degenerate elements change mapping singular values, amplifying directional gradients and error constants.
+Structured meshes have regular connectivity; unstructured meshes permit more flexible shapes and adjacency.
+Both require boundary orientations, face measures, and discrete integration rules.
+
+\section{Curved Elements and Geometric Error}
+High-order field approximation often requires correspondingly accurate curved geometry.
+Mapping degree and volume and surface quadrature jointly affect total error.
+For conservation laws, preservation of constants requires the discrete geometric factors to satisfy the relevant metric identities;
+shared face geometry and opposite normals are the basis of flux cancellation.
+Begin verification with constant fields, low-order polynomials, and analytic surfaces to check geometric integrals, then assess convergence of physical solutions.
+
+\aiexercise{For $x=A\xi+b$, choose rotational, isotropic-scaling, and strongly stretched matrices $A$. Derive gradient, mass, and stiffness scalings, and compare errors for the same linear field on the three meshes.}
+{Represent a circular boundary with straight segments and quadratic curves. At fixed field degree, design convergence experiments separating geometric error from spatial approximation error.}

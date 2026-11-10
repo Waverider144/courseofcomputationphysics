@@ -1,0 +1,79 @@
+\chapter{Mortar 方法与非匹配网格耦合}\label{ch:13}
+\begin{chaptersummary}
+局部高阶空间允许不同单元独立选取尺寸和次数，界面两侧的节点与迹空间因而可能不匹配。Mortar 在共同接口上组织投影、通量和回传，使两侧使用同一份积分数据。本章给出投影矩阵、常数保持及线性能量条件，为 hp 自适应和异构方法耦合提供接口。
+\end{chaptersummary}
+\learninggoals{建立共同接口分区和 Mortar 空间；计算迹投影与对偶回传；证明两侧积分通量抵消；说明能量稳定所需的求积与迹再现条件。}
+\studyroute{略去曲面几何不一致、非线性熵投影和降阶 Mortar 的专门稳定设计；线性证明使用能再现两侧迹的共同空间。}{mortar method; nonconforming interface; mass-adjoint projection; hp nonconforming DG}{在同一线段上以左侧一次、右侧常数迹构造 Mortar 质量矩阵和投影，显式核对通量载荷与常数测试。}
+
+\section{共同接口与迹空间}\index{Mortar 方法}
+考虑两个二维单元相邻的一条平面边 $\Gamma$，法向固定从左到右。
+若两侧次数不同或一条粗边对应多条细边，应先把物理接口划分为共同子面。
+在每个子面上选取 Mortar 空间 $V_m=\Poly_{p_m}$，并用相同几何映射、法向和积分测度。
+取 $p_m$ 至少为两侧迹次数，可在仿射子面上再现两侧迹。
+该守恒耦合思路可见~\cite{kopriva1996}。
+
+\conceptbridge{直接在两侧各自的节点上计算通量，为什么还需要共同接口？}
+{节点集合不同会产生不同的通量采样和积分。共同接口将两侧迹转换到同一空间，
+只计算一份数值通量，再以相反法向传回。常数保持保证总量一致，
+相容的积分与对偶回传进一步连接两侧的能量配对。}
+{非匹配迹 $\longrightarrow$ 共同接口空间 $\longrightarrow$ 共享通量与相容回传。}
+
+\section{投影、通量与对偶回传}
+设 Mortar 基为 $\mu_\alpha$，一侧迹基为 $\phi_i^s$，$s=L,R$，定义
+\[
+(M_m)_{\alpha\beta}=\int_\Gamma\mu_\alpha\mu_\beta\dd S,\qquad
+(B_{ms})_{\alpha i}=\int_\Gamma\mu_\alpha\phi_i^s\dd S.
+\]
+$L^2$ 迹投影满足
+\begin{equation}\label{eq:mortar-proj}
+P_s=M_m^{-1}B_{ms},\qquad u_{s,m}=P_su_s.
+\end{equation}
+在共同积分节点以 $u_{L,m},u_{R,m}$ 评价单值法向通量；
+用同一规则表示其载荷为 $M_mf_m^*$，则两侧的正向外通量载荷为
+\begin{equation}\label{eq:mortar-return}
+r_L=P_L^{\mathsf T}M_mf_m^*,\qquad
+r_R=-P_R^{\mathsf T}M_mf_m^*.
+\end{equation}
+这些是弱残差的对偶载荷。若需要一侧的通量系数，可再作用该侧迹质量矩阵的逆；
+该表达同时说明 $M_sP_{m\to s}=P_s^{\mathsf T}M_m$ 的质量伴随关系。
+
+\section{守恒与线性能量条件}
+设 $\bm1_s$ 和 $\bm1_m$ 表示常数函数。投影再现常数即
+$P_s\bm1_s=\bm1_m$，于是
+\[
+\bm1_L^{\mathsf T}r_L+\bm1_R^{\mathsf T}r_R=0.
+\]
+一条粗边对应多个 Mortar 子面时，对这些子面的载荷求和；
+粗细两侧仍使用同一组积分。
+
+为得到线性能量估计，进一步假设共同空间精确再现两侧迹，
+并且求积精确表示相应乘积。此时
+$P_s^{\mathsf T}M_mP_s=M_s$，
+若有多个子面则对左端矩阵求和。
+对常法向速度 $a_n$ 取
+\[
+f_m^*=a_n\{u_m\}-\frac{|a_n|}{2}[u_m],
+\]
+两侧 DG 边界能量之和为
+\[
+-\frac{|a_n|}{2}[u_m]^{\mathsf T}M_m[u_m]\le0.
+\]
+若共同空间降阶、两侧几何或求积不一致，上述迹范数恒等式需要相应替代设计；
+常数保持负责总量守恒，迹再现、求积与质量伴随关系进一步支撑能量估计。
+
+\section{一个可手算的非匹配接口}
+令 $\Gamma=[-1,1]$，左迹空间基为 $(1,s)$，右迹仅含常数；
+Mortar 也取 $(1,s)$，精确积分得到
+\[
+M_m=\begin{pmatrix}2&0\\0&2/3\end{pmatrix},\quad
+P_L=I_2,\quad P_R=\begin{pmatrix}1\\0\end{pmatrix}.
+\]
+若共同通量系数为 $(F_0,F_1)^{\mathsf T}$，则
+\[
+r_L=\begin{pmatrix}2F_0\\2F_1/3\end{pmatrix},\qquad r_R=-2F_0.
+\]
+常数测试只读取左侧第一分量，其总通量恰好抵消；
+线性分量是左侧内部迹的残差。hp 加密改变接口空间时，需同步更新投影和物理测度。
+
+\aiexercise{将例子改为左侧二次、右侧一次多项式，采用三个 Gauss 点精确积分，显式构造 $M_m,B_{mL},B_{mR}$。检查常数再现、质量伴随与上风界面能量。}
+{把右侧边划分为两个子面并各用一次迹。写出子面映射的 Jacobian，证明粗侧总载荷等于两份细侧载荷的相反数。}

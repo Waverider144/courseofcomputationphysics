@@ -1,0 +1,16 @@
+{
+  "host": "remote",
+  "cpu": "AMD EPYC 9554 64-Core Processor",
+  "sockets": 2,
+  "cores_per_socket": 64,
+  "logical_cpus": 128,
+  "numa_nodes": 2,
+  "gpu": "NVIDIA GeForce RTX 4090",
+  "driver": "565.77",
+  "cuda": "12.9.86",
+  "mpi": "Open MPI 4.1.7a1",
+  "gpu_index_used": 1,
+  "load": "shared GPUs, nonexclusive short validation",
+  "authorized_write_root": "<WORKSPACE>",
+  "source": "read-only lscpu --json, nvidia-smi and compiler/version queries"
+}

@@ -1,0 +1,36 @@
+\chapter{Gaussian Elimination and LU Factorization}\label{v0ch:4}
+\begin{chaptersummary}
+We now know how matrices arise and how to accept approximate solutions. Elimination provides the first solution route: replace the original system with two triangular systems. Pivoting addresses numerical stability; separating factorization from substitution explains reuse for multiple right-hand sides. Sparse and incomplete factorizations retain this mechanism while changing storage and approximation.
+\end{chaptersummary}
+\learninggoals{Compute pivoted LU by hand; perform forward and backward substitution; distinguish factorization, solution, and pivot-growth costs.}
+\paragraph{Core Question}Why can elimination be reused as a solution operator?
+
+\section{Elimination, Permutations, and Triangular Systems}
+At step $k$, pivot on $a_{kk}$ and use multipliers $\ell_{ik}=a_{ik}/a_{kk}$ to update
+$a_{ij}\leftarrow a_{ij}-\ell_{ik}a_{kj}$. The multipliers form unit lower-triangular $L$, and the remaining entries form upper-triangular $U$. Accumulating row permutations in $P$ gives $PA=LU$.
+The solution proceeds through
+\[
+ y_i=(P\bm b)_i-\sum_{j<i}\ell_{ij}y_j,\qquad
+ x_i=\frac{y_i-\sum_{j>i}u_{ij}x_j}{u_{ii}}.
+\]
+Partial pivoting selects the largest-magnitude available entry in the current column. Complete pivoting searches the remaining rows and columns, giving $PAQ=LU$; the unknown ordering must then be restored. Partial pivoting is usually effective, although large element growth remains possible in the worst case.
+\section{A Complete Four-by-Four Example}
+Take
+\[
+ A=\begin{bmatrix}0&2&1&0\\4&4&0&1\\2&0&3&1\\0&1&1&2\end{bmatrix},
+ \quad \bm b=(3,9,6,4)^T.
+\]
+Exchange the first two rows. The first-column multiplier is $\ell_{31}=1/2$. With second pivot 2, use $\ell_{32}=-1,\ell_{42}=1/2$; the third-column multiplier is $\ell_{43}=1/8$. Thus
+\[
+ L=\begin{bmatrix}1&0&0&0\\0&1&0&0\\1/2&-1&1&0\\0&1/2&1/8&1\end{bmatrix},
+ \quad U=\begin{bmatrix}4&4&0&1\\0&2&1&0\\0&0&4&1/2\\0&0&0&31/16\end{bmatrix}.
+\]
+Verify $LU=PA$ entry by entry. Forward substitution gives
+$\bm y=(9,3,9/2,31/16)^T$, and backward substitution gives $\bm x=(1,1,1,1)^T$. The permutation determinant is $-1$, so $\det A=-62$.
+\conceptbridge{Why can the first pivot vanish when the matrix is invertible?}{Invertibility ensures a solution, not nonzero elimination pivots in every ordering. Row exchanges select suitable elimination coordinates. In floating-point arithmetic, small pivots can also amplify multipliers and roundoff.}{Invertible system $\longrightarrow$ suitable elimination order $\longrightarrow$ numerically viable triangular factors.}
+\section{Cost, Reuse, and Verification}
+Dense LU costs approximately $2N^3/3$ FLOPs; two triangular solves cost approximately $2N^2$, with $O(N^2)$ in-place factor storage. For $s$ right-hand sides, factor once and substitute $s$ times. Block LU organizes most updates as matrix multiplication, changing cache reuse without changing the underlying elimination.
+\costnote{Factors support multiple right-hand sides and iterative refinement. Matrix changes generally require refactorization. Report the true residual; if needed, compute residuals more accurately and solve correction equations.}
+\coderef{sparse_linear_algebra/solvers.py}
+\aiexercise{Work through every trailing submatrix, forward solve, and back substitution in the four-by-four example, then cross-check $PA=LU$ with a library factorization.}{Replace the first nonzero pivot by a small value and compare multipliers, element growth, and backward errors with and without partial pivoting.}
+\studyroute{Worst-case pivot-growth bounds and floating-point proofs for block algorithms are omitted. See \cite{golub}.}{partial pivoting; complete pivoting; growth factor; blocked LU; iterative refinement}

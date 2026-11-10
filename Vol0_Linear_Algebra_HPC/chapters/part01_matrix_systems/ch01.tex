@@ -1,0 +1,40 @@
+\chapter{为什么科学计算最终变成矩阵问题？}\label{v0ch:1}
+\begin{chaptersummary}
+第一、二卷的空间离散给出了有限维表示与离散通量，接下来的任务是求解这些离散方程。本章从未知量、局部耦合和边界处理出发，建立矩阵与离散算子的对应关系。这一对应关系决定后续分解与迭代法的选择，也为矩阵自由实现提供统一视角。
+\end{chaptersummary}
+\learninggoals{由一维 Poisson 方程写出矩阵；区分质量、刚度和 Jacobian；识别装配与矩阵自由的共同算子。}
+\paragraph{核心问题}连续方程中的局部微分关系，怎样成为有限个未知量之间的耦合？
+
+\section{从导数到五个未知量}
+取 $-u''=f$ 于 $(0,1)$，$u(0)=g_0,u(1)=g_1$。设 $h=1/6$，$u_i\approx u(ih)$。内部五点满足
+\[
+ A\bm u=\bm b,\quad
+ A=h^{-2}\begin{bmatrix}
+ 2&-1&0&0&0\\-1&2&-1&0&0\\0&-1&2&-1&0\\
+ 0&0&-1&2&-1\\0&0&0&-1&2
+ \end{bmatrix},\quad
+ \bm b=\begin{bmatrix}f_1+g_0/h^2\\f_2\\f_3\\f_4\\f_5+g_1/h^2\end{bmatrix}.
+\]
+行表示离散方程，列表示自由度。邻近差分读取三个值，因此每行至多有三个非零元；边界数据及其系数一起移至右端。取 $u=x(1-x)$、$f=2$ 时，二阶差分对该二次函数精确，可据此核验矩阵、符号与边界实现。
+\conceptbridge{方程已是有限维，为什么还要区分未知量的定义？}{节点值、单元平均值和基函数系数属于不同坐标。离散算子把这些坐标映射为残量；矩阵条目同时编码试验空间、测试方式和相邻单元的相互作用。改变坐标或边界消元方式，即使连续 PDE 不变，矩阵也会改变。}{连续算子 $\longrightarrow$ 自由度与测试 $\longrightarrow$ 代数耦合。}
+\section{装配、块结构与非线性}
+有限元近似 $u_h=\sum_j u_j\phi_j$ 给出
+\[
+ M_{ij}=\int\phi_i\phi_j,\qquad
+ K_{ij}=\int\nabla\phi_i\cdot\nabla\phi_j,\qquad
+ M\dot{\bm u}+K\bm u=\bm f.
+\]
+共享支撑的基函数产生耦合；局部矩阵通过局部到全局编号装配。有限体积中，同一界面的数值通量同时进入两侧残量。DG 的体积分形成单元块，面通量形成邻接块。多物理场可形成鞍点或分块系统。谱基具有全局支撑时，微分矩阵可能稠密。
+对于非线性残量 $\bm F(\bm u)=0$，Newton 修正满足
+\[
+ J(\bm u_k)\delta\bm u=-\bm F(\bm u_k),\qquad J_{ij}=\partial F_i/\partial u_j.
+\]
+$J$ 是当前状态处的线性化；它与时间离散后出现的质量项、边界处理共同决定线性系统。
+\section{存储矩阵还是执行算子}
+带状、块稀疏、Kronecker 和规则 stencil 均可描述相同规模的不同结构。
+矩阵自由实现直接计算 $\bm v\mapsto A\bm v$，例如复用单元积分或邻点差分，省去完整条目存储；预条件仍可能使用装配的近似矩阵。
+\costnote{三对角乘法时间和存储均为 $O(N)$；稠密存储为 $O(N^2)$。矩阵自由减少条目与索引读取，但会重复几何、系数或积分计算。比较对象应是同一算子及精度。}
+\coderef{sparse_linear_algebra/solvers.py}
+\crossref{第一卷空间离散给出 $M,K,J$ 的构造；本卷第 5、23、26 章分别讨论填充、算子指纹和数据布局。}
+\aiexercise{对本章五内部点问题取 $g_0=1,g_1=2,f=0$，逐行推导右端并验证线性解析解；再用线性有限元写出质量与刚度矩阵。}{将同一差分写成 CSR 和不存矩阵的函数，比较输出，指出两者在边界处的共同约定。}
+\studyroute{略去一般边界弱施加与非线性收敛证明。参考 \cite{golub,saad}。}{degrees of freedom; assembly; Jacobian; matrix-free operator}

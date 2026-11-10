@@ -1,0 +1,134 @@
+\chapter{Complex Geometry and Mesh Techniques}\label{ch:21}
+\begin{chaptersummary}
+Fixed body-fitted meshes represent object boundaries directly; complex motion and changing local scales require more flexible geometry. Immersed boundaries, tree meshes, ALE, and overset grids connect geometry to evolution through forcing, common subfaces, moving control volumes, and interpolation. Conservative transfer and geometric conservation provide common principles across these layouts.
+\end{chaptersummary}
+\learninggoals{Explain the states and interfaces of four mesh techniques; derive relative fluxes for moving control volumes; state conservation requirements for coarse--fine transfers, common subfaces, and overset interpolation.}
+\studyroute{Geometry, interface transfer, and conservation organize the mesh equations. Full mesh generators, hole-cutting searches, and boundary-forcing implementations are left for further study.}{immersed boundary; quadtree octree; AMR refluxing; ALE; geometric conservation law; overset}{List shared fluxes for one coarse face adjoining two fine faces, then test a constant solution in a moving control volume and compare spatial with geometric conservation.}
+\section{Immersed Boundaries and Background Meshes}
+An immersed-boundary method places complex objects on a simple background mesh without requiring boundary alignment. Boundary action enters the momentum equation:
+\[
+\rho\left(
+\frac{\partial\bm u}{\partial t}
++\bm u\cdot\nabla\bm u
+\right)
+=
+-\nabla p+\mu\nabla^2\bm u+\bm f_{\mathrm{IB}}.
+\]
+
+\begin{authornote}
+\textbf{Potential Question:}
+"Without a boundary-fitted mesh, why can \(\bm f_{\mathrm{IB}}\) represent the object's effect?"
+
+\textbf{Author Supplement:}
+A body-fitted mesh represents the object surface directly as a mesh boundary where conditions can be imposed. An immersed surface cuts through the background mesh, so added forces or modified nearby discrete equations must enforce its effect. This permits more flexible geometry handling, while requiring explicit checks of near-wall accuracy and conservation.
+
+\textbf{Core Conceptual Connection:}
+\[
+\text{body-fitted boundary condition}
+\longrightarrow
+\text{immersed forcing}
+\longrightarrow
+\text{background-grid computation}
+\]
+\end{authornote}
+
+Continuous forcing transfers forces between Lagrangian boundary points and an Eulerian grid through smooth kernels; discrete forcing modifies nearby discrete equations directly.
+
+Regular background grids simplify computation and complex motion, while near-wall accuracy, flux conservation, and thin structures require corresponding boundary discretizations and checks.
+
+\section{Quadtrees, Octrees, and AMR}
+Quadtrees recursively divide a two-dimensional cell into four children; octrees divide a three-dimensional cell into eight. Resolution is concentrated near shocks, shear layers, vortices, interfaces, or high-error regions.
+
+\begin{authornote}
+\textbf{Potential Question:}
+"Why does local refinement introduce 2:1 balancing, nonconforming interfaces, and conservative transfers?"
+
+\textbf{Author Supplement:}
+Refinement changes more than resolution: it creates new coarse--fine adjacency, requiring compatible fluxes across differently sized faces. Moving refinement regions also require new spatial projections and interface fluxes so that transfers between old and new degrees of freedom remain conservative.
+
+\textbf{Core Conceptual Connection:}
+\[
+\text{local refinement}
+\longrightarrow
+\text{nonmatching interfaces}
+\longrightarrow
+\text{conservative transfer}
+\]
+\end{authornote}
+
+Common implementation constraints include
+\begin{itemize}
+  \item maintaining 2:1 level balance between neighbors;
+  \item treating coarse--fine nonconforming interfaces;
+  \item conservatively transferring variables during refinement and coarsening;
+  \item rebuilding interface projections and flux matching after adaptation.
+\end{itemize}
+
+\section{Moving Meshes, ALE, and Geometric Conservation}
+In an arbitrary Lagrangian--Eulerian description, the mesh moves with velocity \(\bm w\). Conservation becomes
+\[
+\frac{\dd}{\dd t}\int_{\Omega(t)}U\dd V
++
+\int_{\partial\Omega(t)}
+[\bm F(U)-U\bm w]\cdot\bm n\dd S
+=0.
+\]
+
+\begin{authornote}
+\textbf{Potential Question:}
+"Why does mesh motion change the flux from \(\bm F(U)\) to \(\bm F(U)-U\bm w\)?"
+
+\textbf{Author Supplement:}
+A moving boundary changes the amount inside a control volume both through physical transport and by sweeping through space. Integral conservation therefore involves a relative flux combining physical flux and mesh velocity. Discrete geometric conservation requires volume changes to agree with swept volumes; otherwise even a uniform solution may change artificially.
+
+\textbf{Core Conceptual Connection:}
+\[
+\text{fixed control volume}
+\longrightarrow
+\text{moving control volume}
+\longrightarrow
+\text{ALE flux}
+\]
+\end{authornote}
+
+A moving mesh must satisfy geometric conservation: mesh motion alone must not alter a constant physical solution.
+
+Mesh motion can use spring analogies, Laplace smoothing, linear elasticity, radial basis functions, or local reconstruction. Large deformations may require remeshing.
+
+\section{Overset Grids and Nonconforming Coupling}
+Overset grids superpose independent blocks, such as background, body-fitted, and moving local grids. Donor cells supply interpolated data to receiver cells.
+
+\begin{authornote}
+\textbf{Potential Question:}
+"How do overlapping grids define one computational domain? Which structures can interpolation compromise?"
+
+\textbf{Author Supplement:}
+Several easily generated or moved subgrids jointly cover the domain. Covered cells must be identified to avoid duplicate evolution, while donor-to-receiver interpolation couples grid boundaries. Ordinary interpolation need not balance the fluxes on both sides, so global conservation requires additional design or verification.
+
+\textbf{Core Conceptual Connection:}
+\[
+\text{single conforming mesh}
+\longrightarrow
+\text{overlapping mesh blocks}
+\longrightarrow
+\text{interpolation coupling}
+\]
+\end{authornote}
+
+Independent component meshes facilitate large relative rigid-body motion. Challenges include hole cutting, donor search, conservative interpolation, and dynamic connectivity.
+
+
+\section{Consistency in Space, Time, and Geometry}\index{Geometric conservation law}
+Mortars can organize common subfaces at coarse--fine interfaces. Overset grids additionally require a well-defined active physical coverage
+to avoid double-counting conserved quantities. State interpolation, flux matching, and conservative remapping perform different tasks.
+
+For a moving element, the continuous geometric identity is
+\[
+\frac{\dd |K(t)|}{\dd t}
+=\int_{\partial K(t)}\bm w\cdot\bm n\dd S.
+\]
+Discrete volume changes and mesh-swept volumes in ALE fluxes must use compatible time integration.
+Substituting $U=U_0$ into the moving-control-volume update tests preservation of a uniform field.
+
+\aiexercise{Let the endpoints of a one-dimensional element move at prescribed velocities. Derive the constant-solution update from the ALE integral form and state the identity required between volume integration and mesh flux.}
+{Draw a tree-mesh coarse--fine interface and two overlapping grids. Label state transfers, active control volumes, and shared fluxes, then explain how global mass change is measured in each layout.}

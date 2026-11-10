@@ -1,0 +1,30 @@
+\chapter{GMRES}\label{v0ch:12}
+\begin{chaptersummary}
+Arnoldi supplies an orthogonal basis and a small Hessenberg representation. GMRES chooses the correction that minimizes the Euclidean residual in this space. Incremental least squares leads to the algorithm, and restarting balances storage against convergence. Projected residual estimates monitor iteration, while true residuals verify the original equation.
+\end{chaptersummary}
+\learninggoals{Derive GMRES least squares; explain Givens rotations and restart; interpret preconditioned residuals correctly.}
+\paragraph{Core Question}How is the best linear combination chosen from an orthogonal basis?
+
+\section{From a Large Residual to Small Least Squares}
+Write $\bm x_m=\bm x_0+V_m\bm y$. Then
+\[
+ \bm r_m=V_{m+1}(\beta\bm e_1-\bar H_m\bm y),\qquad
+ \bm y_m=\arg\min_{\bm y}\norm{\beta\bm e_1-\bar H_m\bm y}_2.
+\]
+Norm equality depends on orthogonality of $V_{m+1}$. On each new column, Givens rotations eliminate the subdiagonal entry and rotate the right-hand side, updating the residual estimate. Back substitution finally gives $\bm y_m$; the full solution need not be formed at every inner iteration.
+For Chapter 11's two-step example with $\beta=1$, the least-squares solution is
+\[
+ y_1=-95/348,\qquad y_2=25\sqrt5/174,\qquad
+ \norm{\bm r_2}_2=7/\sqrt{174}.
+\]
+This completes a directly checkable Arnoldi--least-squares chain.
+\section{Restart and Preconditioning Semantics}
+GMRES($m$) updates the solution after $m$ steps and restarts from its new residual. Retaining only $m$ directions limits storage but discards prior subspace information and can cause stagnation. Larger restart lengths increase orthogonalization and global communication.
+Left preconditioning solves $M^{-1}A\bm x=M^{-1}\bm b$, usually minimizing $\norm{M^{-1}\bm r}$. Right preconditioning retains the true-residual objective. Verify stopping and callback semantics separately for each library.
+\conceptbridge{Why recompute a residual after its monitored curve has decreased?}{The least-squares estimate relies on the Arnoldi relation and preconditioner scaling. Roundoff perturbs the relation, while left preconditioning changes the norm being monitored. The original equation's residual is the quantity linked to error in Chapter 3.}{Projected-residual monitoring $\longrightarrow$ library semantics and scaling $\longrightarrow$ acceptance of the original equation.}
+\section{The Computational Interface}
+The SciPy experiment uses left preconditioning, with \texttt{M} representing the inverse preconditioner action. At each inner iteration, \texttt{callback\_type='pr\_norm'} reports a preconditioned residual quantity; final verification evaluates $\bm b-A\bm x$. Record restart length, maximum cycles, and tolerances, distinguishing cycles from inner iterations.\cite{scipy}
+\costnote{A cycle uses roughly $m$ operator and preconditioner applications, $O(Nm^2)$ orthogonalization, and $O(Nm)$ basis storage. For nonsymmetric systems, tune restart and preconditioner quality together.}
+\coderef{sparse_linear_algebra/solvers.py}
+\aiexercise{Apply two Givens rotations explicitly to this chapter's $3\times2$ least-squares problem. Verify its coefficients and residual norm.}{Compare GMRES(10), GMRES(30), and ILU-GMRES in total time and true residual. Report inner iterations and restart cycles separately.}
+\studyroute{Stagnation constructions, harmonic Ritz vectors, and recycled subspaces are omitted. See \cite{saad,templates}.}{restarted GMRES; Givens QR; preconditioned residual; deflated GMRES}

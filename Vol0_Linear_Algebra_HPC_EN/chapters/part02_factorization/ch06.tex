@@ -1,0 +1,31 @@
+\chapter{Cholesky and LDL\textsuperscript{T} Factorizations}\label{v0ch:6}
+\begin{chaptersummary}
+Exact factorization cost depends on structure. Symmetry and positive definiteness further reduce work and storage, motivating Cholesky; symmetric indefinite problems require LDL\textsuperscript{T} with block pivots. This distinction supplies the conditions later needed for CG, MINRES, and incomplete Cholesky.
+\end{chaptersummary}
+\learninggoals{Derive Cholesky recurrences; recognize block pivots in indefinite systems; distinguish unpivoted and permuted factorizations.}
+\paragraph{Core Question}Which computations does symmetry reuse, and what does positive definiteness additionally guarantee?
+
+\section{Cholesky Recurrences and an Example}
+For a real SPD matrix, a lower-triangular $L$ with positive diagonal satisfies $A=LL^T$.
+Entrywise comparison gives
+\[
+ \ell_{jj}=\sqrt{a_{jj}-\sum_{k<j}\ell_{jk}^2},\qquad
+ \ell_{ij}=\frac{a_{ij}-\sum_{k<j}\ell_{ik}\ell_{jk}}{\ell_{jj}}.
+\]
+Every Schur complement remains SPD, making the square-root argument positive. For
+$A=\left[\begin{smallmatrix}4&2\\2&3\end{smallmatrix}\right]$, we obtain
+$L=\left[\begin{smallmatrix}2&0\\1&\sqrt2\end{smallmatrix}\right]$.
+Solve $L\bm y=\bm b$, then $L^T\bm x=\bm y$. Dense factorization costs approximately $N^3/3$ FLOPs and stores one triangle. Sparse problems still require ordering and fill analysis.
+\section{Indefinite Problems and Block Pivots}
+A general real symmetric indefinite factorization uses
+\[
+ PAP^T=LDL^T,
+\]
+where $L$ is unit lower triangular and $D$ contains $1\times1$ and $2\times2$ blocks. The matrix
+$\left[\begin{smallmatrix}0&1\\1&0\end{smallmatrix}\right]$ is invertible but has no nonzero first scalar pivot for unpermuted scalar LDL\textsuperscript{T}. Taking the whole matrix as a two-by-two block resolves this example. Stable implementations require symmetric pivoting.
+\conceptbridge{Why is replacing Cholesky square roots by signed numbers insufficient?}{Indefiniteness permits both negative pivots and nonzero coupling with zero diagonals. Scalar pivots may vanish or be too small, requiring simultaneous row/column permutations and two-by-two blocks. Constraint variables in saddle-point systems are a common source.}{Positive-energy elimination $\longrightarrow$ indefinite coupling $\longrightarrow$ symmetric block pivots.}
+\section{Physical Nullspaces and Solver Strategy}
+With rigid-body modes, constants, or gauge freedom, constrain a semidefinite problem or solve on a compatible subspace. Adding a small diagonal changes the problem and requires an explicit interpretation. Block elimination of saddle-point systems also produces Schur complements, used for preconditioning in Chapters 18 and 21.
+\costnote{Cholesky applies to SPD systems. Symmetric indefinite factorization uses pivoting for numerical stability, potentially increasing fill. Structural checks therefore examine the actual discrete fluxes, boundary treatment, and preconditioner action.}
+\aiexercise{Factor the two-by-two SPD example and solve for $(1,1)^T$. Identify the failed scalar LDL\textsuperscript{T} step in the invertible zero-diagonal example.}{Construct Neumann Poisson with a constant nullspace, check compatibility, and compare fixing one unknown with imposing zero mean.}
+\studyroute{Bunch--Kaufman pivot selection and sparse-supernode details are omitted. See \cite{golub}.}{Cholesky; symmetric indefinite; block LDLT; saddle point; nullspace}

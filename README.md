@@ -2,64 +2,81 @@
 
 Initiated by Harvey Tan.
 
-A compact computational-physics knowledge map for readers with a background in mathematics and numerical computation. The text connects model assumptions, PDE structure, discretization, and solver design. Chapter overviews explain dependencies; targeted prompts provide routes to derivations, examples, and numerical experiments while keeping the main exposition concise.
+A concise route from physical models to numerical algorithms and reproducible computation, for readers with a background in mathematics. The three volumes connect modeling assumptions, PDE structure, discretization, matrix solvers, and modern computer architecture.
 
-## Read the Volumes
+## Read the Books
 
-| Volume | Language | PDF | LaTeX source |
-| --- | --- | --- | --- |
-| I: From Particles to Computational Meshes | Chinese | [Read](CourseofComputationPhysics_Vol1_CN.pdf) | [Source](CourseofComputationPhysics_Vol1_CN.tex) |
-| I: From Particles to Computational Meshes | English, earlier abridged draft | Not bundled | [Source](CourseofComputationPhysics_Vol1_EN.tex) |
-| II: From Lorentz Covariance to Hyperbolic Conservation Laws | Chinese | [Read](CourseofComputationPhysics_Vol2_CN.pdf) | [Source](CourseofComputationPhysics_Vol2_CN.tex) |
-| II: From Lorentz Covariance to Hyperbolic Conservation Laws | English | [Read](CourseofComputationPhysics_Vol2_EN.pdf) | [Source](CourseofComputationPhysics_Vol2_EN.tex) |
+| Volume | Chinese PDF | English PDF | Chinese source | English source |
+| --- | --- | --- | --- | --- |
+| 0: Numerical Linear Algebra and Modern High-Performance Computing | [Read](Course_of_Computational_Physics_Vol0.pdf) | [Read](Course_of_Computational_Physics_Vol0_EN.pdf) | [LaTeX](Vol0_Linear_Algebra_HPC/main.tex) | [LaTeX](Course_of_Computational_Physics_Vol0_EN.tex) |
+| I: From Dynamical Reduction to Modern High-Order Discretization | [Read](Course_of_Computational_Physics_Vol1_Revised.pdf) | [Read](Course_of_Computational_Physics_Vol1_EN.pdf) | [LaTeX](Course_of_Computational_Physics_Vol1_Revised.tex) | [LaTeX](Course_of_Computational_Physics_Vol1_EN.tex) |
+| II: From Lorentz Covariance to Hyperbolic Conservation Laws | [Read](CourseofComputationPhysics_Vol2_CN.pdf) | [Read](CourseofComputationPhysics_Vol2_EN.pdf) | [LaTeX](CourseofComputationPhysics_Vol2_CN.tex) | [LaTeX](CourseofComputationPhysics_Vol2_EN.tex) |
 
-The two Volume II editions share chapter structure, equation labels, exercises, figures, and code. The earlier English Volume I draft is not yet synchronized with the revised Chinese edition.
+### Volume 0
 
-See the [editing report (Chinese)](EDITING_REPORT.md) for the revision scope, learning-prompt counts, and verification notes.
+Five parts and 29 chapters develop matrix structure, factorization, Krylov methods, preconditioning, multigrid, and Roofline-based performance analysis. Yee-FDTD, DG/FR, FEM, FVM, and LBM connect solver design to concrete discrete operators. Time integration and parallel communication complete the route from one kernel to total solution cost.
+
+Chinese and English editions share [companion code](Vol0_Linear_Algebra_HPC/code_examples/), [figures](Vol0_Linear_Algebra_HPC/figures/), and [measurement records](Vol0_Linear_Algebra_HPC/results/). See the [experiment guide](docs/experiments.md) for dependencies, validation, and timing conventions.
 
 ### Volume I
 
-The modeling chain runs from deterministic many-particle dynamics through probability distributions, marginalization, kinetic equations, moments, and continuum closure. It then connects asymptotic regimes to numerical transport, discretization, matrix structure, Krylov methods, preconditioning, multigrid, and mesh design.
+*A Concise Course of Computational Physics: From Dynamical Reduction to Modern High-Order Discretization* contains six parts and 22 chapters. Many-particle dynamics leads to statistical descriptions, kinetic equations, moments, and continuum closure. Function spaces and weak forms lead to finite differences, finite volumes, FEM, spectral methods, DG, FR, VCJH, and mortar coupling. LBM, rarefied gases, MHD, gyrokinetics, meshes, and verification complete the modeling chain.
 
-The time-integration section introduces ADER, continuous explicit Runge--Kutta (CERK), and conservative local time stepping (LTS). It distinguishes within-step prediction from shared-flux conservation and physical-time accuracy.
+Chapter 14 connects spatial operators to ADER, continuous explicit Runge--Kutta (CERK), conservative local time stepping (LTS), and implicit--explicit (IMEX) integration. Volume 0 develops the algebraic solution algorithms arising from these discretizations.
 
 ### Volume II
 
-Maxwell equations provide a common example linking differential forms and Lorentz covariance to evolution/constraint decomposition, symmetric hyperbolicity, energy estimates, finite-volume fluxes, compatible discrete operators, and high-order DG dispersion.
+Maxwell equations connect differential forms and Lorentz covariance to evolution and constraints, symmetric hyperbolicity, energy estimates, compatible operators, and high-order DG dispersion. Section 5.5 develops RK, symplectic integration, ADER, CERK, LTS, and IMEX methods. Chapter 7 and its Python appendix provide a reproducible one-dimensional DG dispersion experiment.
 
-Chapter 5.5 connects the method of lines to RK and symplectic integration, ADER, CERK, LTS, and implicit--explicit (IMEX) methods. The conductive Maxwell example separates wave propagation from stiff Ohmic relaxation and identifies the stability, charge-compatibility, and energy checks needed for the split. Chapter 7 and its Python appendix provide a reproducible one-dimensional DG dispersion experiment.
+Each English edition follows its Chinese counterpart in chapter structure, formulas, references, and exercises.
 
-## Learning Structure
+## Learning Routes
 
-- **Chapter overviews** locate each chapter in the dependency chain.
-- **Potential conceptual jumps** in Volume I identify questions and their core conceptual connections. Author supplements are editable drafts.
-- **Further detail and search terms** state what has been omitted and identify terminology for follow-up study.
-- **Ask AI** prompts specify a derivation, example, comparison, or computational check using the surrounding notation.
-- **Active recall and concept checks** in Volume II test understanding before implementation.
+Chapter overviews locate each topic in the dependency chain. Conceptual connections identify the motivation for a transition; search terms identify omitted derivations and prerequisites. Specific Ask-AI prompts open routes to calculations, examples, comparisons, and experiments. Assumptions and cited sources provide the basis for checking the resulting work.
 
-The author supplies motivation, assumptions, and conceptual connections. AI-assisted work develops the intermediate steps and examples; results should be checked against the stated conventions and cited sources.
+## Build and Verify
 
-## Build
-
-Use a TeX distribution with XeLaTeX, Chinese fonts supported by `ctex`, and the packages used in the sources, including `tcolorbox`, `pgfplots`, `listings`, `needspace`, `placeins`, and Latin Modern.
-
-With `latexmk`:
+From the repository root:
 
 ```sh
-latexmk -xelatex -outdir=build -interaction=nonstopmode -halt-on-error CourseofComputationPhysics_Vol1_CN.tex
+make                     # Chinese and English Volumes 0 and I
+make english             # English Volumes 0 and I
+make check               # Mathematical, structural, numerical, and PDF checks
+```
+
+The build uses XeLaTeX through latexmk, generates the Volume I terminology index, and places delivery PDFs at the repository root. Intermediate files stay in build directories.
+
+Use a TeX distribution with ctex-compatible Chinese fonts, Latin Modern, babel, tcolorbox, pgfplots, listings, needspace, and placeins. Verification requires Python 3, NumPy, SciPy, qpdf, and Poppler tools. The [experiment guide](docs/experiments.md) documents the optional CUDA and MPI toolchains.
+
+Individual targets are available:
+
+```sh
+make vol0 vol0-en revised vol1-en
+make verify vol0-verify math-verify translations-verify
+```
+
+Build Volume II explicitly:
+
+```sh
 latexmk -xelatex -outdir=build -interaction=nonstopmode -halt-on-error CourseofComputationPhysics_Vol2_CN.tex
 latexmk -xelatex -outdir=build -interaction=nonstopmode -halt-on-error CourseofComputationPhysics_Vol2_EN.tex
 ```
 
-Alternatively, run `xelatex -interaction=nonstopmode -halt-on-error <file>.tex` repeatedly until the table of contents and cross-references are stable, usually two or three passes. The commands above place build artifacts in `build/`; checked-in PDFs are available at the repository root.
+## Experiments
 
-The DG dispersion code printed in Volume II requires Python 3 and NumPy. It evaluates a semidiscrete Fourier--Bloch symbol, not a full Maxwell field solver.
+```sh
+python -m pip install -r Vol0_Linear_Algebra_HPC/code_examples/requirements.txt
+make vol0-examples        # CPU experiments, figures, and bilingual result tables
+make vol0-hardware        # Optional CUDA and same-host MPI experiments
+```
+
+These targets refresh measurement records. Recorded timings identify their hardware, implementation, and workload; modeled FLOPs and traffic are kept separate from measured runtime. The [code index](Vol0_Linear_Algebra_HPC/README.md) maps examples to topics.
 
 ## Background and Contributions
 
-The project began with a mathematically trained friend's request for a route into physics, alongside an ambition inspired by Landau and Lifshitz's *Course of Theoretical Physics*. Its present emphasis is computational fluid dynamics, computational electromagnetics, and plasma physics.
+The project began with a mathematically trained friend's request for a route into physics, alongside an ambition inspired by Landau and Lifshitz's *Course of Theoretical Physics*. Its focus is computational fluid dynamics, computational electromagnetics, and plasma physics.
 
-Contributions may address derivations, numerical verification, terminology, translations, or additional domains such as first-principles methods, nonlinear continuum mechanics, and explosion mechanics. Please preserve the compact structure, make assumptions explicit, and provide references for new technical material.
+Contributions may address derivations, numerical verification, terminology, translations, or additional physical domains. Preserve the concise structure, state assumptions, and provide references for new technical material.
 
 ## Acknowledgement
 

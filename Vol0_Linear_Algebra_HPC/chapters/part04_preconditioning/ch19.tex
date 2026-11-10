@@ -1,0 +1,28 @@
+\chapter{几何多重网格}\label{v0ch:19}
+\begin{chaptersummary}
+平滑器擅长消除振荡误差，区域分解则揭示了跨域平滑模式的困难。本章把细网格平滑与粗网格修正组合为几何多重网格：将细残差限制为粗误差方程，再把修正插回细层。各尺度误差由适合的空间处理，是多重网格提高效率的核心机制。
+\end{chaptersummary}
+\learninggoals{推导两网格误差传播；定义 R、P 和 Galerkin 粗算子；区分 V、W 与 FMG。}
+\paragraph{核心问题}如何让每种尺度的误差都在合适的网格上被消除？
+
+\section{误差方程与粗修正}
+当前残差 $\bm r_h=\bm b_h-A_h\bm x_h=A_h\bm e_h$。用 $P$ 表示粗到细插值，$R$ 表示限制，定义
+\[
+ A_H=RA_hP,\quad A_H\bm e_H=R\bm r_h,\quad
+ \bm x_h\leftarrow\bm x_h+P\bm e_H.
+\]
+精确粗解的误差算子为 $I-PA_H^{-1}RA_h$。若有前后平滑 $S_{\rm pre},S_{\rm post}$，两网格算子为
+\[
+ E_{\rm TG}=S_{\rm post}(I-PA_H^{-1}RA_h)S_{\rm pre}.
+\]
+SPD 情形可取 $R=P^T$；适当对称平滑及正定粗解可构造固定 SPD 预条件作用。任意前后平滑组合并不自动保持该条件。
+\section{一维插值与递归}
+细网格含 $N=2N_H+1$ 个内部点。粗节点重合处直接注入，夹在两粗节点间的细点线性平均，边界按齐次误差处理。取 $R=P^T$ 后，限制的归一化由该定义确定；若整体缩放 $R$，应同步缩放粗算子与右端。
+V-cycle 每层递归一次，W-cycle 每层递归两次；FMG 从粗网格解出发，逐层插值并施加若干周期，构造接近离散精度的初值。前两者规定周期的递归方式，后者组织由粗到细的整体求解。
+\conceptbridge{粗网格分辨率更低，为什么反而能修正细网格解？}{粗层不负责重建已经由平滑器处理的高频细节，而是表达细网格上仍然缓慢变化的误差。右端应是残差的限制，求的是误差修正，不是重新离散完整物理解的替代品。}{细残差 $\longrightarrow$ 粗误差方程 $\longrightarrow$ 细层修正。}
+\section{实验与复杂度}
+对 $N=63,127,255$ 的 Poisson 使用两次前后加权 Jacobi、最粗层直接解，记录每周期残差缩减与每未知量工作。理想几何粗化下各层自由度形成等比级数，一次 V-cycle 为 $O(N)$；达到网格无关收敛还需要平滑与粗近似性质。
+\costnote{边界层、强各向异性、系数跳跃和复杂几何可能破坏简单点平滑或插值。线平滑、半粗化或更适当粗空间需与算子匹配。}
+\coderef{sparse_linear_algebra/multilevel.py}
+\aiexercise{对七个细内部点显式写出 $P$、$P^TAP$ 和两网格误差矩阵，验证粗空间内的误差被精确粗修正消除。}{画混合频率误差在前平滑、粗修正、后平滑后的变化，比较 V-cycle 与增加平滑次数的成本。}
+\studyroute{略去网格无关收敛证明与完整局部 Fourier 两网格分析。参考 \cite{briggs}。}{coarse grid correction; Galerkin coarse operator; V cycle; W cycle; full multigrid}

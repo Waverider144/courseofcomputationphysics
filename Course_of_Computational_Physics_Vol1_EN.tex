@@ -1,0 +1,61 @@
+% !TeX program = xelatex
+\documentclass[11pt,openany]{book}
+\input{vol1_revised_en/preamble}
+\title{A Concise Course of Computational Physics\\[6pt]\Large From Dynamical Reduction to Modern High-Order Discretization}
+\author{}
+\date{November 2026}
+\begin{document}
+\frontmatter
+\maketitle
+\chapter*{Preface}
+\addcontentsline{toc}{chapter}{Preface}
+Computational physics represents physical states, reduces degrees of freedom, closes unresolved effects, and constructs finite-dimensional evolution under finite computational resources. Each step must identify the information retained, the assumptions introduced, and the structures that can be verified. This volume evaluates these choices through conservation, stability, symmetry, and wave errors.
+
+Four questions organize the text: how to represent the state; how scales and statistics reduce dynamics; how physical assumptions close the influence of unresolved variables; and how finite-dimensional residuals are constrained by discretization. Model selection determines the computational object; numerical methods determine its approximate representation and evolution. Structure preservation connects these decisions.
+
+Part~I proceeds from Hamiltonian dynamics to Liouville, kinetic, and continuum descriptions. Part~II builds function spaces and weak formulations through integration by parts, comparing trial spaces, test spaces, and residual constraints. Part~III derives DG, FR, VCJH, mortar coupling, and time integration. Parts~IV and~V develop discrete-velocity and physical-reduction routes. Part~VI connects meshes, method selection, and verification.
+
+The intended reader has upper-undergraduate mathematical preparation: multivariable calculus, linear algebra, ODEs, PDEs, and basic numerical analysis. The main text supplies key definitions, boundary terms, and algorithmic constructions. General trace theorems, error theory, and research topics have entry points through further-detail notes, search terms, and specific AI questions. Learning objectives and conceptual connections locate each chapter within the dependency chain.
+
+At the formation of algebraic systems, this volume points to Volume~0, \emph{Numerical Linear Algebra and Modern High-Performance Computing}, which develops matrix structure, factorization, Krylov methods, preconditioning, multigrid, and parallel execution. Volume~II uses Maxwell's equations to study geometry, constraint propagation, and electromagnetic discretization.
+
+\paragraph{Notation}
+$\rho_N$ is a normalized many-particle probability density, $f_s$ a number-density distribution, $\rho$ a mass density, and $\rho_c$ a charge density. The scalar field is $u$; $U$ denotes conserved variables or their discrete coefficients, with dimensions specified for each model. Mesh size, polynomial degree, and time step are $h$, $p$, and $\Delta t$. In Chapters~10--14, one-dimensional interfaces use left trace $u^-$, right trace $u^+$, jump $[u]=u^+-u^-$, and average $\{u\}=(u^-+u^+)/2$. Normal numerical fluxes additionally include normal orientation. Collision times, viscous stresses, and discrete relaxation times are distinguished within each chapter.
+
+\tableofcontents
+\mainmatter
+\part{From Microscopic Dynamics to Continuum Models}
+\input{vol1_revised_en/chapters/ch01}
+\input{vol1_revised_en/chapters/ch02}
+\input{vol1_revised_en/chapters/ch03}
+\input{vol1_revised_en/chapters/ch04}
+\part{Mathematical Structure of Continuum Equations}
+\input{vol1_revised_en/chapters/ch05}
+\input{vol1_revised_en/chapters/ch06}
+\input{vol1_revised_en/chapters/ch07}
+\input{vol1_revised_en/chapters/ch08}
+\input{vol1_revised_en/chapters/ch09}
+\part{Modern High-Order Discretization}
+\input{vol1_revised_en/chapters/ch10}
+\input{vol1_revised_en/chapters/ch11}
+\input{vol1_revised_en/chapters/ch12}
+\input{vol1_revised_en/chapters/ch13}
+\input{vol1_revised_en/chapters/ch14}
+\part{Mesoscopic Kinetics and LBM}
+\input{vol1_revised_en/chapters/ch15}
+\input{vol1_revised_en/chapters/ch16}
+\part{Reduction and Closure in Complex Physical Systems}
+\input{vol1_revised_en/chapters/ch17}
+\input{vol1_revised_en/chapters/ch18}
+\input{vol1_revised_en/chapters/ch19}
+\part{Meshes and Verification in Computational Physics}
+\input{vol1_revised_en/chapters/ch20}
+\input{vol1_revised_en/chapters/ch21}
+\input{vol1_revised_en/chapters/ch22}
+\backmatter
+\input{vol1_revised_en/references}
+\clearpage
+\phantomsection
+\addcontentsline{toc}{chapter}{Terminology Index}
+\printindex
+\end{document}

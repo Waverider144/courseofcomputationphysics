@@ -1,0 +1,44 @@
+\chapter{Arnoldi 与 Hessenberg 分解}\label{v0ch:11}
+\begin{chaptersummary}
+Krylov 幂向量生成了搜索空间，但逐步增强的线性相关性会影响数值计算。本章用 Arnoldi 在生成方向的同时正交化，将大型算子作用写成稳定坐标下的小型 Hessenberg 表示。下一章据此求解最小残差问题；本章的重点是建立并核验这条大、小系统之间的联系。
+\end{chaptersummary}
+\learninggoals{执行 MGS Arnoldi；手算前两步；解释正交丢失与 happy breakdown。}
+\paragraph{核心问题}如何在不保存高次矩阵幂的条件下构造可靠子空间基？
+
+\section{Arnoldi 递推}
+令 $\beta=\norm{\bm r_0}_2$、$\bm v_1=\bm r_0/\beta$。第 $j$ 步：
+\[
+ \bm w=A\bm v_j;\quad
+ h_{ij}=\bm v_i^T\bm w,\quad
+ \bm w\leftarrow\bm w-h_{ij}\bm v_i\quad(i=1,\ldots,j);
+ \qquad h_{j+1,j}=\norm{\bm w}_2.
+\]
+若 $h_{j+1,j}\ne0$，令 $\bm v_{j+1}=\bm w/h_{j+1,j}$。因此
+\[
+ AV_m=V_{m+1}\bar H_m,\qquad V_{m+1}^TV_{m+1}=I
+\]
+在精确算术成立，$\bar H_m$ 是 $(m+1)\times m$ 上 Hessenberg 矩阵。
+\section{四阶矩阵前两步}
+使用第 4 章的 $A$，取 $\bm r_0=\bm e_1$。第一步
+\[
+ A\bm e_1=(0,4,2,0)^T,\quad h_{11}=0,\quad
+ h_{21}=2\sqrt5,\quad
+ \bm v_2=(0,2,1,0)^T/\sqrt5.
+\]
+第二步 $A\bm v_2=(5,8,3,3)^T/\sqrt5$。依次投影得
+\[
+ h_{12}=\sqrt5,\quad h_{22}=19/5,\quad
+ h_{32}=7/5,\quad
+ \bm v_3=(0,2,-4,15)^T/(7\sqrt5),
+\]
+\[
+ \bar H_2=\begin{bmatrix}0&\sqrt5\\2\sqrt5&19/5\\0&7/5\end{bmatrix}.
+\]
+逐项检查 $\bm v_i^T\bm v_j=\delta_{ij}$ 和 $AV_2=V_3\bar H_2$。
+\conceptbridge{小矩阵为什么还能保留原问题的求解信息？}{Arnoldi 没有近似已生成基向量的矩阵作用，而是将这些作用精确表示在扩展基中。后续只在选定试探空间内求最优解，近似来自空间限制；有限精度下还需监测正交误差。}{大算子作用 $\longrightarrow$ 正交坐标 $\longrightarrow$ 小型 Hessenberg 问题。}
+\section{失效诊断与成本}
+$h_{j+1,j}=0$ 表示当前子空间对 $A$ 不变；对可逆系统和当前残差，最小残差求解可获得精确解，称为 happy breakdown。有限精度下，接近零的次对角元则触发真实残差检查，以判定是否达到收敛阈值。
+\costnote{$m$ 步需约 $m$ 次矩阵向量乘、$O(Nm^2)$ 正交化工作和 $O(Nm)$ 存储。MGS 可能失去正交，必要时再次投影或采用更稳定策略；分布式点积还带来归约成本。}
+\coderef{sparse_linear_algebra/solvers.py}
+\aiexercise{完全按 MGS 顺序重算本章两步，比较 $AV_2$ 与 $V_3\bar H_2$，并核验全部内积。}{给幂基加入舍入扰动，比较经典 Gram--Schmidt、MGS 与两次 MGS 的正交误差。}
+\studyroute{略去选择性重正交与通信规避 Arnoldi。参考 \cite{saad}。}{Arnoldi; Hessenberg; reorthogonalization; happy breakdown; orthogonality loss}

@@ -7,3 +7,17 @@
 *.fdb_latexmk
 *.xdv
 build/
+__pycache__/
+*.py[cod]
+*.idx
+*.ind
+*.ilg
+*.synctex.gz
+.pytest_cache/
+.venv/
+.env
+.env.*
+!.env.example
+Vol0Prompt.md
+local_notes/
+Legacy/

@@ -1,0 +1,33 @@
+\chapter{Krylov 子空间的基本思想}\label{v0ch:10}
+\begin{chaptersummary}
+精确与近似分解都需要访问因子，大规模问题有时更容易执行矩阵向量乘。本章因此从残差修正构造 Krylov 子空间，把求解转化为逐步增长的投影问题。后续 Arnoldi、GMRES 和 CG 共享这个空间，但选择基底与投影条件不同。核心是通过算子作用表达越来越丰富的误差修正。
+\end{chaptersummary}
+\learninggoals{从残差导出子空间；写出残差多项式；区分 Galerkin 与最小残差。}
+\paragraph{核心问题}只会计算 $A\bm v$，如何逐步逼近 $A^{-1}\bm b$？
+
+\section{由可执行操作生成搜索空间}
+从 $\bm r_0=\bm b-A\bm x_0$ 出发，寻找
+\[
+ \bm x_m\in\bm x_0+\K_m(A,\bm r_0),\qquad
+ \K_m=\operatorname{span}\{\bm r_0,A\bm r_0,\ldots,A^{m-1}\bm r_0\}.
+\]
+若 $\bm x_m-\bm x_0=q_{m-1}(A)\bm r_0$，则
+\[
+ \bm r_m=p_m(A)\bm r_0,\quad
+ p_m(z)=1-zq_{m-1}(z),\quad p_m(0)=1.
+\]
+算法选择多项式，使相关误差或残差变小；无需显式形成高次幂。
+\conceptbridge{如何由算子 $A$ 的反复作用构造逆作用近似？}{子空间保留 $A^k\bm r_0$ 等方向，再由投影共同确定系数。在有限维可逆系统中，关于初始残差的最小多项式具有非零常数项，因此逆作用可表示为有限阶多项式。有限精度、重启和预条件决定这一表示的实际逼近过程。}{易执行的矩阵作用 $\longrightarrow$ 多项式修正空间 $\longrightarrow$ 投影选择系数。}
+\section{投影条件与最小多项式}
+设试探基 $V_m$、测试基 $W_m$，要求
+\[
+ W_m^T(\bm r_0-AV_m\bm y)=0,\qquad
+ W_m^TAV_m\bm y=W_m^T\bm r_0.
+\]
+Galerkin 取测试空间等于搜索空间；最小二范数残差要求残差正交于 $A\K_m$。两者并不相同。
+若最小次数 $\nu$ 满足 $\mu_\nu(A)\bm r_0=0$，则精确算术中适当非重启方法至多 $\nu\le N$ 步得到解；实际使用的目标是远少于 $N$ 步。
+\section{二阶手算}
+取 $A=\diag(1,2)$、$\bm b=(1,1)^T$、$\bm x_0=0$。第一空间只有 $\alpha\bm b$，最小残差系数为 $\alpha=3/5$；第二空间由 $(1,1)^T,(1,2)^T$ 张成整个 $\R^2$，包含精确解 $(1,1/2)^T$。取 $\bm b=(1,0)^T$ 时一维已足够，说明初始残差参与决定有效难度。
+\costnote{每步至少一次算子作用；基的存储与正交化依方法不同。矩阵自由与分布式算子可以直接作为接口，预条件通常比原始谱细节更能决定工程可行性。}
+\aiexercise{对二阶例子分别用 Galerkin 和最小残差条件计算第一步，并解释两个系数为何不同。}{从 $\mu(z)=(z-1)(z-2)$ 写出该矩阵的逆多项式，说明初始残差只含一个特征方向时如何降阶。}
+\studyroute{略去一般投影的稳定性界与非正规多项式逼近。参考 \cite{saad,trefethen}。}{Krylov subspace; residual polynomial; minimal polynomial; Galerkin projection}

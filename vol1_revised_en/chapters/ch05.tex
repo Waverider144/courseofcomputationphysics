@@ -1,0 +1,114 @@
+\chapter{Function Spaces, Sobolev Spaces, and Weak Solutions}\label{ch:5}
+\begin{chaptersummary}
+The first four chapters established physical models and their scale assumptions. Solving these equations also requires specifying the meaning of derivatives, boundary values, and solutions. Starting from integration by parts for Poisson's equation, this chapter introduces weak derivatives and Sobolev spaces, uses energy estimates to establish existence and stability, and discusses the selection of discontinuous solutions of conservation laws. The next chapter constructs finite-dimensional residual constraints in these spaces.
+\end{chaptersummary}
+\learninggoals{Derive a weak form including boundary terms; define weak derivatives and traces; apply the Poincar\'e inequality and Lax--Milgram theorem under explicit assumptions; distinguish broken from global spaces.}
+\studyroute{Weak forms, space definitions, and basic estimates are given; proofs of general trace theorems, compact embeddings, and low-regularity elliptic theory are omitted.}{weak derivative; Sobolev trace; Poincar\'e inequality; Lax--Milgram theorem}{Integrate the Poisson problem on the unit interval by parts, then use an energy estimate to show how $H^{-1}$ data control the $H_0^1$ solution.}
+
+\section{From Strong Form to an Integral Identity}\index{Weak form}
+Let $\Omega\subset\R^d$ be a bounded Lipschitz domain. First consider a sufficiently smooth solution of
+\[
+-\Delta u=f\quad\text{in }\Omega,\qquad u=0\quad\text{on }\partial\Omega.
+\]
+Multiply by a test function $v$ and integrate. The divergence theorem gives
+\begin{equation}\label{eq:poisson-green}
+\int_\Omega\nabla u\cdot\nabla v\dd x
+=\int_\Omega fv\dd x+\int_{\partial\Omega}(\partial_nu)v\dd S.
+\end{equation}
+For test functions with zero boundary values, the boundary term vanishes. This identity uses only first derivatives of $u$,
+so it can be interpreted in a larger space than the classically twice-differentiable functions.
+Nonhomogeneous Dirichlet data are incorporated through a prescribed lifting $u_g$, writing $u=u_g+w$ while retaining the zero-trace test space.
+Neumann data enter the boundary pairing on the right.
+
+\conceptbridge{Why specify a function space after reducing the derivative order?}
+{Integration by parts changes the regularity required by the equation. Square-integrable first weak derivatives make the energy integral meaningful; traces specify boundary conditions. The function space determines admissible solutions, testing directions, and the norm used in stability estimates.}
+{Integration by parts $\longrightarrow$ weak derivatives and boundary traces $\longrightarrow$ a variational problem.}
+
+\section{Weak Derivatives and Completeness}\index{Sobolev spaces}
+For locally integrable $u$, if
+\[
+\int_\Omega u\,\partial_i\varphi\dd x=-\int_\Omega g_i\varphi\dd x
+\quad\text{for every }\varphi\in C_c^\infty(\Omega),
+\]
+then $g_i$ is the $i$th weak derivative of $u$. A distributional derivative may be a general distribution;
+for example, the derivative of a one-dimensional step function is a Dirac distribution, which is not in $L^2$.
+
+A normed space is a Banach space if every Cauchy sequence converges within it.
+A complete space whose norm is induced by an inner product is a Hilbert space. Completeness ensures that limits obtained from energy estimates remain admissible functions.
+\[
+L^2(\Omega)=\{u:\int_\Omega|u|^2\dd x<\infty\},\qquad
+(u,v)_{L^2}=\int_\Omega uv\dd x.
+\]
+Functions equal almost everywhere are identified. Define
+\[
+H^1(\Omega)=\{u\in L^2(\Omega):\partial_i u\in L^2(\Omega),\ 1\le i\le d\},
+\qquad
+\norm{u}_{H^1}^2=\norm{u}_{L^2}^2+\norm{\nabla u}_{L^2}^2.
+\]
+For integers $m\ge0$, $H^m$ requires all weak derivatives with $|\alpha|\le m$ to belong to $L^2$.
+Real-order spaces on $\R^d$ can be defined through the Fourier transform:
+\[
+\norm{u}_{H^s(\R^d)}^2
+=\int_{\R^d}(1+|\bm k|^2)^s|\widehat u(\bm k)|^2\dd\bm k,
+\]
+Here the Fourier transform is unitarily normalized; $H^s$ on a domain can be constructed using restriction and extension.
+
+\section{Traces, the Poincar\'e Inequality, and Energy}\index{Trace operator}
+On the stated domain, the trace operator $\gamma:H^1(\Omega)\to H^{1/2}(\partial\Omega)$
+continuously extends the boundary restriction of smooth functions. Define
+\[
+H_0^1(\Omega)=\overline{C_c^\infty(\Omega)}^{H^1}
+=\{u\in H^1(\Omega):\gamma u=0\}.
+\]
+For $v\in H_0^1(\Omega)$, the Poincar\'e inequality gives
+\[
+\norm{v}_{L^2}\le C_P\norm{\nabla v}_{L^2}.
+\]
+Thus $\norm{\nabla v}_{L^2}$ is an energy norm equivalent to the $H^1$ norm on this space.
+A pure Neumann problem retains a constant nullspace, requires fixing the mean, and must satisfy
+$\int_\Omega f\dd x+\int_{\partial\Omega}g_N\dd S=0$.
+
+\section{The Weak Problem and the Lax--Milgram Theorem}
+Let $V=H_0^1(\Omega)$ and $V'=H^{-1}(\Omega)$. The weak Poisson problem is
+\[
+\text{Find }u\in V:\qquad b(u,v)=\ell(v)\quad\forall v\in V,\qquad
+b(u,v)=\int_\Omega\nabla u\cdot\nabla v\dd x.
+\]
+For $f\in L^2$, $\ell(v)=\int fv$; general $f\in H^{-1}$ requires a duality pairing.
+\begin{theorem}[Lax--Milgram]
+Let $V$ be a real Hilbert space and let a bilinear form satisfy
+$|b(w,v)|\le M\norm{w}_V\norm{v}_V$ and
+$b(v,v)\ge\alpha\norm{v}_V^2$, where $\alpha>0$.
+If $\ell\in V'$, there is a unique $u\in V$ satisfying $b(u,v)=\ell(v)$, with
+$\norm{u}_V\le\norm{\ell}_{V'}/\alpha$.
+\end{theorem}
+For the Poisson problem measured in the energy norm, $M=\alpha=1$.
+Testing with $v=u$ gives this stability estimate; existence follows from Riesz representation and a bounded coercive operator.
+Convection-dominated, saddle-point, and wave problems require estimates adapted to their operators.
+
+\aiexercise{On $(0,1)$, take $u(x)=x(1-x)$. Derive the weak form from $-u''=2$ and calculate the energy and right-hand-side pairing. Then verify that a continuous piecewise-linear function with a corner belongs to $H_0^1$.}
+{Compute the distributional derivative of a one-dimensional step function and explain why it is not in $H^1$. Next derive the compatibility condition and constant nullspace of a pure Neumann problem.}
+
+\section{Weak Solutions and Discontinuities in Conservation Laws}
+For $u_t+\partial_xF(u)=0$ in one dimension, a test function
+$\varphi\in C_c^\infty([0,T)\times\R)$ gives
+\[
+\int_0^T\int_\R(u\varphi_t+F(u)\varphi_x)\dd x\dd t
++\int_\R u_0(x)\varphi(0,x)\dd x=0.
+\]
+A moving discontinuity $x=s t$ satisfies the Rankine--Hugoniot condition
+\[
+s(u_R-u_L)=F(u_R)-F(u_L).
+\]
+The weak identity expresses conservation across a discontinuity. For a one-dimensional scalar conservation law with suitable data, a family of convex entropy inequalities selects the unique entropy solution.
+An entropy pair $\eta,q$ satisfies $q'=\eta'F'$ and requires, in distributions,
+$\partial_t\eta(u)+\partial_xq(u)\le0$. The finite-volume fluxes of Chapter~\ref{ch:8} approximate this propagation.
+
+\section{Broken Sobolev Spaces}
+For a mesh $\mathcal T_h$, define
+\[
+H^1(\mathcal T_h)=\{v\in L^2(\Omega):v|_K\in H^1(K),\ K\in\mathcal T_h\}.
+\]
+Derivatives are initially evaluated elementwise, and interface traces may jump. Distributional derivatives also contain interface contributions;
+DG numerical fluxes or elliptic penalty terms account for these interactions.
+A broken space specifies admissible discontinuities; the algorithm must additionally define residuals and interface coupling.

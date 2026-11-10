@@ -1,0 +1,33 @@
+\chapter{平稳迭代与平滑}\label{v0ch:17}
+\begin{chaptersummary}
+预条件器可以来自分解，也可以来自简单迭代。本章把 Jacobi、Gauss–Seidel 和 SOR 写成误差传播算子，继而解释为何单独求解较慢的迭代仍可成为有效平滑器。这个区别是理解多重网格所需的关键转向：局部迭代只负责它擅长消除的误差。
+\end{chaptersummary}
+\learninggoals{写出迭代矩阵；用谱半径判断收敛；解释高频平滑与全局求解的区别。}
+\paragraph{核心问题}为什么一个不够快的求解方法可以是优秀的算法部件？
+
+\section{矩阵分裂}
+取 $A=M-N$，迭代
+$\bm x_{k+1}=M^{-1}(N\bm x_k+\bm b)$，误差矩阵为
+$E=M^{-1}N=I-M^{-1}A$。对任意初始误差收敛的充要条件为 $\rho(E)<1$。
+在 $A=D+L+U$ 约定下：
+\[
+\begin{array}{c|c}
+\text{Jacobi}&M=D\\
+\text{加权 Jacobi}&\bm x^+=\bm x+\omega D^{-1}\bm r\\
+\text{Gauss--Seidel}&M=D+L\\
+\text{SOR}&M=D/\omega+L
+\end{array}
+\]
+SPD 的 Gauss--Seidel 收敛；SPD 下 SOR 对 $0<\omega<2$ 收敛。一般矩阵需要另外的条件，单凭稀疏性不够。
+\section{Fourier 平滑算例}
+一维 Poisson 内部用周期局部模式 $e_i=e^{\mathrm i i\theta}$ 分析，忽略物理边界对局部符号的影响。加权 Jacobi 的误差放大为
+\[
+ \widehat E(\theta)=1-\omega(1-\cos\theta).
+\]
+取 $\omega=2/3$，对 $\theta\in[\pi/2,\pi]$，$|\widehat E|\le1/3$；当 $\theta\to0$，$\widehat E\to1$。高频误差迅速衰减，平滑误差却保留。普通 Jacobi 的最高频可反号而不衰减，不能将所有松弛无条件视为有效平滑。
+\conceptbridge{高频与低频为何需要不同算法？}{局部更新直接比较邻点差异，振荡误差产生较大残量，因而容易被修正；缓慢变化误差在细网格上残量较小，需要长距离信息传播。粗网格把这种缓慢变化转为可分辨且容易处理的尺度。}{局部松弛 $\longrightarrow$ 剩余平滑误差 $\longrightarrow$ 粗空间修正。}
+\section{实施与成本}
+构造混合误差 $e_i=\sin(\pi x_i)+0.3\sin(16\pi x_i)$，对齐次误差方程施加几次加权 Jacobi，分别投影两个分量。顺序 GS 读取更新后的值，Jacobi 读取旧向量；并行实现需保留此差别。
+\costnote{Jacobi 易并行，通常为带宽敏感的稀疏或 stencil 核；GS 具有依赖。多色、块平滑和 Chebyshev 平滑可改变并行与频率特性，需要针对算子选择参数。}
+\aiexercise{从三点 Poisson stencil 推导 $\widehat E(\theta)$，扫描 $\omega$ 并比较低频、高频误差的衰减。}{加入各向异性扩散，说明点平滑为何可能失效，并用线平滑或半粗化提出修正。}
+\studyroute{略去局部 Fourier 分析的完整两网格符号。参考 \cite{briggs,saad}。}{weighted Jacobi; smoothing factor; local Fourier analysis; line relaxation}

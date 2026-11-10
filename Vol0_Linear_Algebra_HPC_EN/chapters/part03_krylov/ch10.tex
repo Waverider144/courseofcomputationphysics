@@ -1,0 +1,33 @@
+\chapter{The Krylov Subspace Idea}\label{v0ch:10}
+\begin{chaptersummary}
+Exact and approximate factorizations require factor access; large problems may make matrix--vector products easier. This chapter constructs Krylov spaces from residual corrections and turns solution into a growing projection problem. Arnoldi, GMRES, and CG share this space but use different bases and projection conditions. Operator applications express progressively richer corrections.
+\end{chaptersummary}
+\learninggoals{Construct a subspace from the residual; derive residual polynomials; distinguish Galerkin and minimum-residual conditions.}
+\paragraph{Core Question}Given only $A\bm v$, how can we approximate $A^{-1}\bm b$?
+
+\section{Generating a Search Space}
+Starting with $\bm r_0=\bm b-A\bm x_0$, seek
+\[
+ \bm x_m\in\bm x_0+\K_m(A,\bm r_0),\qquad
+ \K_m=\operatorname{span}\{\bm r_0,A\bm r_0,\ldots,A^{m-1}\bm r_0\}.
+\]
+If $\bm x_m-\bm x_0=q_{m-1}(A)\bm r_0$, then
+\[
+ \bm r_m=p_m(A)\bm r_0,\quad
+ p_m(z)=1-zq_{m-1}(z),\quad p_m(0)=1.
+\]
+The method selects a polynomial that reduces the relevant error or residual; no explicit high powers are required.
+\conceptbridge{How do repeated applications of $A$ approximate an inverse action?}{The space retains directions such as $A^k\bm r_0$ and projection selects their coefficients jointly. In a finite-dimensional invertible system, the minimal polynomial relative to the initial residual has a nonzero constant term, allowing a finite polynomial representation of the inverse action. Finite precision, restarting, and preconditioning determine the practical approximation process.}{Accessible operator action $\longrightarrow$ polynomial correction space $\longrightarrow$ projected coefficients.}
+\section{Projection and Minimal Polynomials}
+With trial basis $V_m$ and test basis $W_m$, impose
+\[
+ W_m^T(\bm r_0-AV_m\bm y)=0,\qquad
+ W_m^TAV_m\bm y=W_m^T\bm r_0.
+\]
+Galerkin uses the search space as its test space. Minimizing the residual two-norm requires orthogonality to $A\K_m$. These conditions differ.
+If the least degree $\nu$ satisfies $\mu_\nu(A)\bm r_0=0$, suitable unrestarted methods terminate in at most $\nu\le N$ exact-arithmetic steps. Practical usefulness requires far fewer than $N$ steps.
+\section{A Two-by-Two Calculation}
+Take $A=\diag(1,2)$, $\bm b=(1,1)^T$, and $\bm x_0=0$. The first space contains only $\alpha\bm b$, with minimum-residual coefficient $\alpha=3/5$. The second, spanned by $(1,1)^T,(1,2)^T$, is all of $\R^2$ and contains $(1,1/2)^T$. For $\bm b=(1,0)^T$, one dimension suffices: the initial residual affects effective difficulty.
+\costnote{Each step requires at least one operator application. Basis storage and orthogonalization depend on the method. Matrix-free and distributed operators fit directly; preconditioning often matters more to feasibility than fine details of the original spectrum.}
+\aiexercise{Compute the first Galerkin and minimum-residual steps for the two-by-two example and explain their different coefficients.}{Use $\mu(z)=(z-1)(z-2)$ to express the inverse as a polynomial. Explain degree reduction when the residual has one eigenvector component.}
+\studyroute{General projection stability bounds and nonnormal polynomial approximation are omitted. See \cite{saad,trefethen}.}{Krylov subspace; residual polynomial; minimal polynomial; Galerkin projection}

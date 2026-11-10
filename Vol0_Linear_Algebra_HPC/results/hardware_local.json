@@ -1,0 +1,507 @@
+{
+  "host": "local",
+  "workspace": "<WORKSPACE>",
+  "utc": "2026-11-10T02:45:18.773609+00:00",
+  "remote": false,
+  "gpu_index": "0",
+  "commands": [
+    {
+      "command": [
+        "nvidia-smi",
+        "--query-gpu=name,memory.total,memory.used,utilization.gpu,driver_version",
+        "--format=csv,noheader"
+      ],
+      "returncode": 0,
+      "stdout": "NVIDIA RTX 500 Ada Generation Laptop GPU, 4094 MiB, 11 MiB, 9 %, 580.178.04\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/usr/local/cuda-13.0/bin/nvcc",
+        "--version"
+      ],
+      "returncode": 0,
+      "stdout": "nvcc: NVIDIA (R) Cuda compiler driver\nCopyright (c) 2005-2025 NVIDIA Corporation\nBuilt on Wed_Aug_20_01:58:59_PM_PDT_2025\nCuda compilation tools, release 13.0, V13.0.88\nBuild cuda_13.0.r13.0/compiler.36424714_0\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "mpirun",
+        "--version"
+      ],
+      "returncode": 0,
+      "stdout": "Intel(R) MPI Library for Linux* OS, Version 2021.18.0 Build 20260327 (id: 821f207)\nCopyright 2003-2026, Intel Corporation.\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/usr/local/cuda-13.0/bin/nvcc",
+        "-U_GNU_SOURCE",
+        "-D_DEFAULT_SOURCE",
+        "-arch=native",
+        "-ccbin",
+        "/usr/bin/g++",
+        "-O3",
+        "-std=c++17",
+        "<WORKSPACE>/code_examples/gpu/yee_layout.cu",
+        "-o",
+        "<WORKSPACE>/build/yee_layout"
+      ],
+      "returncode": 2,
+      "stdout": "",
+      "stderr": "/usr/include/x86_64-linux-gnu/bits/mathcalls.h(206): error: exception specification is incompatible with that of previous function \"rsqrt\" (declared at line 629 of /usr/local/cuda-13.0/bin/../targets/x86_64-linux/include/crt/math_functions.h)\n   extern double rsqrt (double __x) noexcept (true); extern double __rsqrt (double __x) noexcept (true);\n                                    ^\n\n/usr/include/x86_64-linux-gnu/bits/mathcalls.h(206): error: exception specification is incompatible with that of previous function \"rsqrtf\" (declared at line 653 of /usr/local/cuda-13.0/bin/../targets/x86_64-linux/include/crt/math_functions.h)\n   extern float rsqrtf (float __x) noexcept (true); extern float __rsqrtf (float __x) noexcept (true);\n                                   ^\n\n2 errors detected in the compilation of \"<WORKSPACE>/code_examples/gpu/yee_layout.cu\".\n"
+    },
+    {
+      "command": [
+        "/usr/local/cuda-13.0/bin/nvcc",
+        "-U_GNU_SOURCE",
+        "-D_DEFAULT_SOURCE",
+        "-arch=native",
+        "-ccbin",
+        "/usr/bin/g++",
+        "-O3",
+        "-std=c++17",
+        "<WORKSPACE>/code_examples/gpu/yee_layout.cu",
+        "-o",
+        "<WORKSPACE>/build/yee_layout"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "<WORKSPACE>/build/yee_layout",
+        "32"
+      ],
+      "returncode": 0,
+      "stdout": "{\"status\":\"executed_gpu\",\"gpu\":\"NVIDIA RTX 500 Ada Generation Laptop GPU\",\"n\":32,\"dofs\":196608,\"dtype\":\"float64\",\"steps\":30,\"dt\":0.0125,\"T\":0.375,\"seconds_device_advance\":0.000559072018,\"max_cpu_difference\":3.36970035e-16,\"error_E_L2\":0.00226679187,\"seconds_with_transfers\":0.001426509,\"general_field_cpu_difference\":6.9388939e-18,\"soa_copy_seconds\":0.000225280002,\"aos_copy_seconds\":0.000283648014,\"layout_repeats\":100,\"threads\":128,\"dram_bytes_measured\":null,\"flops_model\":29491200,\"bytes_model\":141557760,\"work_model\":\"uniform-grid dt/h fusion: 30 FLOPs/cell/step; ideal two-phase bytes\",\"timing_scope\":\"events; H2D/D2H excluded; resident fields\"}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "<WORKSPACE>/build/yee_layout",
+        "64"
+      ],
+      "returncode": 0,
+      "stdout": "{\"status\":\"executed_gpu\",\"gpu\":\"NVIDIA RTX 500 Ada Generation Laptop GPU\",\"n\":64,\"dofs\":1572864,\"dtype\":\"float64\",\"steps\":30,\"dt\":0.00625,\"T\":0.1875,\"seconds_device_advance\":0.00362156796,\"max_cpu_difference\":4.4408921e-16,\"error_E_L2\":0.000285066621,\"seconds_with_transfers\":0.010149711,\"general_field_cpu_difference\":6.9388939e-18,\"soa_copy_seconds\":0.000696319997,\"aos_copy_seconds\":0.00115302396,\"layout_repeats\":100,\"threads\":128,\"dram_bytes_measured\":null,\"flops_model\":235929600,\"bytes_model\":1132462080,\"work_model\":\"uniform-grid dt/h fusion: 30 FLOPs/cell/step; ideal two-phase bytes\",\"timing_scope\":\"events; H2D/D2H excluded; resident fields\"}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "mpicxx",
+        "-O3",
+        "-std=c++17",
+        "<WORKSPACE>/code_examples/mpi/halo.cpp",
+        "-o",
+        "<WORKSPACE>/build/halo"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "mpirun",
+        "-n",
+        "1",
+        "<WORKSPACE>/build/halo",
+        "32"
+      ],
+      "returncode": 0,
+      "stdout": "{\"status\":\"executed_mpi\",\"mode\":\"sendrecv\",\"ranks\":1,\"global_n\":32,\"local_nx\":32,\"dtype\":\"float64\",\"repeats\":30,\"max_rank_seconds\":8.66523766e-05,\"max_error\":2.21689334e-12,\"send_bytes_per_rank\":16384,\"scope\":\"same-host slab stencil; not cross-node scaling\"}\n{\"status\":\"executed_mpi\",\"mode\":\"nonblocking\",\"ranks\":1,\"global_n\":32,\"local_nx\":32,\"dtype\":\"float64\",\"repeats\":30,\"max_rank_seconds\":8.84826288e-05,\"max_error\":2.21689334e-12,\"send_bytes_per_rank\":16384,\"scope\":\"same-host slab stencil; not cross-node scaling\"}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "mpirun",
+        "-n",
+        "2",
+        "<WORKSPACE>/build/halo",
+        "32"
+      ],
+      "returncode": 0,
+      "stdout": "{\"status\":\"executed_mpi\",\"mode\":\"sendrecv\",\"ranks\":2,\"global_n\":32,\"local_nx\":16,\"dtype\":\"float64\",\"repeats\":30,\"max_rank_seconds\":4.96667972e-05,\"max_error\":2.21689334e-12,\"send_bytes_per_rank\":16384,\"scope\":\"same-host slab stencil; not cross-node scaling\"}\n{\"status\":\"executed_mpi\",\"mode\":\"nonblocking\",\"ranks\":2,\"global_n\":32,\"local_nx\":16,\"dtype\":\"float64\",\"repeats\":30,\"max_rank_seconds\":5.03629712e-05,\"max_error\":2.21689334e-12,\"send_bytes_per_rank\":16384,\"scope\":\"same-host slab stencil; not cross-node scaling\"}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "mpicxx",
+        "-O3",
+        "-std=c++17",
+        "<WORKSPACE>/code_examples/mpi/yee.cpp",
+        "-o",
+        "<WORKSPACE>/build/yee_mpi"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "mpirun",
+        "-n",
+        "1",
+        "<WORKSPACE>/build/yee_mpi",
+        "12"
+      ],
+      "returncode": 0,
+      "stdout": "{\"status\":\"executed_mpi\",\"case\":\"full_yee\",\"ranks\":1,\"n\":12,\"dofs\":10368,\"steps\":14,\"dt\":0.03571428571428571,\"T\":0.5,\"dtype\":\"float64\",\"max_rank_seconds\":0.000270788282,\"error_E_L2\":0.0207575730518,\"divB_max\":0,\"divE_max\":0,\"modified_energy_relative_drift\":1.12418469e-16,\"flops_model\":725760,\"send_bytes_per_rank_step\":6912,\"scope\":\"advance includes two-phase packed halos; diagnostics excluded\"}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "mpirun",
+        "-n",
+        "1",
+        "<WORKSPACE>/build/yee_mpi",
+        "24"
+      ],
+      "returncode": 0,
+      "stdout": "{\"status\":\"executed_mpi\",\"case\":\"full_yee\",\"ranks\":1,\"n\":24,\"dofs\":82944,\"steps\":27,\"dt\":0.01851851851851852,\"T\":0.5,\"dtype\":\"float64\",\"max_rank_seconds\":0.00296214572,\"error_E_L2\":0.00509416734184,\"divB_max\":0,\"divE_max\":0,\"modified_energy_relative_drift\":5.52534361e-14,\"flops_model\":11197440,\"send_bytes_per_rank_step\":27648,\"scope\":\"advance includes two-phase packed halos; diagnostics excluded\"}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "mpirun",
+        "-n",
+        "2",
+        "<WORKSPACE>/build/yee_mpi",
+        "12"
+      ],
+      "returncode": 0,
+      "stdout": "{\"status\":\"executed_mpi\",\"case\":\"full_yee\",\"ranks\":2,\"n\":12,\"dofs\":10368,\"steps\":14,\"dt\":0.03571428571428571,\"T\":0.5,\"dtype\":\"float64\",\"max_rank_seconds\":0.000251605386,\"error_E_L2\":0.0207575730518,\"divB_max\":0,\"divE_max\":0,\"modified_energy_relative_drift\":1.58510042e-14,\"flops_model\":725760,\"send_bytes_per_rank_step\":6912,\"scope\":\"advance includes two-phase packed halos; diagnostics excluded\"}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "mpirun",
+        "-n",
+        "2",
+        "<WORKSPACE>/build/yee_mpi",
+        "24"
+      ],
+      "returncode": 0,
+      "stdout": "{\"status\":\"executed_mpi\",\"case\":\"full_yee\",\"ranks\":2,\"n\":24,\"dofs\":82944,\"steps\":27,\"dt\":0.01851851851851852,\"T\":0.5,\"dtype\":\"float64\",\"max_rank_seconds\":0.0032989843,\"error_E_L2\":0.00509416734184,\"divB_max\":0,\"divE_max\":0,\"modified_energy_relative_drift\":5.26912808e-14,\"flops_model\":11197440,\"send_bytes_per_rank_step\":27648,\"scope\":\"advance includes two-phase packed halos; diagnostics excluded\"}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "mpicxx",
+        "-O3",
+        "-std=c++17",
+        "<WORKSPACE>/code_examples/mpi/dg_transport.cpp",
+        "-o",
+        "<WORKSPACE>/build/dg_mpi"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "mpirun",
+        "-n",
+        "1",
+        "<WORKSPACE>/build/dg_mpi",
+        "8",
+        "3"
+      ],
+      "returncode": 0,
+      "stdout": "{\"status\":\"executed_mpi\",\"case\":\"full_dg\",\"ranks\":1,\"elements\":8,\"p\":3,\"dofs\":32,\"dtype\":\"float64\",\"steps\":236,\"dt\":0.000635593220338983,\"T\":0.15,\"max_rank_seconds\":0.000200723373,\"seconds_per_step\":8.50522769e-07,\"error_L2\":7.96970126737e-05,\"mass_drift\":8.32667268e-17,\"send_bytes_per_rank_step\":32,\"scope\":\"RK4 advance includes upwind trace exchange per stage; setup excluded\"}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "mpirun",
+        "-n",
+        "1",
+        "<WORKSPACE>/build/dg_mpi",
+        "16",
+        "3"
+      ],
+      "returncode": 0,
+      "stdout": "{\"status\":\"executed_mpi\",\"case\":\"full_dg\",\"ranks\":1,\"elements\":16,\"p\":3,\"dofs\":64,\"dtype\":\"float64\",\"steps\":471,\"dt\":0.0003184713375796178,\"T\":0.15,\"max_rank_seconds\":0.000435424499,\"seconds_per_step\":9.24468151e-07,\"error_L2\":5.29481749026e-06,\"mass_drift\":1.2490009e-16,\"send_bytes_per_rank_step\":32,\"scope\":\"RK4 advance includes upwind trace exchange per stage; setup excluded\"}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "mpirun",
+        "-n",
+        "2",
+        "<WORKSPACE>/build/dg_mpi",
+        "8",
+        "3"
+      ],
+      "returncode": 0,
+      "stdout": "{\"status\":\"executed_mpi\",\"case\":\"full_dg\",\"ranks\":2,\"elements\":8,\"p\":3,\"dofs\":32,\"dtype\":\"float64\",\"steps\":236,\"dt\":0.000635593220338983,\"T\":0.15,\"max_rank_seconds\":0.000438582977,\"seconds_per_step\":1.85840245e-06,\"error_L2\":7.96970126737e-05,\"mass_drift\":1.38777878e-16,\"send_bytes_per_rank_step\":32,\"scope\":\"RK4 advance includes upwind trace exchange per stage; setup excluded\"}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "mpirun",
+        "-n",
+        "2",
+        "<WORKSPACE>/build/dg_mpi",
+        "16",
+        "3"
+      ],
+      "returncode": 0,
+      "stdout": "{\"status\":\"executed_mpi\",\"case\":\"full_dg\",\"ranks\":2,\"elements\":16,\"p\":3,\"dofs\":64,\"dtype\":\"float64\",\"steps\":471,\"dt\":0.0003184713375796178,\"T\":0.15,\"max_rank_seconds\":0.000794867416,\"seconds_per_step\":1.68761659e-06,\"error_L2\":5.29481749026e-06,\"mass_drift\":1.11022302e-16,\"send_bytes_per_rank_step\":32,\"scope\":\"RK4 advance includes upwind trace exchange per stage; setup excluded\"}\n",
+      "stderr": ""
+    }
+  ],
+  "measurements": [
+    {
+      "status": "executed_gpu",
+      "gpu": "NVIDIA RTX 500 Ada Generation Laptop GPU",
+      "n": 32,
+      "dofs": 196608,
+      "dtype": "float64",
+      "steps": 30,
+      "dt": 0.0125,
+      "T": 0.375,
+      "seconds_device_advance": 0.000559072018,
+      "max_cpu_difference": 3.36970035e-16,
+      "error_E_L2": 0.00226679187,
+      "seconds_with_transfers": 0.001426509,
+      "general_field_cpu_difference": 6.9388939e-18,
+      "soa_copy_seconds": 0.000225280002,
+      "aos_copy_seconds": 0.000283648014,
+      "layout_repeats": 100,
+      "threads": 128,
+      "dram_bytes_measured": null,
+      "flops_model": 29491200,
+      "bytes_model": 141557760,
+      "work_model": "uniform-grid dt/h fusion: 30 FLOPs/cell/step; ideal two-phase bytes",
+      "timing_scope": "events; H2D/D2H excluded; resident fields"
+    },
+    {
+      "status": "executed_gpu",
+      "gpu": "NVIDIA RTX 500 Ada Generation Laptop GPU",
+      "n": 64,
+      "dofs": 1572864,
+      "dtype": "float64",
+      "steps": 30,
+      "dt": 0.00625,
+      "T": 0.1875,
+      "seconds_device_advance": 0.00362156796,
+      "max_cpu_difference": 4.4408921e-16,
+      "error_E_L2": 0.000285066621,
+      "seconds_with_transfers": 0.010149711,
+      "general_field_cpu_difference": 6.9388939e-18,
+      "soa_copy_seconds": 0.000696319997,
+      "aos_copy_seconds": 0.00115302396,
+      "layout_repeats": 100,
+      "threads": 128,
+      "dram_bytes_measured": null,
+      "flops_model": 235929600,
+      "bytes_model": 1132462080,
+      "work_model": "uniform-grid dt/h fusion: 30 FLOPs/cell/step; ideal two-phase bytes",
+      "timing_scope": "events; H2D/D2H excluded; resident fields"
+    },
+    {
+      "status": "executed_mpi",
+      "mode": "sendrecv",
+      "ranks": 1,
+      "global_n": 32,
+      "local_nx": 32,
+      "dtype": "float64",
+      "repeats": 30,
+      "max_rank_seconds": 0.0000866523766,
+      "max_error": 2.21689334e-12,
+      "send_bytes_per_rank": 16384,
+      "scope": "same-host slab stencil; not cross-node scaling"
+    },
+    {
+      "status": "executed_mpi",
+      "mode": "nonblocking",
+      "ranks": 1,
+      "global_n": 32,
+      "local_nx": 32,
+      "dtype": "float64",
+      "repeats": 30,
+      "max_rank_seconds": 0.0000884826288,
+      "max_error": 2.21689334e-12,
+      "send_bytes_per_rank": 16384,
+      "scope": "same-host slab stencil; not cross-node scaling"
+    },
+    {
+      "status": "executed_mpi",
+      "mode": "sendrecv",
+      "ranks": 2,
+      "global_n": 32,
+      "local_nx": 16,
+      "dtype": "float64",
+      "repeats": 30,
+      "max_rank_seconds": 0.0000496667972,
+      "max_error": 2.21689334e-12,
+      "send_bytes_per_rank": 16384,
+      "scope": "same-host slab stencil; not cross-node scaling"
+    },
+    {
+      "status": "executed_mpi",
+      "mode": "nonblocking",
+      "ranks": 2,
+      "global_n": 32,
+      "local_nx": 16,
+      "dtype": "float64",
+      "repeats": 30,
+      "max_rank_seconds": 0.0000503629712,
+      "max_error": 2.21689334e-12,
+      "send_bytes_per_rank": 16384,
+      "scope": "same-host slab stencil; not cross-node scaling"
+    },
+    {
+      "status": "executed_mpi",
+      "case": "full_yee",
+      "ranks": 1,
+      "n": 12,
+      "dofs": 10368,
+      "steps": 14,
+      "dt": 0.03571428571428571,
+      "T": 0.5,
+      "dtype": "float64",
+      "max_rank_seconds": 0.000270788282,
+      "error_E_L2": 0.0207575730518,
+      "divB_max": 0,
+      "divE_max": 0,
+      "modified_energy_relative_drift": 1.12418469e-16,
+      "flops_model": 725760,
+      "send_bytes_per_rank_step": 6912,
+      "scope": "advance includes two-phase packed halos; diagnostics excluded"
+    },
+    {
+      "status": "executed_mpi",
+      "case": "full_yee",
+      "ranks": 1,
+      "n": 24,
+      "dofs": 82944,
+      "steps": 27,
+      "dt": 0.01851851851851852,
+      "T": 0.5,
+      "dtype": "float64",
+      "max_rank_seconds": 0.00296214572,
+      "error_E_L2": 0.00509416734184,
+      "divB_max": 0,
+      "divE_max": 0,
+      "modified_energy_relative_drift": 5.52534361e-14,
+      "flops_model": 11197440,
+      "send_bytes_per_rank_step": 27648,
+      "scope": "advance includes two-phase packed halos; diagnostics excluded"
+    },
+    {
+      "status": "executed_mpi",
+      "case": "full_yee",
+      "ranks": 2,
+      "n": 12,
+      "dofs": 10368,
+      "steps": 14,
+      "dt": 0.03571428571428571,
+      "T": 0.5,
+      "dtype": "float64",
+      "max_rank_seconds": 0.000251605386,
+      "error_E_L2": 0.0207575730518,
+      "divB_max": 0,
+      "divE_max": 0,
+      "modified_energy_relative_drift": 1.58510042e-14,
+      "flops_model": 725760,
+      "send_bytes_per_rank_step": 6912,
+      "scope": "advance includes two-phase packed halos; diagnostics excluded"
+    },
+    {
+      "status": "executed_mpi",
+      "case": "full_yee",
+      "ranks": 2,
+      "n": 24,
+      "dofs": 82944,
+      "steps": 27,
+      "dt": 0.01851851851851852,
+      "T": 0.5,
+      "dtype": "float64",
+      "max_rank_seconds": 0.0032989843,
+      "error_E_L2": 0.00509416734184,
+      "divB_max": 0,
+      "divE_max": 0,
+      "modified_energy_relative_drift": 5.26912808e-14,
+      "flops_model": 11197440,
+      "send_bytes_per_rank_step": 27648,
+      "scope": "advance includes two-phase packed halos; diagnostics excluded"
+    },
+    {
+      "status": "executed_mpi",
+      "case": "full_dg",
+      "ranks": 1,
+      "elements": 8,
+      "p": 3,
+      "dofs": 32,
+      "dtype": "float64",
+      "steps": 236,
+      "dt": 0.000635593220338983,
+      "T": 0.15,
+      "max_rank_seconds": 0.000200723373,
+      "seconds_per_step": 8.50522769e-7,
+      "error_L2": 0.0000796970126737,
+      "mass_drift": 8.32667268e-17,
+      "send_bytes_per_rank_step": 32,
+      "scope": "RK4 advance includes upwind trace exchange per stage; setup excluded"
+    },
+    {
+      "status": "executed_mpi",
+      "case": "full_dg",
+      "ranks": 1,
+      "elements": 16,
+      "p": 3,
+      "dofs": 64,
+      "dtype": "float64",
+      "steps": 471,
+      "dt": 0.0003184713375796178,
+      "T": 0.15,
+      "max_rank_seconds": 0.000435424499,
+      "seconds_per_step": 9.24468151e-7,
+      "error_L2": 0.00000529481749026,
+      "mass_drift": 1.2490009e-16,
+      "send_bytes_per_rank_step": 32,
+      "scope": "RK4 advance includes upwind trace exchange per stage; setup excluded"
+    },
+    {
+      "status": "executed_mpi",
+      "case": "full_dg",
+      "ranks": 2,
+      "elements": 8,
+      "p": 3,
+      "dofs": 32,
+      "dtype": "float64",
+      "steps": 236,
+      "dt": 0.000635593220338983,
+      "T": 0.15,
+      "max_rank_seconds": 0.000438582977,
+      "seconds_per_step": 0.00000185840245,
+      "error_L2": 0.0000796970126737,
+      "mass_drift": 1.38777878e-16,
+      "send_bytes_per_rank_step": 32,
+      "scope": "RK4 advance includes upwind trace exchange per stage; setup excluded"
+    },
+    {
+      "status": "executed_mpi",
+      "case": "full_dg",
+      "ranks": 2,
+      "elements": 16,
+      "p": 3,
+      "dofs": 64,
+      "dtype": "float64",
+      "steps": 471,
+      "dt": 0.0003184713375796178,
+      "T": 0.15,
+      "max_rank_seconds": 0.000794867416,
+      "seconds_per_step": 0.00000168761659,
+      "error_L2": 0.00000529481749026,
+      "mass_drift": 1.11022302e-16,
+      "send_bytes_per_rank_step": 32,
+      "scope": "RK4 advance includes upwind trace exchange per stage; setup excluded"
+    }
+  ],
+  "scope": "same-host MPI; shared GPU short tests, no cross-node scaling",
+  "expected_measurements": 14,
+  "all_executed_checks_passed": true
+}

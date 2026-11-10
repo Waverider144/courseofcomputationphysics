@@ -1,0 +1,210 @@
+\chapter{尺度分析与渐近约化}\label{ch:4}
+
+\begin{chaptersummary}
+已有的动理学、连续介质和电磁模型包含不同尺度与机制。如何在具体问题中取舍这些机制，是本章的主线。无量纲化将相对量级写成尺度比，渐近分析再据此构造极限模型与边界层。这使前面的模型族获得明确的适用区域，也为后续数值误差与分辨率选择提供依据。
+\end{chaptersummary}
+\learninggoals{由特征尺度形成无量纲参数；用主导平衡确定内外区域；说明准中性、强磁场和低频约化所去除的快尺度。}
+\studyroute{这里略去匹配条件的构造和误差一致性证明。}{singular perturbation; dominant balance; matched asymptotic expansions}{对 $\epsilon u''+u'=0$、$u(0)=0,u(1)=1$ 构造内外解，核对边界层位置并给出一致近似。}
+
+\section{无量纲化、尺度排序与渐近展开}\index{奇异摄动}
+常见无量纲数包括
+\[
+\mathrm{Kn}=\frac{\lambda}{L},
+\qquad
+\mathrm{Re}=\frac{\rho UL}{\mu},
+\qquad
+\mathrm{Ma}=\frac{U}{c}.
+\]
+这些参数度量不同物理机制的相对量级。模型选择本质上是决定哪些项在给定极限下保留。
+
+\begin{authornote}
+\textbf{潜在疑问：}
+“为什么连续介质方程之后要立刻谈无量纲数？这些数和模型选择有什么因果关系？”
+
+\textbf{作者补充：}
+不同物理量的数值大小依赖单位，不能直接比较。选定问题的特征长度、速度和时间后，无量纲化把方程各项的相对大小集中到无量纲参数中。参数的大小提示哪些机制可能主导，以及在哪些极限下可以建立简化模型；尺度的选取仍需结合具体问题。
+
+\textbf{核心概念联系：}
+\[
+\text{continuum equations}
+\longrightarrow
+\text{dimensionless ratios}
+\longrightarrow
+\text{model regimes}
+\]
+\end{authornote}
+
+Taylor 展开从局部导数描述函数变化，渐近展开则组织小参数极限下的尺度层次。先看 Taylor 形式：
+\[
+f(x+h)
+=
+f(x)+hf'(x)+\frac{h^2}{2}f''(x)+\cdots.
+\]
+
+\begin{askai}
+AI 展开问题：
+\begin{quote}
+请比较 Taylor expansion 和 asymptotic expansion。给出一个渐近展开有用但级数不收敛的例子，并解释为什么“每次截断后余项更小”比“无限和收敛”更适合某些扰动问题。
+\end{quote}
+
+进一步展开：
+\begin{quote}
+用一个简单函数展示最优截断：计算不同阶截断误差，并说明为什么项最小处附近应该停止。
+\end{quote}
+\end{askai}
+
+它特别适合分析离散算子与连续算子的局部差异。
+
+渐近展开更一般。设 \(\epsilon\to0\)，若尺度函数满足
+\[
+\phi_{n+1}(\epsilon)=o(\phi_n(\epsilon)),
+\]
+且对每个固定 \(N\) 都有
+\[
+f(\epsilon)
+-
+\sum_{n=0}^{N}a_n\phi_n(\epsilon)
+=
+o(\phi_N(\epsilon)),
+\]
+则写作
+\[
+f(\epsilon)\sim\sum_{n=0}^{\infty}a_n\phi_n(\epsilon).
+\]
+
+渐近展开要求：对每个固定截断阶数，余项比最后保留的尺度更小。级数本身可以发散，尺度也可以包含分数幂、对数与指数项，例如
+\[
+1,\quad
+\epsilon^{1/2},\quad
+\epsilon\log\epsilon,\quad
+\ee^{-1/\epsilon}.
+\]
+
+因此，Taylor 级数是由局部导数产生、以普通幂为基的一类特殊展开；渐近展开强调的是不同项的尺度排序。
+
+若系数增长很快，渐近级数可能先改善后恶化。固定 \(\epsilon\) 后，项
+\[
+|a_n\epsilon^n|
+\]
+可能先减小再增大。此时应在最小项附近截断，而不是追求无限求和。这称为最优截断。
+
+若
+\[
+u=u_0+\epsilon u_1+\epsilon^2u_2+\cdots
+\]
+代入后，各阶问题保持原方程的微分阶数和边界条件结构，称为正则摄动。
+
+若小参数乘在最高阶导数前，例如
+\[
+\epsilon u''+u'=0,
+\]
+则 \(\epsilon\to0\) 时方程阶数下降，部分边界条件无法由外部解满足。这是奇异摄动，通常需要边界层、匹配渐近展开、多尺度法或 WKB 方法。
+
+\section{等离子体示例：小 Debye 长度与准中性极限}
+
+考虑一维无量纲化的 Poisson 方程
+\[
+-\epsilon^2\frac{\partial^2\phi}{\partial x^2}
+=
+n_i-n_e,
+\qquad
+\epsilon=\frac{\lambda_D}{L}\ll1.
+\]
+这里 \(\lambda_D\) 是 Debye 长度，\(L\) 是宏观尺度。
+
+若直接令 \(\epsilon=0\)，得到
+\[
+n_i=n_e,
+\]
+即准中性条件。这说明在主体区域，净电荷密度是高阶小量。
+
+但如果边界给定的电势与主体准中性解不相容，最高阶导数前的小参数使问题成为奇异摄动。主体区域的外部展开可写成
+\[
+\phi^{\mathrm{out}}
+=
+\phi_0+\epsilon\phi_1+\epsilon^2\phi_2+\cdots,
+\]
+对电势变化与归一化净电荷均为 $O(1)$ 的层，平衡 $\epsilon^2/\delta^2=O(1)$ 得到 $\delta=O(\epsilon)$。在这一排序下，边界附近引入拉伸坐标
+\[
+\xi=\frac{x}{\epsilon}.
+\]
+
+\begin{authornote}
+\textbf{潜在疑问：}
+“为什么边界附近必须引入 \(\xi=x/\epsilon\)，而不是换成任意新的坐标？”
+
+\textbf{作者补充：}
+当小参数使最高阶导数项在主体区域看似可以忽略时，降阶后的方程可能无法满足全部边界条件。边界附近的解必须在较短距离内迅速变化，使原本系数很小的导数项重新与其他项达到同一量级。先以未知厚度估计各项并作主导平衡，再据此引入拉伸坐标，才能解析这一薄层。
+
+\textbf{核心概念联系：}
+\[
+\text{singular perturbation}
+\longrightarrow
+\text{boundary-layer scale}
+\longrightarrow
+\xi=x/\epsilon
+\]
+\end{authornote}
+
+在该尺度下
+\[
+\frac{\partial}{\partial x}
+=
+\frac{1}{\epsilon}\frac{\partial}{\partial\xi},
+\]
+
+\begin{askai}
+AI 展开问题：
+\begin{quote}
+先以 \(\delta(\epsilon)\) 表示未知的 boundary-layer width，通过 dominant balance 推导 \(\delta\) 随 \(\epsilon\) 的缩放。再比较 stretched coordinate \(x/\epsilon\) 与这一尺度，解释为何令 \(\xi=x/\epsilon\)。
+\end{quote}
+
+进一步展开：
+\begin{quote}
+把外部解、内部解和匹配区域分别画成一张概念图，并说明准中性条件在哪个区域有效。
+\end{quote}
+\end{askai}
+
+Poisson 方程恢复为
+\[
+-\frac{\partial^2\phi^{\mathrm{in}}}{\partial\xi^2}
+=
+n_i-n_e.
+\]
+
+在上述排序下，Debye 尺度的电荷分离层承担壁面电势与主体解之间的匹配。求其形状还需粒子响应、通量与壁面条件；其他电势幅度或输运尺度可能产生额外的过渡层。
+
+该例展示了渐近展开的几个典型特征：
+\begin{enumerate}
+  \item 小参数来自明确的尺度比 \(\lambda_D/L\)；
+  \item 主体区域和边界层使用不同坐标；
+  \item 令小参数为零会降低方程阶数；
+  \item 内外解必须在重叠区域匹配；
+  \item 极限模型的有效性依赖于空间区域和边界条件。
+\end{enumerate}
+
+在等离子体文献中，类似结构还出现在低频极限、强磁场极限、漂移动理学、回旋动理学和 MHD 极限中。阅读时应先问：小参数是什么，哪些变量被假设为同阶，极限是否降低方程阶数，是否存在快时间、短空间或边界层尺度。
+
+常见记号应按以下方式理解：
+\[
+f=g+\Order(\epsilon^p)
+\]
+表示余项被常数倍 \(\epsilon^p\) 控制；
+\[
+f=g+o(\epsilon^p)
+\]
+表示余项与 \(\epsilon^p\) 的比值趋于零；
+\[
+f\sim g
+\]
+既可能表示 \(f/g\to1\)，也可能表示逐阶渐近展开，必须结合上下文判断。
+
+\section{强磁场、低频与回旋尺度}
+带电粒子的回旋频率与典型回旋半径为
+\[
+\Omega_s=\frac{|q_s|B_0}{m_s},\qquad
+\rho_{Ls}=\frac{v_{\mathrm{th},s}}{\Omega_s}.
+\]
+当 $\rho_{Ls}/L\ll1$ 且 $\omega/\Omega_s\ll1$，可按快回旋角与慢导引中心运动组织变量。
+漂移动理学进一步取 $k_\perp\rho_{Ls}\ll1$；回旋动理学允许扰动满足 $k_\perp\rho_{Ls}=O(1)$，
+保留有限回旋半径效应。第~\ref{ch:19}~章给出五维分布、回旋平均与自洽场方程。

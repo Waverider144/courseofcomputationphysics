@@ -1,0 +1,146 @@
+\chapter{Finite Elements, Spectral Methods, and Integral Operators}\label{ch:9}
+\begin{chaptersummary}
+The Galerkin framework connects error analysis to space selection and testing. Local finite-element assembly leads to global Fourier, Legendre, and Chebyshev representations, followed by integral-operator discretization with MoM. Support determines coupling range, while regularity and quadrature govern error, linking approximation theory to matrix structure and solvers in Volume 0.
+\end{chaptersummary}
+\learninggoals{Assemble one-dimensional linear finite-element mass and stiffness matrices; distinguish spectral Galerkin, collocation, and pseudospectral methods; construct a MoM matrix from an integral kernel; explain how smoothness controls approximation rates.}
+\studyroute{Higher-dimensional element families, general spectral-error proofs, singular integration, and full radiation-condition treatment are omitted. Matrix solvers and fast operator application are developed in Volume~0.}{Galerkin finite element; spectral collocation; Fourier pseudospectral; Chebyshev approximation; method of moments}{For one-dimensional Poisson, specify the degrees of freedom, boundary constraints, and matrix entries for local linear FEM and global Legendre Galerkin approximation.}
+\section{Local Finite-Element Spaces and Assembly}\index{Finite element method}
+Finite elements start from a weak form. For Poisson's equation,
+\[
+-\nabla^2u=f
+\]
+multiply by a test function and integrate by parts:
+\[
+\int_\Omega\nabla v\cdot\nabla u\dd V
+=
+\int_\Omega vf\dd V+\text{boundary terms}.
+\]
+
+\begin{askai}
+Ask AI:
+\begin{quote}
+Discretize one-dimensional Poisson using second-order central differences and linear finite elements. Write both matrices for five interior nodes and compare how differential-operator locality becomes matrix sparsity.
+\end{quote}
+
+Follow-up:
+\begin{quote}
+Using the same Poisson problem, explain the relationships among strong form, weak form, test function, basis function, and stiffness matrix.
+\end{quote}
+\end{askai}
+
+Expanding
+\[
+u_h=\sum_jU_j\phi_j
+\]
+gives
+\[
+\bm K\bm U=\bm F.
+\]
+
+The expansion turns the weak form into equations for basis coefficients. A one-dimensional linear element makes the local matrices explicit, after which shared nodes determine assembly.
+
+
+On a one-dimensional element $[x_j,x_{j+1}]$ of length $h_j$, the linear shape functions are
+$\phi_0=1-\xi$, $\phi_1=\xi$, $\xi=(x-x_j)/h_j$.
+Direct integration gives
+\[
+K^{(j)}=\frac1{h_j}\begin{pmatrix}1&-1\\-1&1\end{pmatrix},
+\qquad
+M^{(j)}=\frac{h_j}6\begin{pmatrix}2&1\\1&2\end{pmatrix}.
+\]
+Shared nodes represent the same degree of freedom; local entries are added using the node map.
+Conforming spaces satisfy the required trace conditions. Scalar $H^1$ elements serve Poisson problems;
+Maxwell curl problems require the corresponding tangential-trace structure, developed in Volume~2.
+
+\conceptbridge{How can the same global polynomial space produce both Galerkin and collocation methods?}
+{Modal coefficients and nodal values are representation choices. Galerkin constrains residuals by integral pairing; collocation constrains differential residuals at selected nodes. Suitable quadrature may relate the resulting matrices, with the precise relationship determined by testing, integration, and boundary treatment.}
+{Global approximation space $\longrightarrow$ modal or nodal degrees of freedom $\longrightarrow$ residual mechanism.}
+
+\section{Global Modes, Collocation, and Pseudospectral Methods}\index{Spectral methods}
+Local finite elements organize assembly through compact support; global spectral representations exploit overall smoothness for accuracy. On the periodic interval $[0,2\pi)$, Fourier Galerkin takes
+\[
+u_N(x)=\sum_{k=-N}^{N}\widehat u_k\ee^{\ii kx},\qquad
+\widehat{(\partial_xu_N)}_k=\ii k\widehat u_k.
+\]
+Galerkin tests against the retained Fourier modes. Pseudospectral evaluation transforms modes to nodal values,
+computes nonlinear products in physical space, and transforms back. Unresolved high wave numbers may alias into lower ones;
+appropriate padding or truncation removes aliasing for quadratic nonlinearities.
+
+On $[-1,1]$, Legendre polynomials satisfy
+\[
+\int_{-1}^1P_jP_k\dd x=\frac{2}{2k+1}\delta_{jk}.
+\]
+Chebyshev polynomials $T_k(\cos\theta)=\cos(k\theta)$
+are orthogonal with weight $(1-x^2)^{-1/2}$. This weighted inner product must be distinguished from the unweighted physical $L^2$ inner product.
+Spectral collocation can use Chebyshev--Lobatto nodes $x_j=\cos(j\pi/p)$,
+with $D_{ij}=\ell_j'(x_i)$. Differential residuals are constrained at interior nodes, and boundary values at boundary nodes.
+
+For sufficiently smooth solutions with suitable analytic continuation, increasing the global degree can yield rapid or exponential convergence.
+Finite regularity or discontinuities generally yield algebraic convergence, with possible Gibbs oscillations near interfaces.
+Local polynomials facilitate geometry adaptation and refinement; global modes exploit global smoothness.
+Error comparisons should report total degrees of freedom, quadrature error, and temporal error.
+
+\section{Integral Operators and the Method of Moments}\index{Method of moments}
+The method of moments in computational electromagnetics typically starts from an integral equation:
+\[
+\Lop J=g
+\]
+Expand
+\[
+J=\sum_{n=1}^N I_nf_n,
+\]
+
+\begin{authornote}
+\textbf{Potential Question:}
+"Why switch from differential equations to an integral equation and a current expansion?"
+
+\textbf{Author Supplement:}
+For certain linear scattering or radiation problems, a known background Green's function represents the field through equivalent boundary sources or currents. The unknown changes from a volume field to a boundary density determined by boundary conditions. This can reduce dimension, but the long-range Green's function generally produces a dense matrix.
+
+\textbf{Core Conceptual Connection:}
+\[
+\text{field PDE}
+\longrightarrow
+\text{integral equation}
+\longrightarrow
+\text{current expansion}
+\]
+\end{authornote}
+
+and constrain the integral-equation residual with test functions \(w_m\):
+\[
+\avg{w_m,\Lop J}
+=
+\avg{w_m,g}.
+\]
+
+\begin{askai}
+Ask AI:
+\begin{quote}
+Discretize a simple one-dimensional integral equation using three piecewise-constant basis functions:
+\[
+\Lop J=g
+\]
+Write the entries \(\avg{w_m,\Lop f_n}\) explicitly and explain why each test function generally couples to every basis function.
+\end{quote}
+
+Follow-up:
+\begin{quote}
+Compare the nonzero patterns of differential- and integral-equation matrices, and identify the costs targeted by fast multipole methods or hierarchical matrices.
+\end{quote}
+\end{askai}
+
+This gives
+\[
+\bm Z\bm I=\bm V.
+\]
+
+The long-range kernel generally makes $\bm Z$ dense. This structure and fast matrix application lead to Volume~0.
+
+Specifically, if $(\mathcal LJ)(x)=\int_\Gamma G(x,y)J(y)\dd S_y$,
+then
+\[
+Z_{mn}=\int_\Gamma w_m(x)\int_\Gamma G(x,y)f_n(y)\dd S_y\dd S_x,\qquad
+V_m=\int_\Gamma w_mg\dd S.
+\]
+This testing pairing belongs to integral-equation discretization. Stability depends on the operator, trace spaces, kernel, and basis.

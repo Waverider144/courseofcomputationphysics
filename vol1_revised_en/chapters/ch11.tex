@@ -1,0 +1,78 @@
+\chapter{Flux Reconstruction}\label{ch:11}
+\begin{chaptersummary}
+The strong DG form represents interface residuals as liftings into the element interior. FR follows this idea by interpolating the local flux and incorporating a shared flux through endpoint correction functions. This chapter derives the nodal update and conservation property, then identifies the exact relationship with a particular DG discretization through a mass-matrix lifting condition.
+\end{chaptersummary}
+\learninggoals{Construct discontinuous and corrected fluxes for a one-dimensional conservation law; write the FR spatial operator; prove cell-average conservation; state the basis, integration, and flux conditions required for a DG equivalence.}
+\studyroute{Multidimensional curved meshes, nonlinear aliasing, and general FR entropy analysis are omitted. The next chapter constructs energy-stable correction functions.}{Huynh flux reconstruction; correction function; lifting operator; SBP correction procedure}{At three Gauss nodes, construct a quadratic solution and cubic correction functions, assemble the nodal FR operator, and compare it with exactly integrated strong-form DG.}
+
+\section{Discontinuous Fluxes and Endpoint Corrections}\index{FR methods}
+Consider $u_t+\partial_xF(u)=0$ on an affine element $x=x_j+J_j\xi$.
+Choose $p+1$ distinct nodes $\xi_i$ with Lagrange basis $\ell_i$:
+\[
+u_j^\delta(\xi)=\sum_{i=0}^pu_{ji}\ell_i(\xi),\qquad
+f_j^D(\xi)=\sum_{i=0}^pF(u_{ji})\ell_i(\xi).
+\]
+Here $f^D$ is the degree-$p$ flux interpolant; the nonlinear flux $F(u^\delta)$ may have higher degree.
+An interface solver uses the two solution traces to produce shared, consistently oriented fluxes $f_L^*,f_R^*$.
+Choose correction functions of degree at most $p+1$ satisfying
+\[
+g_L(-1)=1,\quad g_L(1)=0,\qquad
+g_R(-1)=0,\quad g_R(1)=1.
+\]
+The corrected flux is
+\begin{equation}\label{eq:fr-flux}
+f^C=f^D+(f_L^*-f^D(-1))g_L+(f_R^*-f^D(1))g_R.
+\end{equation}
+Thus $f^C(-1)=f_L^*$ and $f^C(1)=f_R^*$.
+The globally shared interface flux has the same endpoint value in each local polynomial. For the original FR construction, see~\cite{huynh2007}.
+
+\conceptbridge{How can two endpoint flux values change every interior degree of freedom?}
+{Correction functions extend endpoint flux differences into element-interior polynomials. Their derivatives deliver interface residuals to every solution node. The correction shape determines how this lifting acts on polynomial modes and therefore affects the spectrum and stability.}
+{Endpoint flux differences $\longrightarrow$ correction polynomials $\longrightarrow$ interior residual lifting.}
+
+\section{The Nodal FR Update and Local Conservation}
+Let $D_{ik}=\ell_k'(\xi_i)$, $C_{iL}=g_L'(\xi_i)$, and $C_{iR}=g_R'(\xi_i)$.
+Constrain the corrected differential residual at the nodes:
+\begin{equation}\label{eq:fr-operator}
+J_j\dot u_{ji}
+=-\sum_kD_{ik}F(u_{jk})
+-(f_L^*-f_L^D)g_L'(\xi_i)
+-(f_R^*-f_R^D)g_R'(\xi_i).
+\end{equation}
+Let $R$ be the $2\times(p+1)$ endpoint-evaluation matrix. Then
+$J_j\dot{\bm u}_j=-D\bm f_j-C(\bm f^*-R\bm f_j)$.
+All derivatives have degree at most $p$, so the nodal equality is also a polynomial identity throughout the element.
+Exact integration gives
+\[
+\frac{\dd}{\dd t}\left(J_j\int_{-1}^1u_j^\delta\dd\xi\right)
+=-f_R^*+f_L^*.
+\]
+Shared fluxes and endpoint conditions therefore ensure cell-average conservation. The particular correction functions must additionally satisfy the desired stability conditions.
+
+\section{The Matrix Relationship with DG}
+In the same basis, let $M_{ik}=\int\ell_i\ell_k$ and $B=\diag(-1,1)$.
+Polynomial integration by parts gives
+\[
+MD+D^{\mathsf T}M=R^{\mathsf T}BR.
+\]
+For a linear flux $F(u)=au$, strong-form DG is
+\[
+J_j\dot{\bm u}_j=-aD\bm u_j-M^{-1}R^{\mathsf T}B
+(\bm f^*-aR\bm u_j).
+\]
+Therefore, when
+\begin{equation}\label{eq:fr-dg-lift}
+C=M^{-1}R^{\mathsf T}B,
+\end{equation}
+and representation, integration, mapping, and fluxes agree, FR and this semidiscrete DG operator coincide.
+An invertible basis transformation gives the same relationship in a modal implementation.
+Nonlinear fluxes, underintegration, or other correction functions require a new comparison of volume and boundary operators.
+
+\section{Error and Spectral Analysis}
+Correction functions change the interface feedback into element modes. On a uniform periodic mesh, the Bloch symbol gives the spectrum,
+allowing comparison of dissipation, dispersion, and explicit stable steps on the physical branch.
+An energy method instead examines evolution directly in a chosen norm and includes physical boundaries.
+Dissipation, dispersion, and stable step size also depend on fluxes, correction functions, and the time integrator. Cost comparisons by total degrees of freedom and error therefore record these choices alongside formal order.
+
+\aiexercise{For $p=1$, a linear flux, and Gauss solution nodes, calculate $M,D,R,B$. Obtain $g_L',g_R'$ from~\eqref{eq:fr-dg-lift}, integrate them, check all four endpoint conditions, and compare the local matrices with DG.}
+{Replace a correction function by another polynomial satisfying the same endpoint conditions. Check conservation, then calculate the periodic-symbol eigenvalues to distinguish the requirements for conservation and stability.}

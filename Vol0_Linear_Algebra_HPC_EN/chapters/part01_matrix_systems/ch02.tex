@@ -1,0 +1,35 @@
+\chapter{Matrix Structure and Solver Difficulty}\label{v0ch:2}
+\begin{chaptersummary}
+Once the discrete operator is identified, symmetry, definiteness, nonnormality, and sensitivity connect matrix structure to solution difficulty. These properties guide the choice of Cholesky, CG, GMRES, and preconditioning. The selection proceeds from algorithmic assumptions to problem sensitivity and observed convergence.
+\end{chaptersummary}
+\learninggoals{Identify SPD and indefinite systems; distinguish eigenvalues, singular values, condition numbers, and spectral radii; interpret the limitations of nonnormal examples.}
+\paragraph{Core Question}Why can equally sparse matrices require different solution strategies?
+
+\section{Energy Structure and Nullspaces}
+A real matrix is SPD if $A=A^T$ and $\bm x^TA\bm x>0$ for $\bm x\ne0$; nonnegativity alone gives positive semidefiniteness. Dirichlet Poisson matrices are SPD. Pure Neumann discretizations generally have a constant nullspace and require compatible data and a normalization. A symmetric indefinite quadratic form takes both signs, for example
+\[
+ A_s=\begin{bmatrix}2&1\\1&0\end{bmatrix}.
+\]
+A saddle-point matrix $\left[\begin{smallmatrix}K&B^T\\B&0\end{smallmatrix}\right]$ is generally indefinite even when $K$ is SPD. Upwind transport, nonsymmetric boundary treatment, or linearization can produce nonsymmetry.
+SPD makes $\frac12\bm x^TA\bm x-\bm b^T\bm x$ strictly convex, gives positive Cholesky pivots, and supports CG energy minimization and positive denominators. These conclusions do not extend directly to nonsymmetric matrices.
+\section{Three Measures of Scale}
+For invertible $A$,
+\[
+ \kappa_2(A)=\norm{A}_2\norm{A^{-1}}_2
+ =\frac{\sigma_{\max}(A)}{\sigma_{\min}(A)},\qquad
+ \rho(A)=\max_i|\lambda_i(A)|.
+\]
+Singular values control Euclidean norm amplification, eigenvalues describe invariant directions, and the spectral radius characterizes asymptotic convergence of a fixed iteration. For SPD matrices these quantities give $\kappa_2=\lambda_{\max}/\lambda_{\min}$; general matrices require the singular-value ratio.
+\conceptbridge{Why can a system be difficult when every eigenvalue equals 1?}{Nonnormal eigenvectors may be nearly dependent, or a complete eigenbasis may not exist. Norms of error-propagating matrix polynomials also depend on eigenvector conditioning and Jordan structure. Interpret spectra alongside singular values, nonnormality, and measured residual histories.}{Eigenvalue locations $\longrightarrow$ polynomial action $\longrightarrow$ vector-norm response.}
+\section{A Minimal Counterexample and Mesh Effects}
+Take $A_K=\left[\begin{smallmatrix}1&K\\0&1\end{smallmatrix}\right]$. Its eigenvalues remain 1, yet
+$A_K(0,1)^T=(K,1)^T$, and $\kappa_2(A_K)$ increases with $K$. Exact-arithmetic GMRES can still terminate in two steps, so conditioning alone does not predict iteration counts.
+The one-dimensional Poisson eigenvalues are
+\[
+ \lambda_j=4h^{-2}\sin^2\frac{j\pi}{2(N+1)},\quad 1\le j\le N,
+\]
+Thus $\kappa_2=O(h^{-2})$ under refinement. Improved discretization accuracy can accompany a harder algebraic system.
+\costnote{A full singular-value decomposition is expensive for large sparse systems. Start from PDE structure, boundaries, and discrete energy; supplement these with small spectral estimates, residual monitoring, and mesh-sequence experiments.}
+\aiexercise{Compute singular values and condition numbers of $A_K$ for $K=1,10,100$. Choose right-hand sides with different one- and two-step GMRES residuals.}{Derive the Poisson eigenvalues and verify conditioning under mesh refinement. Explain why this does not specify the iteration growth for every right-hand side.}
+\crossref{These conditions support Chapters 6, 13, and 15; Chapter 16 examines preconditioned structure.}
+\studyroute{Pseudospectra and general nonnormal convergence bounds are omitted. See \cite{trefethen,saad}.}{SPD; singular values; condition number; nonnormality; pseudospectrum}

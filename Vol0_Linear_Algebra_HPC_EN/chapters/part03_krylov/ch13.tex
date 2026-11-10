@@ -1,0 +1,45 @@
+\chapter{Conjugate Gradients}\label{v0ch:13}
+\begin{chaptersummary}
+General nonsymmetric problems require long bases or restart, whereas SPD structure supports conjugate directions with short recurrences. This chapter develops CG through quadratic-energy minimization, states its assumptions and error bound, and completes a two-step example. Later SPD preconditioners and multigrid combinations must preserve the required structure.
+\end{chaptersummary}
+\learninggoals{Execute CG and PCG; explain A-conjugacy and energy error; identify standard PCG assumptions.}
+\paragraph{Core Question}How does SPD structure reduce storage while retaining subspace optimality?
+
+\section{Energy Minimization and Short Recurrences}
+For SPD $A$, CG minimizes
+$\norm{\bm x_*-\bm x}_A$ over $\bm x_0+\K_k(A,\bm r_0)$, where $\norm{\bm e}_A^2=\bm e^TA\bm e$.
+Initialize $\bm p_0=\bm r_0$ and iterate
+\[
+ \alpha_k=\frac{\bm r_k^T\bm r_k}{\bm p_k^TA\bm p_k},\quad
+ \bm x_{k+1}=\bm x_k+\alpha_k\bm p_k,\quad
+ \bm r_{k+1}=\bm r_k-\alpha_kA\bm p_k,
+\]
+\[
+ \beta_k=\frac{\bm r_{k+1}^T\bm r_{k+1}}{\bm r_k^T\bm r_k},\qquad
+ \bm p_{k+1}=\bm r_{k+1}+\beta_k\bm p_k.
+\]
+In exact arithmetic, residuals are mutually orthogonal and directions are $A$-conjugate. Positive definiteness makes each nonzero search-direction denominator positive, supporting the short recurrence.
+\section{Two Steps and an Error Bound}
+Take $A=\left[\begin{smallmatrix}4&1\\1&3\end{smallmatrix}\right]$,
+$\bm b=(1,2)^T$, $\bm x_0=0$.
+The first step has $\alpha_0=1/4$,
+$\bm x_1=(1/4,1/2)^T$,
+$\bm r_1=(-1/2,1/4)^T$;
+$\beta_0=1/16$,
+$\bm p_1=(-7/16,3/8)^T$.
+The second has $\alpha_1=4/11$, giving
+$\bm x_2=(1/11,7/11)^T$.
+A classical bound is
+\[
+ \frac{\norm{\bm e_k}_A}{\norm{\bm e_0}_A}
+ \le2\left(\frac{\sqrt\kappa-1}{\sqrt\kappa+1}\right)^k,
+ \qquad \kappa=\kappa_2(A).
+\]
+This is a worst-case upper bound. Eigenvalue clustering and right-hand-side directions may yield faster convergence; the residual two-norm need not decrease monotonically.
+\section{Conditions for PCG}
+For fixed SPD $M$, solve $\bm z_k=M^{-1}\bm r_k$. Replace the numerator of $\alpha$ by $\bm r_k^T\bm z_k$ and define $\beta$ by ratios of successive such inner products, using direction $\bm z_{k+1}+\beta_k\bm p_k$. The effective SPD operator is $M^{-1/2}AM^{-1/2}$; Euclidean symmetry of $M^{-1}A$ is not required.
+\conceptbridge{Why does SPD of the original matrix not justify arbitrary preconditioning in standard CG?}{Preconditioning changes the geometry used by the method. A fixed SPD inverse action defines an admissible energy-coordinate transformation. Nonsymmetric or iteration-dependent actions generally disrupt the orthogonality behind short recurrences.}{Original energy $\longrightarrow$ symmetric positive-definite transformation $\longrightarrow$ preserved conjugacy structure.}
+\costnote{Each step uses one $A\bm p$, a few vector updates and dot products, and $O(N)$ storage; distributed reduction latency may dominate. For ILU or AMG, check the full inverse action against standard PCG's fixed, symmetric, positive-definite requirements.}
+\coderef{sparse_linear_algebra/solvers.py}
+\aiexercise{Compute every inner product in the two-step example. Verify A-conjugacy and compare energy error with the residual two-norm.}{Apply IC and nonsymmetric ILU to the same SPD system. Check assumptions explicitly; one successful run does not establish applicability.}
+\studyroute{Finite-precision conjugacy loss and pipelined-CG stability proofs are omitted. See \cite{saad,templates}.}{conjugate gradient; A norm; PCG; SPD preconditioner; finite precision CG}

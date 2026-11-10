@@ -1,0 +1,50 @@
+\chapter{Computational and Memory Fingerprints of Discretizations}\label{v0ch:23}
+\begin{chaptersummary}
+Roofline analysis begins with an operator's work and data traffic. Comparing finite differences, finite volumes, FEM, DG, FR, and LBM shows how degrees of freedom, locality, order, and geometry shape reuse. These computational and access patterns form performance signatures, made concrete by the following Yee update and integrated experiments.
+\end{chaptersummary}
+\learninggoals{Construct work and access models; distinguish assembled and matrix-free operators; compare volume, face, streaming, and collision terms.}
+\paragraph{Core Question}How does spatial discretization determine what a machine reads and computes?
+
+\section{Finite Differences and Finite Volumes}
+A three-dimensional seven-point Laplacian can be evaluated as
+\[
+ (\bm L u)_{ijk}
+ =h^{-2}(u_{i+1,j,k}+u_{i-1,j,k}+u_{i,j+1,k}
+ +u_{i,j-1,k}+u_{i,j,k+1}+u_{i,j,k-1}-6u_{ijk})
+\]
+Counting five neighbor additions, multiplication by 6, subtraction, and scaling gives 8 FLOPs. Seven reads and one write give 64 semantic bytes per double-precision output. Ideal spatial reuse approaches one read and one write, or 16 bytes, excluding write allocation. Spatial and temporal blocking improve within-step and cross-step reuse, subject to boundaries and dependencies.
+Finite volumes combine gradient reconstruction, limiters, face Riemann fluxes, and residual accumulation. Unstructured faces introduce gathers/scatters. Computing each face once avoids duplicate fluxes but may require coloring, atomics, or buffers; independent cell traversal avoids write conflicts but repeats flux work. Compare at equal accuracy and conservation requirements.
+\section{Finite Elements, DG, and FR}
+Low-order assembled FEM may be dominated by sparse multiplication, while assembly also involves quadrature, geometry, and sparse accumulation. Matrix-free evaluation recomputes element actions, trading arithmetic for entry and index traffic.
+For three-dimensional tensor elements with $n=p+1$ points per direction, a dense volume operator can cost $O(n^6)$; sum factorization reduces directional derivatives to $O(n^4)$:
+\[
+ (\partial_\xi u)_{ijk}=\sum_{\ell=0}^{p}D_{i\ell}u_{\ell jk}.
+\]
+Each direction uses $n^3$ length-$n$ dot products, totaling $3n^3(2n-1)$ FLOPs. Reading the input once and writing three derivatives gives approximately $32n^3$ bytes of field traffic, plus derivative matrices, geometry, and materials. Batching, register pressure, and faces change actual reuse.
+DG volume terms, face fluxes, and liftings admit separate models; FR combines nodal derivatives with interface-flux corrections. Both exploit local matrix products on tensor grids. Correction functions, quadrature, and nodes determine their operator relationship, while energy or spectral estimates establish stability.
+\conceptbridge{How can higher order be faster despite more operations per element?}{Higher order may improve reuse and reach a target error with fewer elements. It also changes unknown counts, face costs, and explicit stability limits. Evaluate spatial error, temporal error, and total step count together.}{High-order local work $\longrightarrow$ reuse and error changes $\longrightarrow$ total-cost comparison.}
+\section{LBM Streaming and Collision}
+Each lattice site stores $Q$ populations; BGK collision is
+\[
+ f_q^*=f_q-\tau^{-1}(f_q-f_q^{\rm eq}),\qquad
+ f_q(\bm x+\bm c_q\Delta t,t+\Delta t)=f_q^*(\bm x,t).
+\]
+D2Q9, D3Q19, and D3Q27 have 9, 19, and 27 populations. Two-buffer streaming requires at least $2Q$ scalar reads/writes; double-precision D2Q9 gives 144 bytes/site before collision temporaries and boundaries.
+SoA groups one population across sites; AoS groups populations at each site. Suitability depends on SIMD/SIMT mapping and collision implementation. Push writes postcollision values to neighbors; pull reads from neighbors. Injective periodic streaming avoids write conflicts, while complex boundaries require separate treatment.
+\section{A Common Comparison}
+\begin{center}\small
+\begin{tabularx}{\textwidth}{lXX}
+\toprule Method&Reuse and access&Typical limitations\\\midrule
+FDM&Regular neighbors and cross-point reuse&Bandwidth, boundaries, time steps\\
+FVM&Face geometry, reconstruction, fluxes&Irregular access, branches, accumulation\\
+FEM&Local quadrature or sparse products&Different assembly/application paths\\
+DG&Tensor volume and face data&Registers, lifting, stable step size\\
+FR&Point derivatives and flux corrections&Nodes, correction functions, face exchange\\
+LBM&Population streaming and collision&Layout, storage, complex boundaries\\
+FDTD&Staggered curl stencils&Two-phase dependencies, bandwidth, dispersion\\\bottomrule
+\end{tabularx}
+\end{center}
+\costnote{The table uses access patterns to locate bottlenecks. Method comparisons fix the physical problem, error, precision, hardware, and parallel scale. For NumPy implementations, include temporary-array traffic in addition to the ideal fused-kernel model.}
+\coderef{roofline/kernels.py; dg_fr/transport.py; lbm/stream_collision.py}
+\aiexercise{List operations and reads/writes for seven-point Laplacian, tensor derivatives, and D2Q9 streaming. Identify cache-reusable reads.}{Compare first-order upwind FVM and high-order DG for the same periodic sine transport, recording spatial error, steps, and total time. Keep LBM fluid physics distinct from arbitrary scalar transport.}
+\studyroute{General curved-element sum factorization and FR energy-stability proofs are omitted. See \cite{hesthaven,vcjh,frdisp,roofline}.}{sum factorization; matrix-free FEM; DG volume surface; FR correction; LBM SoA AoS}

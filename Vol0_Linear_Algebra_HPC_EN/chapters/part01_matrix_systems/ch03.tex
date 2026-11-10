@@ -1,0 +1,37 @@
+\chapter{Residuals, Errors, and Numerical Convergence}\label{v0ch:3}
+\begin{chaptersummary}
+After identifying matrix properties, we need a stopping criterion. This chapter connects sensitivity, floating-point implementation, and iteration monitoring through the exact residual--error relation. Report both normalization and the true residual, and assess algebraic error against discretization error and the physical quantities of interest.
+\end{chaptersummary}
+\learninggoals{Distinguish forward error, backward error, and residual; include absolute tolerances; recognize drift between recursive and true residuals.}
+\paragraph{Core Question}What is established when software reports convergence?
+
+\section{Computable Quantities and Unknown Error}
+Define $\bm e_k=\bm x_*-\bm x_k$ and $\bm r_k=\bm b-A\bm x_k$. Then
+\[
+ A\bm e_k=\bm r_k,\quad
+ \frac{\norm{\bm e_k}}{\norm{\bm x_*}}
+ \le \kappa(A)\frac{\norm{\bm r_k}}{\norm{\bm b}}\quad(\bm b\ne0).
+\]
+A small residual means approximate satisfaction of the equations; the inverse operator also controls solution error. For $A=\diag(1,10^{-8})$, $\bm x_*=(1,1)^T$, and $\bm x_k=(1,0)^T$, the relative residual is approximately $10^{-8}$, while relative solution error is approximately $1/\sqrt2$.
+A normwise relative backward error is
+\[
+ \eta_k=\frac{\norm{\bm b-A\bm x_k}}
+ {\norm{A}\norm{\bm x_k}+\norm{\bm b}}
+\]
+This allows perturbations of $A$ and $\bm b$ at a common relative scale that make $\bm x_k$ exact for the perturbed problem. Componentwise backward error instead normalizes with $|A||\bm x_k|+|\bm b|$ entry by entry.
+\conceptbridge{Why not reduce every residual to machine precision?}{Discretization, data, and floating-point arithmetic each impose resolution limits. Oversolving wastes time without improving the target error; premature termination contaminates physical quantities. Allocate an error budget, then use conditioning, stability estimates, or quantity-of-interest tests to assess algebraic accuracy.}{Discretization error budget $\longrightarrow$ algebraic tolerance $\longrightarrow$ verifiable result.}
+\section{Stopping and Finite Precision}
+A common true-residual criterion is
+\[
+ \norm{\bm r_k}\le
+ \max(\texttt{atol},\texttt{rtol}\norm{\bm b}).
+\]
+For $\bm b=0$, use an absolute threshold or the initial residual scale; $A\bm x=0$ still requires attention to nullspaces. When variable units differ substantially, define row and column scaling so that a single component does not dominate the norm.
+The model $\mathrm{fl}(a\circ b)=(a\circ b)(1+\delta)$, $|\delta|\lesssim u$, describes a basic floating-point operation within the normal range. Cancellation, overflow, and underflow limit relative accuracy. Stability concerns how an algorithm handles perturbations; conditioning concerns the sensitivity of the problem.
+Rounding can cause the recursively maintained Krylov residual to drift from $\bm b-A\bm x_k$, so final verification recomputes the true residual. Small denominators, lost orthogonality, and preconditioner failure enter explicit breakdown or stagnation diagnostics that guide continuation or a change of strategy.
+\section{Experiments and Monitoring}
+For the diagonal example, print relative residual, relative error, and $\eta_k$. On Poisson mesh sequences, fix a physical error target and vary \texttt{rtol} to expose oversolving. Newton outer iterations also require nonlinear-residual monitoring: inner linear convergence does not establish overall convergence.
+\costnote{A true residual requires an operator application and a norm; distributed norms generally require a global reduction. Balance monitoring frequency and reliability, retaining a final acceptance check.}
+\coderef{sparse_linear_algebra/solvers.py}
+\aiexercise{Compute forward error, relative residual, and backward error for the diagonal example. Explain why their values are consistent.}{Design stopping logic for zero right-hand sides, scaling, and iteration limits. Compare recursive and recomputed residual costs.}
+\studyroute{Componentwise perturbation theory and residual-replacement error analysis are omitted. See \cite{golub,templates}.}{forward error; backward error; true residual; residual replacement; inexact Newton}

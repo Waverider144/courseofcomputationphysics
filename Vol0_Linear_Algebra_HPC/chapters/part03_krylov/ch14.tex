@@ -1,0 +1,34 @@
+\chapter{BiCG 与 BiCGSTAB}\label{v0ch:14}
+\begin{chaptersummary}
+非对称问题中，GMRES 的基存储与正交化可能昂贵。本章通过双侧子空间介绍 BiCG，再用局部残差平滑得到 BiCGSTAB。短递推降低存储，却引入非单调收敛和 breakdown 风险。方法选择因此需要同时考察内存、矩阵性质和失败处理。
+\end{chaptersummary}
+\learninggoals{理解影子残差与双正交；执行 BiCGSTAB 主递推；区分失效与收敛。}
+\paragraph{核心问题}能否为非对称系统保留短递推，以及代价是什么？
+
+\section{双侧投影}
+BiCG 同时构造 $\K_k(A,\bm r_0)$ 与 $\K_k(A^T,\widetilde{\bm r}_0)$，使两侧残差双正交、方向双共轭。影子残差需满足 $\widetilde{\bm r}_0^T\bm r_0\ne0$。它通常需要 $A$ 与 $A^T$ 作用，且关键内积可能为零而真正残差未消失。
+BiCGSTAB 对 BiCG 的残差多项式再乘局部一次因子，避免显式使用 $A^T$，并缓和某些振荡；它不保证每步残差下降。
+\section{可执行递推}
+给定固定影子 $\widetilde{\bm r}$，设 $\bm p=\bm v=0$，
+$\rho_{\rm old}=\alpha=\omega=1$。每步依次计算
+\[
+ \rho=\widetilde{\bm r}^T\bm r,\quad
+ \beta=(\rho/\rho_{\rm old})(\alpha/\omega),\quad
+ \bm p=\bm r+\beta(\bm p-\omega\bm v),\quad
+ \bm v=A\bm p,\quad \alpha=\rho/(\widetilde{\bm r}^T\bm v),
+\]
+\[
+ \bm s=\bm r-\alpha\bm v,\qquad
+ \bm t=A\bm s,\qquad
+ \omega=\frac{\bm t^T\bm s}{\bm t^T\bm t},\qquad
+ \bm x\leftarrow\bm x+\alpha\bm p+\omega\bm s,\quad
+ \bm r\leftarrow\bm s-\omega\bm t.
+\]
+若 $\bm s$ 已满足容差，先更新 $\alpha\bm p$ 并结束，避免 $0/0$。还需检查 $\rho$、$\widetilde{\bm r}^T\bm v$、$\bm t^T\bm t$ 和 $\omega$ 的失效。右预条件时实际方向先通过 $M^{-1}$，解更新也使用变换后方向，不能只替换某一处矩阵乘。
+\conceptbridge{短递推节省的是什么，丢失的又是什么？}{GMRES 显式维护整个当前基并求全空间最小残差。BiCGSTAB 通过特殊多项式递推仅保存少量向量，不再拥有同样的每步最小残差性质，且递推系数依赖可能退化的内积。}{全基最小化 $\longrightarrow$ 短递推近似选择 $\longrightarrow$ 存储优势与失效风险。}
+\section{最小实验}
+取一维上风对流扩散三对角矩阵，选已知 $\bm x_*=\bm1$ 并设 $\bm b=A\bm x_*$。比较 GMRES 和 BiCGSTAB 的真实残差历史、算子作用次数与时间；改变扩散系数和右端，观察非正规性与残差方向的影响。
+\costnote{典型每步需要两次矩阵与预条件作用，基存储为 $O(N)$。总工作由每步成本与实际收敛共同决定。失效时记录返回码和真实残差，再考虑调整预条件、重启影子向量或切换到 GMRES。}
+\coderef{sparse_linear_algebra/solvers.py}
+\aiexercise{对 $A=\left[\begin{smallmatrix}3&1\\0&2\end{smallmatrix}\right]$、$\bm b=(1,1)^T$ 手算首步，指出 $\omega$ 最小化的是哪个局部残差。}{构造接近 breakdown 的小例子，给每个分母设置尺度相关检查，并区分提前收敛和真正失效。}
+\studyroute{略去 BiCG 双侧递推的完整推导及稳定化多项式变体。参考 \cite{saad,templates}。}{BiCG; biorthogonality; shadow residual; BiCGSTAB; breakdown}

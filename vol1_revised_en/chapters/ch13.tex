@@ -1,0 +1,79 @@
+\chapter{Mortar Methods and Nonconforming Mesh Coupling}\label{ch:13}
+\begin{chaptersummary}
+Local high-order spaces allow independent element sizes and degrees, so interface nodes and trace spaces may not match. Mortars organize projection, flux evaluation, and return transfer on a shared interface, ensuring that both sides use the same integral data. Projection matrices, constant preservation, and linear energy conditions provide an interface for hp adaptation and heterogeneous methods.
+\end{chaptersummary}
+\learninggoals{Construct a common interface partition and mortar space; calculate trace projection and dual return transfer; prove cancellation of integrated fluxes; state the quadrature and trace-reproduction conditions for energy stability.}
+\studyroute{Inconsistent curved geometry, nonlinear entropy projections, and specialized reduced-order mortar stabilization are omitted. The linear proof uses a common space reproducing both traces.}{mortar method; nonconforming interface; mass-adjoint projection; hp nonconforming DG}{On one segment, construct mortar mass and projection matrices for a linear left trace and constant right trace, then check flux loads and constant tests explicitly.}
+
+\section{Common Interfaces and Trace Spaces}\index{Mortar methods}
+Consider a planar edge $\Gamma$ between two two-dimensional elements, with normal fixed from left to right.
+For unequal polynomial degrees, or one coarse edge adjoining several fine edges, first partition the physical interface into common subfaces.
+On each subface, choose $V_m=\Poly_{p_m}$ and use identical geometry mappings, normals, and integration measures.
+Taking $p_m$ at least as large as both trace degrees reproduces both traces on affine subfaces.
+For this conservative coupling approach, see~\cite{kopriva1996}.
+
+\conceptbridge{Why introduce a common interface instead of evaluating fluxes at each side's own nodes?}
+{Different nodes lead to different flux samples and integrals. A common interface represents both traces in one space,
+evaluates one numerical flux, and returns it with opposite outward normals. Constant preservation ensures agreement of total quantities;
+compatible integration and dual transfer also connect the two energy pairings.}
+{Nonmatching traces $\longrightarrow$ common interface space $\longrightarrow$ shared flux and compatible return transfer.}
+
+\section{Projection, Fluxes, and Dual Return Transfer}
+Let $\mu_\alpha$ be a mortar basis and $\phi_i^s$ a trace basis on side $s=L,R$. Define
+\[
+(M_m)_{\alpha\beta}=\int_\Gamma\mu_\alpha\mu_\beta\dd S,\qquad
+(B_{ms})_{\alpha i}=\int_\Gamma\mu_\alpha\phi_i^s\dd S.
+\]
+The $L^2$ trace projection satisfies
+\begin{equation}\label{eq:mortar-proj}
+P_s=M_m^{-1}B_{ms},\qquad u_{s,m}=P_su_s.
+\end{equation}
+Evaluate a single-valued normal flux from $u_{L,m},u_{R,m}$ at common quadrature nodes.
+Represent its load with the same rule as $M_mf_m^*$. The outward flux loads are
+\begin{equation}\label{eq:mortar-return}
+r_L=P_L^{\mathsf T}M_mf_m^*,\qquad
+r_R=-P_R^{\mathsf T}M_mf_m^*.
+\end{equation}
+These are dual loads in weak residuals. Flux coefficients on one side require an additional inverse trace mass matrix;
+this also gives the mass-adjoint relation $M_sP_{m\to s}=P_s^{\mathsf T}M_m$.
+
+\section{Conservation and Linear Energy Conditions}
+Let $\bm1_s$ and $\bm1_m$ represent constants. Constant reproduction means
+$P_s\bm1_s=\bm1_m$, hence
+\[
+\bm1_L^{\mathsf T}r_L+\bm1_R^{\mathsf T}r_R=0.
+\]
+If one coarse edge meets several mortar subfaces, sum their loads;
+the coarse and fine sides still use the same integrals.
+
+For a linear energy estimate, further assume that the common space reproduces both traces exactly
+and that quadrature exactly integrates the relevant products. Then
+$P_s^{\mathsf T}M_mP_s=M_s$,
+For multiple subfaces, sum the matrices on the left.
+For constant normal speed $a_n$, use
+\[
+f_m^*=a_n\{u_m\}-\frac{|a_n|}{2}[u_m],
+\]
+The combined DG interface energy contribution is
+\[
+-\frac{|a_n|}{2}[u_m]^{\mathsf T}M_m[u_m]\le0.
+\]
+If the common space has lower degree or the geometry and quadrature differ, the trace-norm identity requires a corresponding replacement construction.
+Constant preservation supplies total conservation; trace reproduction, quadrature, and mass-adjoint transfer additionally support the energy estimate.
+
+\section{A Hand-Computable Nonconforming Interface}
+Let $\Gamma=[-1,1]$, with left trace basis $(1,s)$ and a constant-only right trace.
+Use mortar basis $(1,s)$. Exact integration gives
+\[
+M_m=\begin{pmatrix}2&0\\0&2/3\end{pmatrix},\quad
+P_L=I_2,\quad P_R=\begin{pmatrix}1\\0\end{pmatrix}.
+\]
+For shared flux coefficients $(F_0,F_1)^{\mathsf T}$,
+\[
+r_L=\begin{pmatrix}2F_0\\2F_1/3\end{pmatrix},\qquad r_R=-2F_0.
+\]
+a constant test reads only the first left component, so the total flux cancels exactly.
+The linear component contributes to the left trace residual. Changing interface spaces during hp adaptation requires updating projections and physical measures together.
+
+\aiexercise{Use a quadratic left trace and linear right trace, with three Gauss points for exact integration. Construct $M_m,B_{mL},B_{mR}$ and verify constant reproduction, mass adjointness, and upwind interface energy.}
+{Split the right edge into two subfaces with linear traces. Write the subface-map Jacobians and prove that the coarse-side total load is the negative sum of the two fine-side loads.}

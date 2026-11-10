@@ -1,0 +1,38 @@
+\section{Recorded Numerical Results}
+These tables are generated from the shared JSON records, not from new runs. CPU: Intel Core Ultra 7 155H; NumPy 1.26.4; SciPy 1.15.3. Double precision and single-thread BLAS. Times describe these implementations and small workloads.
+\begin{center}\small\begin{tabular}{lrrrrr}\toprule
+Case & Cells/elements & $p$ & Steps & $L^2$ error & Advance/s\\\midrule
+Yee & 12 & -- & 14 & 2.076e-02 & 1.424e-03\\
+Yee & 24 & -- & 27 & 5.094e-03 & 8.223e-03\\
+DG & 8 & 1 & 44 & 2.523e-02 & 2.015e-03\\
+DG & 16 & 1 & 87 & 6.550e-03 & 4.003e-03\\
+DG & 8 & 2 & 120 & 1.665e-03 & 5.416e-03\\
+DG & 16 & 2 & 240 & 2.091e-04 & 1.100e-02\\
+DG & 8 & 3 & 236 & 7.970e-05 & 1.056e-02\\
+DG & 16 & 3 & 471 & 5.295e-06 & 2.169e-02\\
+FVM & 32 & 0 & 12 & 5.534e-02 & 6.787e-05\\
+FVM & 64 & 0 & 24 & 2.786e-02 & 1.272e-04\\
+\bottomrule\end{tabular}\end{center}
+Yee uses $T=0.5$; DG/FVM use $T=0.15$. DG and FVM errors compare reconstructed fields against exact fields by integration. FVM cell-average error is also stored. Errors and times for different equations are interpreted separately.
+\section{GPU and MPI Records}
+GPU kernels use constant-coefficient fusion: 30 FLOPs per cell-step. Device advance and transfer-inclusive times are separate. Both grids use 30 steps but different final times; their error ratio is not a convergence-order estimate. Remote GPU timings are short shared-load validation runs.
+\begin{center}\small\begin{tabular}{lrrrrr}\toprule
+Device & $n$ & $T$ & Kernel/s & With transfers/s & CPU max.\ difference\\\midrule
+Local RTX 500 Ada & 32 & 0.3750 & 5.591e-04 & 1.427e-03 & 3.37e-16\\
+Local RTX 500 Ada & 64 & 0.1875 & 3.622e-03 & 1.015e-02 & 4.44e-16\\
+GK RTX 4090 & 32 & 0.3750 & 1.745e-04 & 8.856e-04 & 3.37e-16\\
+GK RTX 4090 & 64 & 0.1875 & 4.792e-04 & 5.303e-03 & 4.44e-16\\
+\bottomrule\end{tabular}\end{center}
+MPI runs use one host, include halos, and do not measure cross-node scaling.
+\begin{center}\small\begin{tabular}{llrrrr}\toprule
+Host & Case & Cells/elements & Ranks & $L^2$ error & Max.\ rank time/s\\\midrule
+Local & Yee & 12 & 2 & 2.076e-02 & 2.516e-04\\
+Local & Yee & 24 & 2 & 5.094e-03 & 3.299e-03\\
+Local & DG($p=3$) & 8 & 2 & 7.970e-05 & 4.386e-04\\
+Local & DG($p=3$) & 16 & 2 & 5.295e-06 & 7.949e-04\\
+GK & Yee & 12 & 2 & 2.076e-02 & 1.304e-04\\
+GK & Yee & 24 & 2 & 5.094e-03 & 1.768e-03\\
+GK & DG($p=3$) & 8 & 2 & 7.970e-05 & 2.962e-04\\
+GK & DG($p=3$) & 16 & 2 & 5.295e-06 & 6.748e-04\\
+\bottomrule\end{tabular}\end{center}
+The hardware JSON files retain one-/two-rank records, conservation, and constraints. No DRAM counters or calibrated roofs were used; semantic traffic and ideal reuse are separate models in the main text.

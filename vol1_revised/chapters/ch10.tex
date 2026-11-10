@@ -1,0 +1,100 @@
+\chapter{不连续 Galerkin 方法}\label{ch:10}
+\begin{chaptersummary}
+有限体积通过共享通量保证单元间守恒，有限元通过测试函数约束残差。DG 将这两个机制结合为局部高阶多项式、逐单元弱形式与界面通量。本章以一维平流推导质量矩阵和局部演化，再由常数与解本身作测试，分别得到守恒与能量恒等式，并进一步讨论扩散的界面罚项。
+\end{chaptersummary}
+\learninggoals{构造分片试探空间与迹；推导一维 DG 矩阵；证明局部与整体守恒；区分双曲上风稳定与椭圆罚项强制性。}
+\studyroute{略去一般非线性熵稳定、多维边界估计和 DG 椭圆误差定理；正文使用常系数、仿射单元及精确积分。}{discontinuous Galerkin; broken polynomial space; upwind flux; symmetric interior penalty; modal nodal DG}{对二次 Legendre 基完整装配平流单元的质量矩阵、体积矩阵和端点向量，并逐界面求和验证能量估计。}
+
+\section{局部空间、自由度与迹}\index{DG 方法}
+在周期区间上，单元 $K_j=(x_{j-1/2},x_{j+1/2})$ 的长度为 $h_j$。
+取
+\[
+V_h^p=\{v\in L^2:v|_{K_j}\in\Poly_p(K_j)\}.
+\]
+每个单元有 $p+1$ 个标量自由度；相邻迹独立。考虑
+\[
+u_t+a u_x=0,\qquad F(u)=au,\qquad a\in\R.
+\]
+固定界面正向为从左到右，令 $u^-$、$u^+$ 为两侧迹，
+$[u]=u^+-u^-$，$\{u\}=(u^-+u^+)/2$。一致上风通量为
+\[
+\widehat f=a\{u\}-\frac{|a|}{2}[u].
+\]
+$a>0$ 时 $\widehat f=au^-$。
+
+\conceptbridge{逐单元允许跳跃后，信息通过什么机制跨单元传播？}
+{分片空间允许各单元独立近似；分部积分产生界面通量。用同一个 Riemann 通量连接两侧迹，便将局部残差耦合起来。常数测试函数给出单元守恒，高阶测试函数决定内部多项式的演化。}
+{分片多项式 $\longrightarrow$ 逐单元弱形式 $\longrightarrow$ 共享数值通量。}
+
+\section{一维平流的完整弱形式}
+取任意 $v_h\in\Poly_p(K_j)$，乘方程并分部积分：
+\[
+\int_{K_j}v_h\partial_tu_h\dd x
+-\int_{K_j}a u_h\partial_xv_h\dd x
++\widehat f_{j+1/2}v_h(x_{j+1/2}^{-})
+-\widehat f_{j-1/2}v_h(x_{j-1/2}^{+})=0.
+\]
+映射 $x=x_j+J_j\xi$，$\xi\in[-1,1]$，$J_j=h_j/2$。
+展开 $u_h=\sum_{\ell=0}^pU_{j\ell}\phi_\ell(\xi)$，定义
+\[
+M_{i\ell}=\int_{-1}^1\phi_i\phi_\ell\dd\xi,\quad
+S_{i\ell}=\int_{-1}^1\phi_i'\phi_\ell\dd\xi,\quad
+r_i=\phi_i(1),\quad l_i=\phi_i(-1).
+\]
+对每个基函数测试，得到
+\begin{equation}\label{eq:dg-local}
+J_jM\dot U_j=a S U_j-r\widehat f_{j+1/2}+l\widehat f_{j-1/2}
+=:R_j(U).
+\end{equation}
+体积矩阵仅作用于本单元，界面残差调用邻居迹。
+在 Legendre 模态基中，
+$M_{ii}=2/(2i+1)$。对 $p=1$，
+\[
+M=\begin{pmatrix}2&0\\0&2/3\end{pmatrix},\quad
+S=\begin{pmatrix}0&0\\2&0\end{pmatrix},\quad
+r=\begin{pmatrix}1\\1\end{pmatrix},\quad
+l=\begin{pmatrix}1\\-1\end{pmatrix}.
+\]
+取 $a>0$，令 $Q_j=U_{j0}+U_{j1}$，则
+\[
+h_j\dot U_{j0}=-aQ_j+aQ_{j-1},\qquad
+\frac{h_j}{3}\dot U_{j1}=2aU_{j0}-aQ_j-aQ_{j-1}.
+\]
+这给出从自由度到局部 ODE 的可直接实现形式。
+
+\section{局部守恒与能量恒等式}
+令 $v_h=1$，
+\[
+\frac{\dd}{\dd t}\int_{K_j}u_h\dd x
+=-\widehat f_{j+1/2}+\widehat f_{j-1/2}.
+\]
+所有单元求和时，共享通量抵消。$p=0$ 的上风 DG 恢复一阶有限体积空间离散。
+令 $v_h=u_h$，对每个界面合并两侧贡献：
+\[
+\frac12\frac{\dd}{\dd t}\sum_j\int_{K_j}u_h^2\dd x
+=\sum_f\left(\widehat f-a\{u_h\}\right)[u_h]
+=-\frac{|a|}{2}\sum_f[u_h]^2.
+\]
+周期边界、常系数与精确积分使等式闭合。中心通量给出零右端。
+全离散稳定性还需时间积分器与空间谱相容；有物理边界时能量式需计入边界通量。
+
+\section{模态、节点与椭圆问题}
+模态 DG 保存基函数系数；节点 DG 保存插值节点值。
+当两者表示同一个多项式空间，且积分与通量相同，基变换连接其半离散方程。
+质量集块或求积改变可能产生不同离散算子。
+
+对周期一维 Poisson 问题，可在均值为零的分片空间中使用对称内罚形式
+\begin{equation}\label{eq:sip}
+\begin{aligned}
+b_h(u,v)={}&\sum_K\int_Ku'v'\dd x
++\sum_f\bigl(\{u'\}[v]+\{v'\}[u]\bigr)\\
+&+\sum_f\frac{\sigma(p+1)^2}{h_f}[u][v].
+\end{aligned}
+\end{equation}
+此处延用右迹减左迹的标量跳跃，因此一致性项取正号。
+$h_f$ 取相邻尺度的适当最小值，$\sigma$ 足够大时，
+迹逆估计可将界面交叉项吸收到体积与罚项中，得到离散强制性。
+Dirichlet 边界还需相容的边界一致性项与罚项，进一步构造见~\cite{arnold2002}。
+
+\aiexercise{对周期均匀网格和 $p=2$，从式~\eqref{eq:dg-local}~逐项计算 $M,S,l,r$，给出全局块耦合。取常数测试函数及解本身，分别验证总质量和上风能量恒等式。}
+{对式~\eqref{eq:sip}~代入光滑精确解并检查界面项符号；再用离散迹不等式说明罚参数需要控制哪些交叉项。}

@@ -1,0 +1,30 @@
+\chapter{代数多重网格}\label{v0ch:20}
+\begin{chaptersummary}
+几何多重网格利用现成网格层次；当输入主要是稀疏矩阵时，需要从代数耦合构造粗空间。本章介绍经典 AMG 与平滑聚合，说明强连接、近零空间和 PDE 信息如何决定插值。两条路线共享同一目标：在粗层保留平滑器难以消除的误差方向。
+\end{chaptersummary}
+\learninggoals{解释代数光滑误差；区分经典插值与聚合；记录算子复杂度和粗层成本。}
+\paragraph{核心问题}只有稀疏矩阵时，如何识别需要留给粗层的误差？
+
+\section{从几何光滑到代数光滑}
+误差经松弛变化很小时，可称为相应平滑器下的代数光滑误差。对于典型扩散型 M-矩阵，较大的负非对角条目常对应强耦合；一种经典强连接判据是
+$-a_{ij}\ge\theta\max_{k\ne i}(-a_{ik})$。
+此判据依赖符号和问题类型，不能原样推广到任意非对称或分块系统。
+经典 AMG 选择粗变量并用强连接构造插值；粗空间近似难消除的误差。平滑聚合先把变量分组形成暂定插值 $P_0$，再用
+\[
+ P=(I-\omega D^{-1}A)P_0,\qquad A_c=P^TAP
+\]
+等操作改善能量特征。弹性问题常需刚体近零模态，复杂系统还需块信息或专用策略。
+\conceptbridge{AMG 为什么仍需要物理信息，而不只是检查非零位置？}{非零模式只说明存在耦合，不说明哪些组合是低能量或难以松弛。系数大小、符号、各向异性及近零空间决定了粗空间应该保留的方向。}{矩阵耦合 $\longrightarrow$ 难消除模式 $\longrightarrow$ 合适的插值空间。}
+\section{复杂度与可靠组合}
+网格复杂度和算子复杂度分别为
+\[
+ C_g=\frac{\sum_\ell N_\ell}{N_0},\qquad
+ C_o=\frac{\sum_\ell\nnz(A_\ell)}{\nnz(A_0)}.
+\]
+粗层若越来越稠密，即使迭代数下降，构造、内存和通信仍可能恶化。AMG 可作为独立迭代或外层预条件；配 CG 需检查整个周期为固定 SPD，配变化内层策略通常选择 FGMRES。
+\section{可执行教学模型}
+本卷代码以一维 Poisson 为例，将相邻点聚合、暂定常数插值、一次 Jacobi 平滑插值和精确粗解组合成两层作用，用于核验 $P^TAP$、对称性与残差修正。向生产级 AMG 扩展时，还需加入递归粗化、稳健强连接、截断与并行粗层处理；性能测量则对应各自完整实现。\cite{petsc}
+\costnote{报告构造时间、$C_g,C_o$、周期成本及外层次数。强非对称输运、鞍点及高频不定波问题往往需要针对性预条件，不宜把扩散型 AMG 的效果直接外推。}
+\coderef{sparse_linear_algebra/multilevel.py}
+\aiexercise{对七点 Poisson 构造相邻聚合的 $P_0$，计算平滑后的 $P$ 和 $P^TAP$，比较常数与振荡误差的修正。}{改变系数跳跃和聚合方式，记录算子复杂度、构造时间与 PCG 真实残差；先检验预条件对称正定性。}
+\studyroute{略去 Ruge--Stüben 插值公式与平滑聚合收敛理论。参考 \cite{saad,briggs,petsc}。}{algebraically smooth error; strength of connection; classical AMG; smoothed aggregation; near nullspace}

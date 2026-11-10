@@ -1,0 +1,30 @@
+\chapter{The Role and Cost of Preconditioning}\label{v0ch:16}
+\begin{chaptersummary}
+Krylov methods build corrections through operator applications; preconditioning further adjusts directional scales and coupling. Left, right, and symmetric transformations connect approximate factorization to projection. Their value depends on transformed convergence, inverse-action cost, and reuse, with conditioning, spectral clustering, and nonnormality playing different roles for different matrix classes.
+\end{chaptersummary}
+\learninggoals{Distinguish left, right, and symmetric preconditioning; apply inverse actions correctly; include setup and application in total cost.}
+\paragraph{Core Question}How can a cheaper problem improve the original solve without changing its exact solution?
+
+\section{Transformations and Residuals}
+A fixed invertible $M$ can be used as
+\[
+ M^{-1}A\bm x=M^{-1}\bm b\quad\text{(left)},\qquad
+ AM^{-1}\bm y=\bm b,\ \bm x=M^{-1}\bm y\quad\text{(right)}.
+\]
+If $M=CC^T$ is SPD, use the symmetric transformation
+$C^{-1}AC^{-T}\widehat{\bm x}=C^{-1}\bm b$, $\bm x=C^{-T}\widehat{\bm x}$. Apply triangular or approximate solves without forming $M^{-1}$.
+For SPD matrices, spectral equivalence
+$c\,\bm v^TM\bm v\le\bm v^TA\bm v\le C\,\bm v^TM\bm v$
+bounds the effective condition number by $C/c$. In nonsymmetric systems, reduced conditioning alone does not ensure faster GMRES; eigenvectors and nonnormality also affect residual polynomials.
+\conceptbridge{Why can left and right preconditioning have identical eigenvalues but different residual histories?}{For invertible $M$, the preconditioned matrices are similar, but variables, residual metrics, and polynomial-action vectors differ. Similarity does not preserve Euclidean norms. Specify the minimized quantity and the original equation checked at termination.}{Equivalent exact solution $\longrightarrow$ different projection geometries $\longrightarrow$ different residual histories.}
+\section{A Minimal Example and Cost}
+For $A=\diag(1,10^6)$ and $M=A$, preconditioning removes the scale disparity in one action. For a general large matrix, however, solving exactly with $M=A$ is the original problem. Jacobi retains the diagonal, block methods retain local coupling, and multigrid approximately handles cross-scale coupling.
+\[
+ T_{\rm total}=T_{\rm setup}
+ +k(T_A+T_{M^{-1}}+T_{\rm orth}+T_{\rm reduce})
+ +T_{\rm verify}.
+\]
+Multiple right-hand sides or time steps can amortize setup; coefficient changes require reassessing reuse.
+\costnote{Control storage, setup, application, communication, and robustness together. Fewer iterations with expensive triangular solves can cost more than additional inexpensive iterations.}
+\aiexercise{Implement left- and right-preconditioned GMRES for a nonsymmetric three-by-three system. Plot true and preconditioned residuals and explain the difference.}{Given setup and per-step costs for two preconditioners, find the number of right-hand sides at which the more expensive setup pays off.}
+\studyroute{Field-of-values bounds and general spectral-equivalence proofs are omitted. See \cite{saad,templates}.}{left preconditioning; right preconditioning; spectral equivalence; time to solution}

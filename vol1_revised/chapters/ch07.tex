@@ -1,0 +1,212 @@
+\chapter{有限差分法：一致性、稳定性与波动误差}\label{ch:7}
+\begin{chaptersummary}
+函数空间与残差框架确定后，本章用网格函数和差分算子构造最直接的离散模型。Taylor 展开给出一致性，误差演化给出稳定性，修正方程与数值频率分别量化耗散和色散。这些分析将为有限体积、高阶方法及时间推进提供比较尺度。
+\end{chaptersummary}
+\learninggoals{从模板推导截断误差；说明周期 Fourier 分析的前提；区分稳定性、CFL 必要条件和收敛性；计算振幅与相位误差。}
+\studyroute{正文通过平流、网格范数和误差传播建立差分分析；有限边界 SBP--SAT 分析与完整收敛证明留待进一步展开。}{grid function; truncation error; von Neumann analysis; modified equation; SBP--SAT}{对上风格式推导逐模态放大因子，再以离散 Parseval 公式证明周期离散 L2 收缩。}
+\section{网格函数与差分算子}
+均匀节点 $x_i=ih$ 上的自由度为 $U_i\approx u(x_i)$。定义
+\[
+(D_-U)_i=\frac{U_i-U_{i-1}}h,\qquad
+(D_0U)_i=\frac{U_{i+1}-U_{i-1}}{2h},\qquad
+\norm{U}_{2,h}^2=h\sum_i|U_i|^2.
+\]
+网格函数属于有限维序列空间。差分算子在网格点近似微分方程；
+插值可用于比较网格函数与连续场。
+\section{一致性、稳定性与修正方程}\index{有限差分法}
+考虑线性平流方程
+\[
+u_t+au_x=0,
+\qquad
+u(x,t)=u_0(x-at).
+\]
+
+\begin{authornote}
+\textbf{潜在疑问：}
+“前面讲的是复杂物理模型，为什么进入数值离散时突然只研究线性平流方程？”
+
+\textbf{作者补充：}
+复杂输运方程同时包含多种物理机制，难以辨认误差来自哪里。线性平流方程只保留以固定速度传播这一基本过程，因而可以单独考察离散格式如何改变传播、振幅和相位。它是分析数值机制的参照模型，其结论仍需结合非线性、变系数和边界等因素重新判断。
+
+\textbf{核心概念联系：}
+\[
+\text{complicated transport physics}
+\longrightarrow
+\text{linear advection as minimal model}
+\]
+\end{authornote}
+
+前向时间差分满足
+\[
+\frac{u_i^{n+1}-u_i^n}{\Delta t}
+=
+u_t+\Order(\Delta t),
+\]
+中心空间差分满足
+\[
+\frac{u_{i+1}-u_{i-1}}{2\Delta x}
+=
+u_x+\Order(\Delta x^2).
+\]
+离散格式的阶数来自离散算子与连续算子的局部展开匹配。
+
+对线性常系数格式，可令误差模态为
+\[
+e_i^n=\widehat e^n\ee^{\ii kx_i},
+\]
+
+\begin{authornote}
+\textbf{潜在疑问：}
+“为什么任意误差可以用 Fourier 模态来分析？为什么研究单个模态就能判断整体误差传播？”
+
+\textbf{作者补充：}
+在线性常系数、平移不变的格式中，每个离散 Fourier 模态经过一步更新后仍具有相同波数，只改变其复振幅。因此可逐个研究放大因子，判断各模态是否增长。这种分析最直接适用于无限或周期均匀网格；有限边界、变系数和非线性可能引入额外耦合，需要另行分析。
+
+\textbf{核心概念联系：}
+\[
+\text{arbitrary numerical error}
+\longrightarrow
+\text{Fourier modes}
+\longrightarrow
+\text{amplification factor}
+\]
+\end{authornote}
+
+\begin{askai}
+AI 展开问题：
+\begin{quote}
+从任意离散误差的 Fourier decomposition 开始，逐步建立 von Neumann stability analysis：说明线性常系数差分格式为何保持各 Fourier mode，并据此分别研究其 amplification factor。
+\end{quote}
+
+进一步展开：
+\begin{quote}
+对一阶上风格式完整代入 \(e_i^n=\widehat e^n e^{\ii kx_i}\)，推导 \(G(k)\)，再画出不同 CFL 数下的 \(|G(k)|\)。
+\end{quote}
+\end{askai}
+
+得到
+\[
+\widehat e^{n+1}=G(k)\widehat e^n.
+\]
+单步放大因子刻画各模态变化。对要求无增长的平流离散，收缩条件写成
+\[
+|G(k)|\le1.
+\]
+
+显式格式还受到 CFL 条件约束。定义
+\[
+\nu=\frac{a\Delta t}{\Delta x}.
+\]
+其含义是数值依赖域必须覆盖物理依赖域。
+
+\begin{authornote}
+\textbf{潜在疑问：}
+“为什么 \(\nu=a\Delta t/\Delta x\) 会和依赖域有关？这个数为什么限制显式格式？”
+
+\textbf{作者补充：}
+特征速度决定真实解的物理依赖域，离散模板和时间步长决定数值信息的传播范围。网格细化时，数值依赖域覆盖物理依赖域是正确收敛的必要条件；稳定性还需由误差演化估计检验。CFL 条件正是这两种传播范围之间的联系。
+
+\textbf{核心概念联系：}
+\[
+\text{amplification factor stability}
+\longrightarrow
+\text{CFL number}
+\longrightarrow
+\text{domain of dependence}
+\]
+\end{authornote}
+
+当 \(a>0\) 时，一阶上风格式为
+\[
+u_i^{n+1}
+=
+u_i^n-\nu(u_i^n-u_{i-1}^n)
+=
+(1-\nu)u_i^n+\nu u_{i-1}^n.
+\]
+在
+\[
+0\le\nu\le1
+\]
+时，新值是旧值的凸组合，因此不会产生新的局部极值。
+
+其修正方程为
+\[
+u_t+au_x
+=
+\frac{a\Delta x}{2}(1-\nu)u_{xx}
++\cdots.
+\]
+
+\begin{askai}
+AI 展开问题：
+\begin{quote}
+对一阶上风格式做 modified equation analysis。请从 Taylor 展开开始逐项推导
+\[
+u_t+au_x=\frac{a\Delta x}{2}(1-\nu)u_{xx}+\cdots
+\]
+并解释右侧扩散项如何对应数值耗散。
+\end{quote}
+
+进一步展开：
+\begin{quote}
+写一个最小 Python 数值实验，比较中心格式和上风格式传播一个 Gaussian pulse 时的耗散差异。
+\end{quote}
+\end{askai}
+
+右侧等效扩散项解释了上风格式的数值耗散：它抑制高频误差，也抹平真实小尺度。
+一般线性稳定性要求在固定物理时间 $T$ 内
+$\sup_{n\Delta t\le T}\norm{S_h^n}\le C_T$，常数与网格无关。
+对平移不变标量更新，Parseval 关系把这一条件转为模态幂的统一界。
+允许 $|G|\le1+C\Delta t$ 的有界增长；一次更新的 $|G|>1$ 需结合细化极限判断。
+例如
+\[
+|G(k)|>1,
+\]
+表示该模态单步增长；若某个随网格细化持续存在的放大值与 1 有固定间隔，固定物理时间内的模态幂会无界增长。
+对适定线性初值问题，在相容的离散设置中，一致性与稳定性共同保证收敛。
+
+\section{数值色散与波动误差}
+设连续波解为
+\[
+u=\widehat u\ee^{\ii(kx-\omega t)}.
+\]
+对线性平流方程，
+\[
+\omega=ak.
+\]
+相速度和群速度均为 \(a\)：
+\[
+c_p=\frac{\omega}{k}=a,
+\qquad
+c_g=\frac{\dd\omega}{\dd k}=a.
+\]
+
+离散格式通常得到数值频率
+\[
+\omega_{\mathrm{num}}(k).
+\]
+
+\begin{askai}
+AI 展开问题：
+\begin{quote}
+选择一个具体差分格式，对一维线性平流方程推导数值频率 \(\omega_{\mathrm{num}}(k)\)。请分别指出 \(\operatorname{Re}\omega_{\mathrm{num}}\) 和 \(\operatorname{Im}\omega_{\mathrm{num}}\) 如何对应相位误差与耗散误差。
+\end{quote}
+
+进一步展开：
+\begin{quote}
+比较两个格式在同一个波数 \(k\) 下的相速度误差，并估计传播很多波长后相位偏差会累积到多大。
+\end{quote}
+\end{askai}
+
+若
+\[
+\operatorname{Re}\omega_{\mathrm{num}}\neq ak,
+\]
+则出现数值色散；若
+\[
+\operatorname{Im}\omega_{\mathrm{num}}<0,
+\]
+则出现数值耗散。
+
+流体激波计算通常需要适量耗散，声学、电磁波和弹性波计算则更关注长距离传播中的相位误差。格式选择必须匹配目标物理。

@@ -1,0 +1,114 @@
+\chapter{函数空间、Sobolev 空间与弱解}\label{ch:5}
+\begin{chaptersummary}
+前四章给出了物理模型及其尺度假设。求解这些方程还需规定导数、边界值和解的含义。本章从 Poisson 分部积分进入弱导数与 Sobolev 空间，用能量估计说明解为何存在且稳定，再以守恒律说明间断解的选择。下一章将在这些空间上构造有限维残差约束。
+\end{chaptersummary}
+\learninggoals{从强形式得到含边界项的弱形式；定义弱导数与迹；在给定假设下使用 Poincar\'e 不等式和 Lax--Milgram 定理；区分分片空间与整体空间。}
+\studyroute{正文给出弱形式、空间定义和核心估计，略去一般迹定理、紧嵌入及低正则性椭圆理论的证明。}{weak derivative; Sobolev trace; Poincar\'e inequality; Lax--Milgram theorem}{对单位区间的 Poisson 问题逐项分部积分，再用能量估计说明 $H^{-1}$ 数据如何控制 $H_0^1$ 解。}
+
+\section{从强形式到积分恒等式}\index{弱形式}
+取有界 Lipschitz 区域 $\Omega\subset\R^d$。先考虑足够光滑的解
+\[
+-\Delta u=f\quad\text{于 }\Omega,\qquad u=0\quad\text{于 }\partial\Omega.
+\]
+乘测试函数 $v$ 并积分，散度定理给出
+\begin{equation}\label{eq:poisson-green}
+\int_\Omega\nabla u\cdot\nabla v\dd x
+=\int_\Omega fv\dd x+\int_{\partial\Omega}(\partial_nu)v\dd S.
+\end{equation}
+令测试函数的边界值为零后，边界项消失。该恒等式只使用 $u$ 的一阶导数，
+因而可以在比经典二阶可微函数更大的空间中解释。
+非齐次 Dirichlet 数据通过给定提升 $u_g$ 写作 $u=u_g+w$，测试空间仍取零迹空间。
+Neumann 数据则进入右端边界配对。
+
+\conceptbridge{为何降低导数阶数后，还要专门规定函数空间？}
+{分部积分改变了方程对正则性的要求。平方可积的一阶弱导数使能量积分有意义；迹规定边界条件。函数空间同时决定允许的解、测试方向以及稳定性估计的度量。}
+{分部积分 $\longrightarrow$ 弱导数与边界迹 $\longrightarrow$ 变分问题。}
+
+\section{弱导数与空间的完备性}\index{Sobolev 空间}
+对局部可积的 $u$，若
+\[
+\int_\Omega u\,\partial_i\varphi\dd x=-\int_\Omega g_i\varphi\dd x
+\quad\text{对所有 }\varphi\in C_c^\infty(\Omega),
+\]
+则 $g_i$ 是 $u$ 的第 $i$ 个弱导数。分布导数允许右端是一般分布；
+例如一维阶跃函数的导数是 Dirac 分布，它不属于 $L^2$。
+
+赋范空间中的每个 Cauchy 列都在该空间收敛时，称其为 Banach 空间。
+范数由内积诱导且完备时，称其为 Hilbert 空间。完备性保证能量估计所得的极限仍是允许的函数。
+\[
+L^2(\Omega)=\{u:\int_\Omega|u|^2\dd x<\infty\},\qquad
+(u,v)_{L^2}=\int_\Omega uv\dd x.
+\]
+这里按几乎处处相等识别函数。定义
+\[
+H^1(\Omega)=\{u\in L^2(\Omega):\partial_i u\in L^2(\Omega),\ 1\le i\le d\},
+\qquad
+\norm{u}_{H^1}^2=\norm{u}_{L^2}^2+\norm{\nabla u}_{L^2}^2.
+\]
+整数 $m\ge0$ 时，$H^m$ 要求所有 $|\alpha|\le m$ 的弱导数属于 $L^2$。
+实数阶数可在 $\R^d$ 上通过 Fourier 变换定义：
+\[
+\norm{u}_{H^s(\R^d)}^2
+=\int_{\R^d}(1+|\bm k|^2)^s|\widehat u(\bm k)|^2\dd\bm k,
+\]
+其中采用酉 Fourier 归一化；区域上的 $H^s$ 可由限制和延拓构造。
+
+\section{迹、Poincar\'e 不等式与能量}\index{迹算子}
+对上述区域，迹算子 $\gamma:H^1(\Omega)\to H^{1/2}(\partial\Omega)$
+连续地延拓光滑函数的边界限制。定义
+\[
+H_0^1(\Omega)=\overline{C_c^\infty(\Omega)}^{H^1}
+=\{u\in H^1(\Omega):\gamma u=0\}.
+\]
+对 $v\in H_0^1(\Omega)$，Poincar\'e 不等式给出
+\[
+\norm{v}_{L^2}\le C_P\norm{\nabla v}_{L^2}.
+\]
+因此 $\norm{\nabla v}_{L^2}$ 在该空间上是与 $H^1$ 范数等价的能量范数。
+纯 Neumann 问题保留常数零空间，需固定平均值，并满足
+$\int_\Omega f\dd x+\int_{\partial\Omega}g_N\dd S=0$。
+
+\section{弱问题与 Lax--Milgram 定理}
+令 $V=H_0^1(\Omega)$，$V'=H^{-1}(\Omega)$。弱 Poisson 问题为
+\[
+\text{求 }u\in V:\qquad b(u,v)=\ell(v)\quad\forall v\in V,\qquad
+b(u,v)=\int_\Omega\nabla u\cdot\nabla v\dd x.
+\]
+当 $f\in L^2$ 时 $\ell(v)=\int fv$；一般 $f\in H^{-1}$ 时使用对偶配对。
+\begin{theorem}[Lax--Milgram]
+设 $V$ 为实 Hilbert 空间，双线性形式满足
+$|b(w,v)|\le M\norm{w}_V\norm{v}_V$ 及
+$b(v,v)\ge\alpha\norm{v}_V^2$，其中 $\alpha>0$。
+若 $\ell\in V'$，则存在唯一 $u\in V$ 满足 $b(u,v)=\ell(v)$，并有
+$\norm{u}_V\le\norm{\ell}_{V'}/\alpha$。
+\end{theorem}
+Poisson 问题以能量范数度量时 $M=\alpha=1$。
+取 $v=u$ 即得到该稳定性估计；存在性可通过 Riesz 表示与有界强制算子证明。
+对流主导、鞍点或波动问题需要与其算子相符的估计。
+
+\aiexercise{在 $(0,1)$ 上取 $u(x)=x(1-x)$。从强形式 $-u''=2$ 推导弱形式，计算能量与右端配对，再取一个有折点的连续分片线性函数，验证其属于 $H_0^1$。}
+{以一维阶跃函数为例计算分布导数；说明它为何不属于 $H^1$。随后推导纯 Neumann 问题的兼容条件与常数零空间。}
+
+\section{守恒律的弱解与间断}
+对一维 $u_t+\partial_xF(u)=0$，测试函数
+$\varphi\in C_c^\infty([0,T)\times\R)$ 给出
+\[
+\int_0^T\int_\R(u\varphi_t+F(u)\varphi_x)\dd x\dd t
++\int_\R u_0(x)\varphi(0,x)\dd x=0.
+\]
+移动间断 $x=s t$ 满足 Rankine--Hugoniot 条件
+\[
+s(u_R-u_L)=F(u_R)-F(u_L).
+\]
+弱恒等式提供跨间断的守恒关系。对一维标量守恒律，在适当数据条件下，一族凸熵不等式选择唯一熵解；
+熵对 $\eta,q$ 满足 $q'=\eta'F'$，要求分布意义的
+$\partial_t\eta(u)+\partial_xq(u)\le0$。有限体积通量将在第~\ref{ch:8}~章近似这一传播过程。
+
+\section{分片 Sobolev 空间}
+设 $\mathcal T_h$ 为网格，
+\[
+H^1(\mathcal T_h)=\{v\in L^2(\Omega):v|_K\in H^1(K),\ K\in\mathcal T_h\}.
+\]
+其导数先逐单元计算，界面迹可有跳跃。分布导数还包含界面贡献；
+DG 的数值通量或椭圆罚项负责这些界面作用。
+分片空间规定允许的不连续性，算法仍需进一步给出残差与界面耦合。

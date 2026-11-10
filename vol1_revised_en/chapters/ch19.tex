@@ -1,0 +1,123 @@
+\chapter{Gyrokinetics and Multiscale Reduction}\label{ch:19}
+\begin{chaptersummary}
+The strong-field ordering of Chapter 4 separates fast gyromotion from slow transport. Coordinate transformations and ordered averaging remove the fast angle while retaining parallel-velocity and magnetic-moment distributions. Gyroaveraging and reconstruction of physical moments reconnect reduced particles with self-consistent fields. A uniform-field electrostatic model makes this five-dimensional reduction concrete.
+\end{chaptersummary}
+\learninggoals{Specify strong-field orderings and five-dimensional coordinates; distinguish guiding centers from gyrocenters; calculate Fourier gyroaverages; separate kinetic reduction, moment closure, field coupling, and numerical discretization.}
+\studyroute{A controlled uniform-field electrostatic example is given; general electromagnetic Lie transforms, second-order Hamiltonians, magnetization, and collision transformations in magnetic geometry are omitted. A complete model must use a consistent variational order.}{guiding center; gyrocenter; gyroaverage; finite Larmor radius; gyrokinetic polarization; electromagnetic gyrokinetics}{Gyroaverage a perpendicular Fourier potential in a uniform field, derive the Bessel factor, and write linear quasineutrality for a specified nonadiabatic distribution variable.}
+
+\section{Scale Ordering and the Five-Dimensional State}\index{Gyrokinetics}
+Using equilibrium scale $L_B$ and ion thermal gyroradius $\rho_{Li}$, a common perturbation ordering is
+\[
+\epsilon=\rho_{Li}/L_B\ll1,\qquad
+\omega/\Omega_i=O(\epsilon),\qquad
+k_\parallel/k_\perp=O(\epsilon),\qquad
+k_\perp\rho_{Li}=O(1).
+\]
+Weak perturbations may additionally satisfy $|q_i\delta\phi|/T_i=O(\epsilon)$.
+Below, $T_s$ denotes temperature in energy units, corresponding to $k_BT_s$ earlier.
+Electromagnetic, collisional, and electron-scale models require additional orderings.
+
+The original phase space $(\bm x,\bm v)$ can be transformed to
+$(\bm R,v_\parallel,\mu,\vartheta)$,
+where $\mu=m v_\perp^2/(2B_0)$ and $\vartheta$ is the fast gyrophase.
+A guiding-center transformation first handles rapid gyromotion in the equilibrium field;
+a gyrocenter transformation then handles perturbation-induced angle dependence.
+The reduced distribution $F_s(\bm R,v_\parallel,\mu,t)$ no longer depends independently on $\vartheta$,
+retaining three position and two velocity coordinates.
+For uniform $B_0$ and a gyrophase-independent function $A$, velocity moments use
+\[
+\int A\dd^3v=\frac{2\pi B_0}{m_s}
+\int_{-\infty}^{\infty}\int_0^\infty A\dd\mu\dd v_\parallel.
+\]
+The angle integral has been performed analytically; parallel velocity and magnetic moment remain independent variables.
+
+\conceptbridge{Why do field equations still require polarization and gyroaveraging after a fast angle has been removed?}
+{The position coordinate changes from particle position to gyrocenter, but density and current are measured at physical positions.
+Pushing the reduced distribution back to physical space produces finite-Larmor-radius, polarization, and magnetization contributions.
+These arise at the same transformation order as the reduced dynamics and determine consistent fields and energy pairings.}
+{Phase-space transformation $\longrightarrow$ five-dimensional evolution $\longrightarrow$ physical moments and self-consistent fields.}
+
+\section{Gyroaveraging and Finite Larmor Radius}
+Write particle position as $\bm x=\bm R+\bm\rho(\vartheta)$.
+At fixed gyrocenter and magnetic moment, define
+\[
+\langle\phi\rangle_{\bm R}
+=\frac1{2\pi}\int_0^{2\pi}
+\phi(\bm R+\bm\rho(\vartheta))\dd\vartheta.
+\]
+For a plane wave in a uniform magnetic field,
+\[
+\left\langle\ee^{\ii\bm k\cdot\bm x}\right\rangle_{\bm R}
+=\ee^{\ii\bm k\cdot\bm R}
+J_0(k_\perp v_\perp/\Omega_s).
+\]
+finite $k_\perp\rho_{Ls}$ changes the particle response through ring averaging.
+The small parameter removes the fast angle, while the Bessel factor retains its influence on slow-scale coupling.
+
+\section{Kinetic Structure and a Specific Model}
+General gyrocenter dynamics can be written in characteristic form:
+\[
+\partial_tF_s+\dot{\bm R}_s\cdot\nabla_{\bm R}F_s
++\dot v_{\parallel s}\partial_{v_\parallel}F_s=C_s^{\mathrm{GK}}[F].
+\]
+Characteristics, phase-space measure, and collisions must use the same reduced coordinates;
+a nonuniform field requires the corresponding phase-space Jacobian in conservative form.
+
+As a computable example, take uniform $B_0\bm b$, no equilibrium gradients, no collisions, and low-frequency electrostatic perturbations.
+Let $F_{0s}$ be a uniform Maxwellian at temperature $T_s$,
+and $h_s$ the usual nonadiabatic distribution, with its convention fixed by the physical-density formula below.
+A corresponding nonlinear electrostatic system is
+\begin{equation}\label{eq:slab-gk}
+\partial_th_s+v_\parallel\partial_\parallel h_s
++\bm v_{E,s}\cdot\nabla_\perp h_s
+=\frac{q_sF_{0s}}{T_s}\partial_t\langle\phi\rangle_{\bm R},
+\qquad
+\bm v_{E,s}=\frac{\bm b\times\nabla\langle\phi\rangle_{\bm R}}{B_0}.
+\end{equation}
+The drift is the $\bm E\times\bm B/B_0^2$ velocity of the ring-averaged electric field.
+A uniform equilibrium has no gradient drive; density or temperature gradients require matching drive terms.
+For general electromagnetic construction and energy conservation, see~\cite{brizard2007,abel2013}.
+
+\section{Quasineutrality, Polarization, and Amp\`ere Coupling}
+For a Fourier mode of this uniform-field model, the physical density perturbation is
+\[
+\delta n_{s,\bm k}
+=-\frac{q_sn_{0s}}{T_s}\phi_{\bm k}
++\int J_{0s}h_{s,\bm k}\dd^3v,\qquad
+J_{0s}=J_0(k_\perp v_\perp/\Omega_s).
+\]
+Thus quasineutrality, $\sum_sq_s\delta n_s=0$, gives
+\begin{equation}\label{eq:gk-qn}
+\sum_s\frac{q_s^2n_{0s}}{T_s}\phi_{\bm k}
+=\sum_sq_s\int J_{0s}h_{s,\bm k}\dd^3v.
+\end{equation}
+If instead $g_{s,\bm k}=h_{s,\bm k}-(q_sF_{0s}/T_s)J_{0s}\phi_{\bm k}$,
+the same relation becomes
+\[
+\sum_s\frac{q_s^2n_{0s}}{T_s}(1-\Gamma_{0s})\phi_{\bm k}
+=\sum_sq_s\int J_{0s}g_{s,\bm k}\dd^3v,
+\]
+\[
+\Gamma_{0s}=I_0(b_s)\ee^{-b_s},\qquad
+b_s=k_\perp^2T_s/(m_s\Omega_s^2).
+\]
+The two forms use different distribution variables, so the polarization term appears in different places.
+The zero-wave-number potential gauge and particle-number compatibility require separate specification.
+
+Electromagnetic models also determine $A_\parallel$ through parallel current
+and include $\delta B_\parallel$, polarization, and magnetization according to their ordering.
+The Amp\`ere current must use a push-back consistent with the gyrocenter coordinates, distribution variable, and field equations.
+These relations couple the retained velocity distributions to electromagnetic potentials; truncating higher moments is a separate closure choice.
+
+\section{Collisions, Turbulent Transport, and Discretization Levels}
+Gyrokinetic collision models must preserve the appropriate particle, momentum, and energy moments
+and be compatible with the reduced measure and entropy dissipation. Turbulent particle and heat fluxes arise from correlations between distribution perturbations and radial drifts;
+a particle flux has the structure $\langle\int\delta f_s\,v_{E,r}\dd^3v\rangle$.
+Specific fluxes depend on the push-back definition and averaging region.
+
+The five-dimensional state still requires discretization in position, parallel velocity, magnetic moment, and time.
+Domain extent, velocity-tail truncation, and collision resolution control different errors;
+spectral, DG, or particle representations are subsequent numerical choices.
+
+\aiexercise{For a Maxwellian equilibrium and uniform field, calculate $\langle\exp(\ii\bm k_\perp\cdot\bm\rho)\rangle$ and verify $\int F_{0s}J_{0s}^2\dd^3v=n_{0s}\Gamma_{0s}$. Prove that the $h_s$ and $g_s$ quasineutrality forms are equivalent.}
+{Starting from~\eqref{eq:slab-gk}, fix periodic boundaries and velocity truncation, and list the data needed to check quasineutrality residuals, free energy, and velocity-space convergence. For further reading, choose one electromagnetic model and map its distribution variable, Jacobian, collision term, and field equations consistently.}

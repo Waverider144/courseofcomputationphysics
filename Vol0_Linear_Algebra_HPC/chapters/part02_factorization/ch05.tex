@@ -1,0 +1,33 @@
+\chapter{稀疏 LU 与大型稀疏系统}\label{v0ch:5}
+\begin{chaptersummary}
+稀疏性减少了原矩阵的存储，消元却会在因子中引入新的耦合。本章用消元图解释填充，并区分排序、符号分析和数值分解。理解这些中间结构，才能估计稀疏直接法的内存与工作量，也能看出后续不完全分解为何需要截断填充。
+\end{chaptersummary}
+\learninggoals{识别 Schur 补填充；解释消元图与排序；给出规则二维和三维问题的条件化成本。}
+\paragraph{核心问题}原矩阵很稀疏，因子为什么仍可能超出内存？
+
+\section{消元创造邻居之间的联系}
+将一个主元与其余未知量分块：
+\[
+ A=\begin{bmatrix}a&\bm r^T\\\bm c&B\end{bmatrix}
+ \quad\Rightarrow\quad
+ S=B-\bm c a^{-1}\bm r^T.
+\]
+即使 $B_{ij}=0$，只要 $c_i r_j\ne0$，$S_{ij}$ 就可能非零。对称图中消去一个节点会把其剩余邻居连为团。四节点星形图若先消中心，三个叶节点之间产生填充；先消叶节点可避免这一步的额外边。
+\conceptbridge{为什么编号会影响内存，却不改变方程的物理解？}{对未知量重新编号只是置换坐标，但消元按编号依次形成 Schur 补。每一步保留哪些节点，决定哪些相互作用被压缩成新耦合。排序优化的是计算路径和中间结构。}{同一耦合图 $\longrightarrow$ 不同消元路径 $\longrightarrow$ 不同因子填充。}
+\section{排序与两阶段分析}
+最小度类排序倾向先消低连接节点；嵌套剖分通过小分隔集将图分为较独立区域，先处理内部再处理分隔集。符号分析预测非零结构、消元树和存储；数值阶段计算因子。非对称 LU 的动态主元交换可能改变预测，因此实际内存还受稳定性策略影响。
+对规则、局部耦合的 $N$ 未知量椭圆问题，采用合适嵌套剖分且忽略额外主元增长时，典型估算为
+\[
+\begin{array}{c|cc}
+ &\text{分解工作量}&\text{因子存储}\\\hline
+2D&O(N^{3/2})&O(N\log N)\\
+3D&O(N^2)&O(N^{4/3})
+\end{array}
+\]
+上述估算以规则网格和指定排序为前提。二维每方向 $n$ 点时 $N\sim n^2$，三维则 $N\sim n^3$；统一未知量定义后，才能比较两种维数下的成本。
+\section{Poisson 实验}
+对五点 Poisson 生成 CSR，再转换为求解器使用的 CSC。分别采用自然编号与库提供的近似最小度类排序，记录 $\nnz(A)$、$\nnz(L)+\nnz(U)$、分解和回代时间。三维七点问题从较小网格开始，并随因子存储量逐步扩大规模。
+\costnote{稀疏直接法常适合中等规模、较难预条件的系统和多右端问题；大型三维问题的填充与通信可能成为限制。数值重复分解、符号结构复用和多个右端的摊销应分别统计。}
+\coderef{sparse_linear_algebra/solvers.py}
+\aiexercise{对四节点星形 SPD 矩阵，分别先消中心与先消叶节点，写出每次 Schur 补并画填充边。}{对二维 Poisson 比较自然编号与 COLAMD 的因子非零数；说明它为何只是排序实例而非上述渐近界的证明。}
+\studyroute{略去分隔定理、超节点和多波前实现。参考 \cite{golub,saad}。}{fill-in; elimination graph; nested dissection; symbolic factorization; multifrontal}

@@ -1,0 +1,48 @@
+\chapter{Time Integration and Total Solution Cost}\label{v0ch:25}
+\begin{chaptersummary}
+Spatial throughput gives the cost of one call; time integration determines call counts and implicit-solve work. A common framework connects RK, staggered integration, ADER, CERK, LTS, and IMEX to stability, phase accuracy, and structure preservation. At a specified error and final time, step size, stages, solves, and communication jointly determine total cost.
+\end{chaptersummary}
+\learninggoals{Relate semidiscrete spectra to stability regions; distinguish symplecticity from energy conservation; analyze high-order, local-step, and stiff-splitting costs.}
+\paragraph{Core Question}Why can a simulation remain slow when one spatial evaluation is fast?
+
+\section{Method of Lines and Stability Regions}
+Spatial discretization gives $M\dot{\bm u}=\bm R(\bm u)$. Each explicit RK stage applies $M^{-1}\bm R$, cheaply for local or diagonal mass matrices. For $\dot y=\lambda y$, one step is $y^{n+1}=R(z)y^n$ with $z=\Delta t\lambda$; absolute stability requires $|R(z)|\le1$. Classical RK4 has
+$R(z)=1+z+z^2/2+z^3/6+z^4/24$. Spectra, nonnormality, and energy estimates jointly constrain usable steps.
+For purely imaginary $\lambda$, forward Euler has $|1+\mathrm i\omega\Delta t|>1$, producing modal growth. The time integrator's stability region is therefore part of the complete energy analysis.
+\section{Staggering, Symplecticity, and Phase}
+Yee/leapfrog staggers suitable split systems and is conditionally stable. St\"ormer--Verlet is second-order symplectic for separable Hamiltonian systems. Implicit midpoint
+\[
+ \frac{\bm u^{n+1}-\bm u^n}{\Delta t}
+ =A\frac{\bm u^{n+1}+\bm u^n}{2}
+\]
+exactly preserves a quadratic energy when $A^TQ+QA=0$ with fixed SPD $Q$. It is symplectic for general Hamiltonian systems, but symplecticity does not generally imply exact preservation of the original Hamiltonian.
+For $\lambda=\mathrm i\omega$, midpoint has phase frequency
+$\omega_h=2\arctan(\omega\Delta t/2)/\Delta t$. Stable amplitude can accompany accumulated phase error; inaccurate linear solves also affect preservation.
+\section{ADER, CERK, and LTS}
+ADER constructs high-order time representations using element-local space--time prediction, followed by interface space--time flux correction. Prediction can improve local reuse; cost, stability, and order depend on the implementation.
+CERK denotes continuous explicit Runge--Kutta, adding an within-step approximation
+\[
+ \bm u(t_n+\theta\Delta t)
+ \approx\bm u_n+\Delta t\sum_i b_i(\theta)\bm k_i,\quad0\le\theta\le1.
+\]
+Within-step accuracy follows the continuous-extension order conditions; endpoint accuracy follows those of the RK update. Coupling and output therefore check the two orders separately.
+LTS groups elements by size or wave speed. Conservation requires one shared time-integrated interface flux, with consistent fine-step accumulation and coarse correction. Interpolation, flux registers, scheduling, and imbalance add cost.
+\section{IMEX and Stiff Sources}
+Split $\dot{\bm u}=F(\bm u)+G(\bm u)$, treating propagation explicitly and stiff sources implicitly. Additive RK stages are
+\[
+ U_i=\bm u^n+\Delta t\sum_{j<i}\widetilde a_{ij}F(U_j)
+                  +\Delta t\sum_{j\le i}a_{ij}G(U_j),
+\]
+The endpoint uses separate explicit and implicit weights. Order and stability depend on the paired tableaux and coupling conditions.
+Conductive Maxwell may use $G_E=-\sigma E/\varepsilon$. A first-order split example is
+\[
+ E^{n+1}=\frac{E^n+\Delta t\,(\curl H)^n/\varepsilon}
+ {1+\Delta t\,\sigma/\varepsilon}.
+\]
+This illustrates cheap local implicit damping. If propagation uses forward Euler, the $\sigma=0$ wave limit remains unsuitable. Choose an IMEX pair compatible with the hyperbolic explicit stability region. Global diffusion or coupled implicit sources may reintroduce large linear systems.
+\conceptbridge{Why do high-order or implicit methods not automatically reduce cost?}{Higher order changes stage counts and error constants; implicit treatment changes stability limits but adds solves. Local steps change scheduling and communication. At equal error requirements, determine usable steps, total steps, and the complete per-step execution graph together.}{Stability and accuracy $\longrightarrow$ usable time step $\longrightarrow$ stages, solves, and communication.}
+\section{Minimal Comparisons}
+For periodic sine transport, compare RK4, second-order methods, and staggered wave updates. For $\dot y=\mathrm i\omega y-\sigma y$, compare explicit/IMEX stability and phase. Assess error at a fixed final time rather than only plotting $|R|$.
+\costnote{$T_{\rm total}=T_{\rm setup}+N_tT_{\rm step}+T_{\rm output}$, where $T_{\rm step}$ includes all stages, implicit solves, and communication. ADER and LTS trade extra local work for opportunities to reduce global updates. CERK supplies time-aligned states; interface fluxes and the combined stability region control conservation and stability.}
+\aiexercise{Derive midpoint's phase frequency from its amplification factor. Quantify phase error after one hundred periods and compare RK4.}{Write shared flux integrals and fine-step accumulation for adjacent unequal-step elements. Explain why interpolated boundary values alone do not ensure conservation.}
+\studyroute{ADER predictors, CERK order conditions, and high-order IMEX tableaux are omitted. See Volume II's time-integration chapter and \cite{hesthaven,ader,cerk,imex}.}{method of lines; symplectic integrator; ADER; continuous explicit Runge Kutta; conservative LTS; IMEX additive RK}

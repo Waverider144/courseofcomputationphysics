@@ -1,0 +1,33 @@
+\chapter{Solver Combinations and Engineering Selection}\label{v0ch:21}
+\begin{chaptersummary}
+Factorization, Krylov projection, local corrections, and multilevel methods form the solver's building blocks. Matrix structure, tolerances, reuse, and hardware costs organize them into a complete workflow. The subsequent Roofline analysis extends evaluation from one operator call to the full computation required for a target error and physical final time.
+\end{chaptersummary}
+\learninggoals{Choose compatible solver combinations; separate setup and solve; allocate discretization, linear, and nonlinear error budgets.}
+\paragraph{Core Question}How are algorithmic components assembled into a verifiable, reusable, comparable solver?
+
+\section{Conditions for Combinations}
+\begin{center}\small
+\begin{tabularx}{\textwidth}{lXX}
+\toprule System&Candidate combination&Required checks\\\midrule
+SPD diffusion&CG+IC or symmetric MG/AMG&Fixed SPD inverse action; nullspace handling\\
+Symmetric indefinite&MINRES+SPD block preconditioner&Symmetry and preconditioner definiteness\\
+Nonsymmetric transport--diffusion&GMRES+ILU/AMG&Restart, nonnormality, true residual\\
+Changing inner solves&FGMRES+variable MG/local solves&Actual correction directions and inner cost\\
+Moderate size, multiple right-hand sides&Sparse direct or recycled Krylov&Setup amortization, memory, numerical rank\\\bottomrule
+\end{tabularx}
+\end{center}
+Each combination assumes the stated matrix structure; AMG additionally needs coarse spaces and smoothers adapted to the problem's persistent error modes.
+\section{Tolerances and Nonlinear Outer Iteration}
+A Newton step $J_k\delta\bm u_k=-\bm F(\bm u_k)$ may impose
+\[
+ \norm{J_k\delta\bm u_k+\bm F(\bm u_k)}
+ \le\eta_k\norm{\bm F(\bm u_k)}.
+\]
+Use looser inner tolerances early and reduce $\eta_k$ near the solution to match linear work to outer convergence needs; line searches or trust regions provide globalization. Discretization error and quantities of interest determine final tolerances, with software defaults serving as initial settings.
+\conceptbridge{Why can more accurate linear solves fail to improve the full calculation?}{Early Newton Jacobians represent only local nonlinear behavior. Solving the linearized system more accurately does not remove linearization error. Evolution also has space and time errors. Allocate effort to the sources controlling the result.}{Overall error target $\longrightarrow$ layered tolerances $\longrightarrow$ total solution time.}
+\section{A Minimal Selection Experiment}
+On the same Poisson and advection--diffusion systems, compare direct solves, unpreconditioned Krylov, ILU-GMRES, and two-level preconditioning. Check assumptions and final errors, then record setup, application, counts, and factor/hierarchy storage. Repeat for ten right-hand sides to examine reuse.
+\costnote{Total cost includes assembly, ordering, preconditioner setup, operator action, orthogonalization, communication, and final checks. Triangular solves, SpMV, dot products, and dense blocks have distinct hardware fingerprints, examined in Part V.}
+\coderef{sparse_linear_algebra/solvers.py; sparse_linear_algebra/multilevel.py}
+\aiexercise{Write selection records for two-dimensional Poisson and nonsymmetric advection--diffusion: structural evidence, assumptions, tolerance rationale, setup cost, and failure fallback.}{Use measured setup/solve times to plot multiple-right-hand-side amortization. Distinguish fewest iterations from shortest total time.}
+\studyroute{Specialized block preconditioning for coupled PDEs and global nonlinear convergence proofs are omitted. See \cite{saad,petsc}.}{solver configuration; setup amortization; inexact Newton; tolerance budget; time to solution}

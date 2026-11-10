@@ -1,0 +1,146 @@
+\chapter{有限元、谱方法与积分算子离散}\label{ch:9}
+\begin{chaptersummary}
+Galerkin 框架将误差分析联系到空间选择与测试条件。本章先装配局部有限元，再比较 Fourier、Legendre 和 Chebyshev 的全局表示，最后以 MoM 构造积分算子的离散。局部或全局支撑决定耦合范围，正则性与求积共同影响误差，因而将逼近理论自然引向第 0 卷的矩阵结构与求解。
+\end{chaptersummary}
+\learninggoals{装配一维线性有限元质量与刚度矩阵；区分谱 Galerkin、谱配置和伪谱；用积分核构造 MoM 矩阵；解释光滑性对逼近速度的影响。}
+\studyroute{略去高维单元族、谱误差定理的一般证明、奇异积分与辐射条件的完整处理；矩阵求解与快速作用算法见第 0 卷。}{Galerkin finite element; spectral collocation; Fourier pseudospectral; Chebyshev approximation; method of moments}{对一维 Poisson 问题分别写出局部线性有限元和全局 Legendre Galerkin 的自由度、边界约束及矩阵条目。}
+\section{局部有限元空间与装配}\index{有限元法}
+有限元法从弱形式出发。以 Poisson 方程
+\[
+-\nabla^2u=f
+\]
+为例，乘测试函数并分部积分：
+\[
+\int_\Omega\nabla v\cdot\nabla u\dd V
+=
+\int_\Omega vf\dd V+\text{边界项}.
+\]
+
+\begin{askai}
+AI 展开问题：
+\begin{quote}
+对一维 Poisson 方程做二阶中心差分和线性有限元离散，各写出 5 个内部网格点对应的矩阵，并比较 differential operator 的 locality 如何变成 matrix sparsity。
+\end{quote}
+
+进一步展开：
+\begin{quote}
+用同一个 Poisson 例子解释 strong form、weak form、test function、basis function 和 stiffness matrix 之间的关系。
+\end{quote}
+\end{askai}
+
+展开
+\[
+u_h=\sum_jU_j\phi_j
+\]
+后得到
+\[
+\bm K\bm U=\bm F.
+\]
+
+上述展开将弱形式转为基函数系数的方程。下面以一维线性单元显式计算局部矩阵，再由共享节点完成装配。
+
+
+在一维单元 $[x_j,x_{j+1}]$ 上，长度为 $h_j$，线性形函数分别为
+$\phi_0=1-\xi$、$\phi_1=\xi$，$\xi=(x-x_j)/h_j$。
+直接积分得到
+\[
+K^{(j)}=\frac1{h_j}\begin{pmatrix}1&-1\\-1&1\end{pmatrix},
+\qquad
+M^{(j)}=\frac{h_j}6\begin{pmatrix}2&1\\1&2\end{pmatrix}.
+\]
+共享节点对应同一自由度，局部条目按节点映射相加。
+协调有限元空间满足所需迹条件；$H^1$ 标量元用于 Poisson，
+Maxwell 旋度问题则需要相应的切向迹结构，见第二卷。
+
+\conceptbridge{同一组全局多项式为何可以产生 Galerkin 和配置两种谱方法？}
+{模式系数与节点值是表示选择。Galerkin 通过积分配对约束残差，配置法在选定节点约束微分残差。两者在适当求积下可能产生相关矩阵，具体关系由测试条件、积分和边界处理决定。}
+{全局近似空间 $\longrightarrow$ 模式或节点自由度 $\longrightarrow$ 残差机制。}
+
+\section{全局模式、配置点与伪谱}\index{谱方法}
+局部有限元利用紧支撑组织装配，全局谱表示则利用整体光滑性提高精度。周期 $[0,2\pi)$ 上的 Fourier Galerkin 近似取
+\[
+u_N(x)=\sum_{k=-N}^{N}\widehat u_k\ee^{\ii kx},\qquad
+\widehat{(\partial_xu_N)}_k=\ii k\widehat u_k.
+\]
+Galerkin 以保留的 Fourier 模式测试残差。伪谱计算把模式转到节点，
+在物理空间计算非线性乘积，再变回模式；未解析的高波数可能混叠到低波数，
+二次非线性可用适当填充或截断消混叠。
+
+区间 $[-1,1]$ 上，Legendre 多项式满足
+\[
+\int_{-1}^1P_jP_k\dd x=\frac{2}{2k+1}\delta_{jk}.
+\]
+Chebyshev 多项式 $T_k(\cos\theta)=\cos(k\theta)$
+在权 $(1-x^2)^{-1/2}$ 下正交；该权内积与物理无权 $L^2$ 内积需要分别指定。
+谱配置可用 Chebyshev--Lobatto 节点 $x_j=\cos(j\pi/p)$，
+令 $D_{ij}=\ell_j'(x_i)$，直接在内部节点约束微分残差，边界节点施加边值。
+
+对于足够光滑且解析延拓合适的解，增加全局次数可带来快速甚至指数型收敛。
+有限正则性或间断通常只给代数收敛，界面附近还可能出现 Gibbs 振荡。
+局部多项式便于几何适配与局部加密，全局模式则利用整体光滑性。
+误差比较需报告总自由度、积分误差和时间误差。
+
+\section{积分算子与 MoM}\index{矩量法}
+计算电磁学中的矩量法通常从积分方程
+\[
+\Lop J=g
+\]
+出发。展开
+\[
+J=\sum_{n=1}^N I_nf_n,
+\]
+
+\begin{authornote}
+\textbf{潜在疑问：}
+“为什么计算电磁学这里突然从微分方程转向积分方程和电流展开？”
+
+\textbf{作者补充：}
+对某些线性散射或辐射问题，可以利用已知背景介质的 Green 函数，把区域内的场表示为边界上等效源或电流产生的场。这样未知量从体域场转到边界密度，并通过边界条件确定；维数可能降低，但 Green 函数的远程作用也使离散矩阵通常变为稠密。
+
+\textbf{核心概念联系：}
+\[
+\text{field PDE}
+\longrightarrow
+\text{integral equation}
+\longrightarrow
+\text{current expansion}
+\]
+\end{authornote}
+
+并对测试函数 \(w_m\) 约束积分方程残差：
+\[
+\avg{w_m,\Lop J}
+=
+\avg{w_m,g}.
+\]
+
+\begin{askai}
+AI 展开问题：
+\begin{quote}
+用三段分片常数基函数离散一个简单一维积分方程
+\[
+\Lop J=g
+\]
+显式写出矩阵条目 \(\avg{w_m,\Lop f_n}\)，并解释为什么每个测试函数通常会和所有基函数耦合。
+\end{quote}
+
+进一步展开：
+\begin{quote}
+比较微分方程离散矩阵和积分方程离散矩阵的非零结构，并说明快速多极子或层次矩阵想减少的是什么成本。
+\end{quote}
+\end{askai}
+
+得到
+\[
+\bm Z\bm I=\bm V.
+\]
+
+由于积分核具有长程作用，$\bm Z$ 通常稠密。该结构及快速矩阵作用的算法引向第 0 卷。
+
+具体地，若 $(\mathcal LJ)(x)=\int_\Gamma G(x,y)J(y)\dd S_y$，
+则
+\[
+Z_{mn}=\int_\Gamma w_m(x)\int_\Gamma G(x,y)f_n(y)\dd S_y\dd S_x,\qquad
+V_m=\int_\Gamma w_mg\dd S.
+\]
+这里的测试配对属于积分方程离散；其稳定性取决于算子、迹空间、核与基函数。

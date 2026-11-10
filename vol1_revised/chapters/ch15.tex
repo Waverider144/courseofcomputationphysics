@@ -1,0 +1,110 @@
+\chapter{从 Boltzmann 方程到格子 Boltzmann 方法}\label{ch:15}
+\begin{chaptersummary}
+前面直接离散宏观方程，本章转而在动理学层次选择有限速度与碰撞模型，再通过长波、低 Mach 极限恢复宏观输运。D2Q9 与 D3Q27 将速度集合、各向同性矩和精确格点迁移联系起来，Chapman--Enskog 展开则说明非平衡应力与离散时间修正如何共同确定黏度。
+\end{chaptersummary}
+\learninggoals{定义离散粒子群与守恒矩；构造 D2Q9 与 D3Q27；完成迁移和碰撞更新；由多尺度展开解释低 Mach 流体极限和黏度公式。}
+\studyroute{略去完整三阶 Chapman--Enskog 代数及一般热力学格子的构造；正文限于无外力、标准等温低 Mach 模型。}{lattice Boltzmann; D2Q9; D3Q27; Chapman--Enskog expansion; lattice viscosity}{验证 D2Q9 的二阶与四阶各向同性矩，再从迁移—碰撞方程的二阶 Taylor 展开推导黏度中的半时间步修正。}
+
+\section{离散速度与介观变量}\index{LBM}
+连续动理学含 $\bm x,\bm v$ 两类变量。
+离散速度模型选 $\bm c_i$ 与粒子群密度 $f_i(\bm x,t)$，满足
+\[
+\partial_tf_i+\bm c_i\cdot\nabla f_i=\Omega_i,\qquad
+\rho=\sum_i f_i,\qquad \rho\bm u=\sum_i\bm c_i f_i.
+\]
+本章的 $f_i$ 为质量密度型离散速度变量，已吸收速度求积权重，
+区别于第一章的数密度型连续分布 $f$。
+速度集合与平衡态的矩匹配决定可描述的宏观模型；
+空间迁移与时间离散随后形成数值更新。
+当 $\bm c_i\Delta t$ 恰好连接格点，特征迁移可直接实现为格点数据移位。
+
+\conceptbridge{为何只保存有限个速度方向，还能得到宏观黏性流动？}
+{宏观方程读取分布的低阶矩。若离散速度、权重和平衡态匹配所需的各向同性矩，
+碰撞又保持质量与动量，长波展开便可计算非平衡应力。
+恢复的方程与误差由这些矩条件、尺度排序和时间离散共同决定。}
+{离散速度与碰撞矩 $\longrightarrow$ 非平衡应力 $\longrightarrow$ 宏观输运极限。}
+
+\section{D2Q9 与 D3Q27}
+令 $c_\ell=\Delta x/\Delta t$，D2Q9 的速度为
+\[
+\bm c_i/c_\ell\in\{(0,0),(\pm1,0),(0,\pm1),(\pm1,\pm1)\}.
+\]
+静止、轴向和对角方向的权重分别为
+$4/9,1/9,1/36$，格子声速 $c_s^2=c_\ell^2/3$。
+D3Q27 使用三个方向 $\{0,\pm c_\ell\}$ 的张量积，
+一维权重 $w(0)=2/3$、$w(\pm c_\ell)=1/6$，三维权重为各方向权重的乘积。
+两种格子都满足相应维数下的
+\[
+\sum_iw_i=1,\quad \sum_iw_i c_{i\alpha}=0,\quad
+\sum_iw_i c_{i\alpha}c_{i\beta}=c_s^2\delta_{\alpha\beta},
+\]
+\[
+\sum_iw_i c_{i\alpha}c_{i\beta}c_{i\gamma}c_{i\delta}
+=c_s^4(\delta_{\alpha\beta}\delta_{\gamma\delta}
++\delta_{\alpha\gamma}\delta_{\beta\delta}
++\delta_{\alpha\delta}\delta_{\beta\gamma}).
+\]
+更高阶速度矩受到有限格子的限制。
+
+\section{平衡态、碰撞与迁移}
+等温二阶低 Mach 平衡态取
+\begin{equation}\label{eq:lbm-eq}
+f_i^{\mathrm{eq}}=w_i\rho\left[
+1+\frac{\bm c_i\cdot\bm u}{c_s^2}
++\frac{(\bm c_i\cdot\bm u)^2}{2c_s^4}
+-\frac{|\bm u|^2}{2c_s^2}\right].
+\end{equation}
+由上述矩恒等式，
+\[
+\sum_if_i^{\mathrm{eq}}=\rho,\quad
+\sum_i\bm c_if_i^{\mathrm{eq}}=\rho\bm u,\quad
+\sum_i\bm c_i\bm c_if_i^{\mathrm{eq}}=\rho c_s^2I+\rho\bm u\bm u.
+\]
+BGK--LBM 每步先作局部碰撞，再作迁移：
+\begin{equation}\label{eq:lbe}
+f_i^*(\bm x,t)=f_i-\frac{\Delta t}{\tau_{\mathrm{LB}}}(f_i-f_i^{\mathrm{eq}}),
+\qquad
+f_i(\bm x+\bm c_i\Delta t,t+\Delta t)=f_i^*(\bm x,t).
+\end{equation}
+碰撞保持零、一阶矩，周期格点迁移保持全局粒子群之和。
+$\tau_{\mathrm{LB}}$ 有时间量纲；常用格子单位 $\Delta t=c_\ell=1$ 时，
+松弛率为 $s=1/\tau_{\mathrm{LB}}$。边界反射或重构也需检查质量与动量交换。
+
+\section{Chapman--Enskog 展开与黏度}\index{Chapman--Enskog 展开}
+记 $D_i=\partial_t+\bm c_i\cdot\nabla$。
+对式~\eqref{eq:lbe}~作光滑长波 Taylor 展开：
+\[
+D_if_i+\frac{\Delta t}{2}D_i^2f_i+\cdots
+=-\frac{f_i-f_i^{\mathrm{eq}}}{\tau_{\mathrm{LB}}}.
+\]
+令空间与时间导数按小参数排序，并写
+$f_i=f_i^{(0)}+\epsilon f_i^{(1)}+\epsilon^2f_i^{(2)}+\cdots$，
+对非平衡部分施加零质量、零动量矩。
+零阶给 $f_i^{(0)}=f_i^{\mathrm{eq}}$，一阶给
+\[
+f_i^{(1)}=-\tau_{\mathrm{LB}}D_i^{(1)}f_i^{\mathrm{eq}}.
+\]
+取零、一阶矩得到等温 Euler 主部；
+二阶矩将 $f_i^{(1)}$ 转为黏性应力，Taylor 项进一步产生时间修正。
+在低 Mach、近不可压缩的黏性尺度下，
+\[
+\partial_t\rho+\nabla\cdot(\rho\bm u)=0,
+\]
+\[
+\rho_0(\partial_t\bm u+\bm u\cdot\nabla\bm u)
+=-\nabla p+\rho_0\nu\Delta\bm u,\qquad
+\nabla\cdot\bm u=0
+\]
+为相应极限方程；其中 $p$ 来自 $c_s^2\rho$ 的小幅压力扰动，
+$\rho/\rho_0=1+O(\mathrm{Ma}^2)$，且
+\begin{equation}\label{eq:lbm-viscosity}
+\nu=c_s^2\left(\tau_{\mathrm{LB}}-\frac{\Delta t}{2}\right).
+\end{equation}
+$\tau_{\mathrm{LB}}>\Delta t/2$ 给出正黏度。
+黏度正性给出松弛参数的基本范围，完整更新的稳定性还包括平衡态正性、边界与非流体模态。
+连续 BGK 碰撞时间与离散 $\tau_{\mathrm{LB}}$ 的对应取决于时间积分；
+式~\eqref{eq:lbm-viscosity}~适用于这里给定的更新。
+标准等温二阶模型的宏观结论受低 Mach 和长波假设约束~\cite{qian1992}。
+
+\aiexercise{列出 D2Q9 的九个速度与权重，直接计算平衡态的质量、动量和二阶矩。写出无边界周期格子的碰撞与迁移，逐步证明总质量守恒。}
+{固定目标运动黏度，改变 $\Delta t$ 后重新计算 $\tau_{\mathrm{LB}}$；对周期剪切波 $u_x(y,0)=U_0\sin ky$ 测量衰减率 $\nu k^2$，区分格子单位与物理单位。}

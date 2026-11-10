@@ -1,0 +1,129 @@
+\chapter{Combining High-Order Methods and Time Integration}\label{ch:14}
+\begin{chaptersummary}
+DG, FR, and mortars define local spaces and interface operators; complete evolution also requires temporal coordination. Shared fluxes connect spatial methods, ADER and CERK provide within-step states, LTS coordinates local steps, and IMEX treats stiff splitting. Spatial approximation, interface integration, and time advancement therefore form one accuracy and conservation problem.
+\end{chaptersummary}
+\learninggoals{Construct shared-flux DG--FR coupling; distinguish ADER, CERK, and LTS; write an IMEX split; design conservative h, p, and hp transfers and time-convergence experiments.}
+\studyroute{High-order RK coefficient derivations, general nonlinear space-time predictor iteration, and adaptive-error proofs are omitted. Each algorithm must specify its quadrature and time schedule.}{ADER DG; continuous explicit Runge--Kutta; conservative local time stepping; IMEX; hp adaptivity}{Couple neighboring DG and FR elements with one interface solver. Verify conservation at a common step size, then introduce two-to-one LTS and compare interface time integrals and total conservation errors.}
+
+\section{Shared Fluxes between Different Spatial Methods}
+For a common conservation law, both DG and FR express cell-average updates through outward flux integrals.
+Using common states, normals, and single-valued fluxes at the interface, returned through compatible liftings,
+allows a DG element to couple to an FR element. Nonconforming interfaces use the mortars of Chapter~\ref{ch:13}.
+Overall order is constrained by both approximations, interface projection, and quadrature;
+the individual energy estimates must also close under the common interface pairing.
+
+\conceptbridge{If each spatial method is stable, why recheck interfaces and time integration after coupling?}
+{Stability estimates contain interface and time-update contributions. Coupling changes the times, projections, and pairings of neighboring data,
+and therefore changes these contributions. Shared flux integrals control conservation; stability regions and compatible energy pairings control evolution.
+Both checks must apply to the final combined operator.}
+{Local spatial operators $\longrightarrow$ interface and temporal coupling $\longrightarrow$ fully discrete structure.}
+\section{High-Order Time Integration: ADER, CERK, and LTS}\label{sec:v1-time}
+Spatial discretization gives the finite-dimensional system
+\[
+M_h\dot U_h=R_h(U_h,t).
+\]
+For a fixed invertible mass matrix, write $\dot U_h=L_h(U_h,t)$.
+Time integrators approximate its evolution; their order, stability region, and interface time data must match the spatial discretization.
+The following distinguishes within-step approximations from local time scheduling. Volume~2, Section~5.5 develops the Maxwell setting.
+
+\paragraph{ADER: Local Space-Time Prediction and Conservative Updating.}
+ADER (Arbitrary high-order DERivatives) originated in high-order time expansions:
+classical constructions replace temporal derivatives with spatial derivatives through the PDE, while modern constructions can solve an element-local space-time weak problem.
+The resulting $q_K(\bm x,t)$ supplies volume terms and interface flux integrals throughout the time step.
+For a source-free finite-volume update,
+\[
+|K|(\bar U_K^{n+1}-\bar U_K^n)
+=-\sum_{f\subset\partial K}\int_{t_n}^{t_{n+1}}\int_f
+\widehat F(q_K,q_{K_f};\bm n_f)\dd S\dd t.
+\]
+the local prediction is followed by a correction coupling neighbors through shared fluxes. Accuracy depends on reconstruction, the predictor, and integration order;
+explicit hyperbolic updates retain their corresponding CFL constraint.
+See \href{https://doi.org/10.1016/j.cma.2014.07.019}{Dumbser's ADER--LTS construction}.
+
+In ADER--DG, the same local predictor $q_K$ also supplies basis-weighted volume residuals.
+Integrating the DG weak form over one step gives
+\[
+\begin{aligned}
+\int_Kv_h(u_h^{n+1}-u_h^n)\dd x
+={}&\int_{t_n}^{t_{n+1}}\int_K\nabla v_h\cdot F(q_K)\dd x\dd t\\
+&-\int_{t_n}^{t_{n+1}}\int_{\partial K}v_h\widehat F(q_K,q_{K_f};n)\dd S\dd t.
+\end{aligned}
+\]
+The predictor supplies space-time data; DG testing and shared fluxes form the correction. This identifies precisely where ADER couples to spatial DG.
+
+\paragraph{CERK: Continuous Explicit Runge--Kutta.}
+CERK constructs a continuous within-step approximation from explicit RK stage derivatives $k_i$:
+\[
+U_h(t_n+\theta\Delta t)\approx
+U_h^n+\Delta t\sum_{i=1}^{s}b_i(\theta)k_i,\qquad 0\le\theta\le1.
+\]
+Here $b_i(0)=0$ and $b_i(1)=b_i$, matching the endpoint RK weights.
+Continuous-extension order conditions control within-step accuracy, while the endpoint RK conditions control end-of-step accuracy. Coupling and output must satisfy their respective requirements.
+The approximation supports output, coupling interpolation, or local predictors. See
+\href{https://doi.org/10.1137/0913084}{Owren--Zennaro's continuous explicit RK methods}.
+For element-local prediction, RK stages solve a local problem and neighboring effects enter through correction fluxes;
+see~\cite{altmann2010} for this space-time coupling.
+
+\paragraph{LTS: Local Time Stepping.}
+When local mesh sizes or wave speeds vary strongly, the most restrictive element determines a uniform time step.
+LTS assigns different physical time steps to different elements and synchronizes them at common time levels.
+If a coarse element advances by $\Delta T$ while a fine neighbor takes $m$ substeps, their shared time-integrated flux must satisfy
+\[
+\Phi_f^{\mathrm{coarse}}
+=\sum_{r=1}^{m}\Phi_{f,r}^{\mathrm{fine}},
+\]
+All terms use one normal convention and enter neighboring updates with opposite signs.
+ADER or CERK can provide within-step states; LTS additionally requires scheduling, quadrature, and flux accumulation.
+Physical-time LTS must preserve temporal accuracy; local pseudo-time stepping for steady-state acceleration has a different objective.
+Efficiency depends on the fraction of small elements and the costs of interface prediction, integration, and synchronization.
+
+\begin{askai}
+\textbf{Ask AI:}\par
+\textbf{Omitted Detail and Keywords:} ADER predictor--corrector; CERK dense-output order conditions; conservative LTS. High-order coefficient construction and scheduling algorithms are omitted.
+
+For one-dimensional advection, place coarse and fine elements next to each other with time-step ratio $2:1$. Use a time polynomial and a CERK extension to supply interface states, list the flux integrals over both fine substeps, and verify total conservation.
+
+Follow-up: Freeze the coarse-side state for the whole step and measure the resulting temporal order; then compare the update counts of uniform stepping and LTS.
+\end{askai}
+
+\section{RK Stability Regions and IMEX Splitting}
+If a spatial mode satisfies $\dot y=\lambda_hy$, an RK update is
+$y^{n+1}=\mathcal R(\Delta t\lambda_h)y^n$,
+The spatial spectrum and temporal stability region must be checked together.
+SSP methods express updates as convex combinations of suitable forward Euler steps.
+Inheritance of strong stability requires the Euler step to be stable in the target functional under the corresponding step restriction.
+High-order spatial energy estimates and SSP properties have distinct assumptions.
+
+For combined propagation and stiff relaxation, use the split
+\[
+\dot U=F_h(U)+G_h(U)
+\]
+with explicit $F_h$ and implicit $G_h$.
+The common stages of an autonomous additive Runge--Kutta method are
+\[
+\begin{aligned}
+Y_i&=U^n+\Delta t\sum_{j<i}\widetilde a_{ij}F_h(Y_j)
++\Delta t\sum_{j\le i}a_{ij}G_h(Y_j),\\
+U^{n+1}&=U^n+\Delta t\sum_i\widetilde b_iF_h(Y_i)
++\Delta t\sum_i b_iG_h(Y_i).
+\end{aligned}
+\]
+The two tableaux must satisfy additive order conditions~\cite{ascher1997}.
+Implicit treatment of local collision sources can reduce the step restriction imposed by fast relaxation.
+Explicit propagation retains its stability restriction, and the stiff limit requires checks of asymptotic preservation and actual temporal order.
+Volume~2 gives a conducting-Maxwell example.
+
+\section{h, p, and hp Adaptation}
+$h$ adaptation changes element sizes; $p$ adaptation changes local degrees; $hp$ adaptation changes both.
+Smooth regions may benefit from degree elevation, whereas discontinuities and local geometric scales often require smaller elements and stabilization.
+Transfer operators should satisfy
+\[
+\int_Ku_{\mathrm{new}}\dd x
+=\int_Ku_{\mathrm{old}}\dd x,
+\]
+Sum over all children during refinement; aggregate child integrals before coarsening.
+An $L^2$ projection preserves the average when constants are included as tests; positivity and other constraints may require additional limiting.
+After repartitioning, update interface spaces, geometric measures, and quadrature rules together.
+
+\aiexercise{For smooth periodic advection, fix the spatial mesh and measure temporal convergence with RK4 and a Heun continuous extension. Then fix a sufficiently small step and measure spatial convergence. Explain what mass, energy, and phase errors each measure.}
+{For a discrete-velocity equation with fast BGK relaxation, select documented IMEX coefficients and distinguish propagation CFL, collision relaxation, and an unresolved limiting regime. Record the coefficient source and observed order as part of the experiment.}

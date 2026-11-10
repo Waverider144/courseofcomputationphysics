@@ -1,0 +1,22 @@
+\chapter{Incomplete Factorization}\label{v0ch:8}
+\begin{chaptersummary}
+Fill in exact sparse factorization motivates a cheaper approximate inverse action. Incomplete factorizations select and drop entries while retaining pivot and triangular-solve constraints. This prepares preconditioner design in Part IV: an approximation is assessed through its improvement of outer convergence together with setup and application costs.
+\end{chaptersummary}
+\learninggoals{Distinguish ILU0, ILUk, ILUT, and IC; explain dropping and fill; apply factors through triangular solves.}
+\paragraph{Core Question}Which elimination information should limited memory retain to improve iteration?
+
+\section{Truncated Elimination}
+Exact LU can create entries at initially zero locations. ILU(0) retains the prescribed original pattern. ILU($k$) retains entries by symbolic fill level: original entries have level zero; a path through pivot $j$ proposes the sum of its levels plus one, retaining the minimum proposed level. ILUT uses numerical thresholds and row-size limits. Check each library's scaling, ordering, and pivoting definitions.
+With $A\approx LU=M$, the preconditioning action is
+\[
+ \bm z=M^{-1}\bm r:\qquad L\bm y=\bm r,\quad U\bm z=\bm y.
+\]
+The explicit inverse is generally not formed.
+\section{Minimal Examples}
+Unpivoted tridiagonal Poisson LU has no out-of-band fill, so ILU(0) can equal exact LU. A four-vertex cycle or two-dimensional five-point matrix generates additional fill; ILU(0) discards some of it. Comparing these examples exposes the dropping mechanism.
+IC approximates $A\approx LL^T$ in a symmetric pattern for SPD matrices $A$. Dropping changes the Schur complements encountered during elimination, so IC pivot positivity must also be checked. Nonpositive pivots motivate reordering, shifts, or modified strategies.
+\conceptbridge{Why compute a factorization that is not exact?}{An outer iteration needs an inexpensive transformation of correction directions, not a preconditioner that solves independently. Retaining dominant local coupling can reduce outer work, at the cost of dependency-limited triangular solves on each application.}{Exact elimination cost $\longrightarrow$ controlled truncation $\longrightarrow$ approximate inverse within outer iteration.}
+\costnote{Smaller drop tolerances usually increase fill, setup, and triangular-solve costs, without guaranteeing monotonically better total time. General ILU is usually nonsymmetric and does not automatically supply the SPD preconditioner required by standard PCG. Zero pivots, small pivots, and parallel dependencies are distinct risks.}
+\coderef{sparse_linear_algebra/solvers.py}
+\aiexercise{Apply ILU(0) to tridiagonal and two-dimensional five-point Poisson. List dropped entries and compare true preconditioned-solve residuals.}{Sweep ILUT drop tolerances, recording setup, factor nonzeros, GMRES counts, and total time to identify a cost tradeoff.}
+\studyroute{Modified incomplete factorizations and spectral-equivalence proofs are omitted. See \cite{saad,templates}.}{ILU(0); level of fill; ILUT; incomplete Cholesky; drop tolerance}

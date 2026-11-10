@@ -1,0 +1,28 @@
+\chapter{Incomplete Factorization and Domain Decomposition}\label{v0ch:18}
+\begin{chaptersummary}
+Local triangular solves and sweeps do not directly scale to many processors. Partitioning unknowns into subdomains combines local solves and overlapping exchange into parallel preconditioners. Once local coupling is treated, global low-frequency errors still require a coarse space, motivating multigrid.
+\end{chaptersummary}
+\learninggoals{Write additive Schwarz; distinguish overlap, RAS, and symmetry; explain the need for a coarse space.}
+\paragraph{Core Question}How can approximate inverse action be parallelized without losing essential global information?
+
+\section{Combining Local Solves}
+Let $R_i$ restrict a global vector to a subdomain, with $A_i=R_iAR_i^T$. Additive Schwarz applies
+\[
+ B=\sum_i R_i^TA_i^{-1}R_i,\qquad \bm z=B\bm r.
+\]
+Subdomains may overlap; local systems can use exact LU, ILU, or other approximations. For SPD $A$, covering subdomains, and exact or SPD local inverse actions, $B$ can be SPD. Multiplicative Schwarz updates residuals sequentially, resembling subdomain GS.
+RAS injects local corrections only into nonoverlapping cores, reducing repeated exchange but generally producing a nonsymmetric inverse action. Outer-method selection therefore checks both the original matrix and the RAS action against standard PCG's symmetry requirements.
+\section{Coarse Spaces and Block Systems}
+Single-level local methods transmit smooth error slowly across many subdomains. Adding coarse space $Z$,
+\[
+ B_0=Z(Z^TAZ)^{-1}Z^T,
+\]
+addresses global modes and can be combined with local corrections. Without a coarse level, iteration counts often rise with the subdomain count; bounds depend on overlap, scales, and the PDE.
+For saddle-point systems, block elimination yields the Schur complement
+$S=A_{22}-A_{21}A_{11}^{-1}A_{12}$. Approximate block-diagonal or block-triangular preconditioners can address separate physical scales instead of applying one generic ILU to all entries.
+\conceptbridge{Why can accurate local solutions still yield slow global convergence?}{Local accuracy treats internal subdomain relations. Slowly varying interdomain modes may survive every individual correction. A coarse space exchanges global information; greater local accuracy alone does not replace it.}{Accurate local solve $\longrightarrow$ remaining interdomain modes $\longrightarrow$ global coarse correction.}
+\section{A Minimal Experiment}
+Partition one-dimensional Poisson into four subdomains and compare block Jacobi, one-layer-overlap additive Schwarz, and a version with a subdomain-constant coarse space. At fixed total degrees of freedom, increase subdomain count and record local setup, exchange volume, and iterations to expose the role of coarse correction. Distributed scaling is then measured through multiprocess timings.
+\costnote{Overlap increases local storage and communication but may improve convergence. Local ILU confines sequential dependencies to subdomains; coarse solves and global reductions can become the bottleneck.}
+\aiexercise{For eight-point Poisson, write two overlapping restrictions $R_i$ and $B$. Check symmetry, then replace injection by RAS and check again.}{Derive the Schur complement of a pressure--velocity system and explain why block-triangular preconditioning often accompanies GMRES.}
+\studyroute{Schwarz condition-number bounds, BDDC, and FETI-DP are omitted. See \cite{saad,petsc}.}{additive Schwarz; restricted additive Schwarz; domain decomposition; coarse space; Schur complement}

@@ -1,0 +1,129 @@
+\chapter{现代高阶方法的组合与时间推进}\label{ch:14}
+\begin{chaptersummary}
+DG、FR 和 Mortar 已确定局部空间与接口算子，完整演化还需在时间上协调它们。本章从共享通量连接不同空间方法，再用 ADER 与 CERK 提供步内状态、LTS 协调局部步长、IMEX 处理刚性分拆。空间逼近、接口积分与时间推进由此组成共同的精度与守恒要求。
+\end{chaptersummary}
+\learninggoals{构造 DG--FR 的共享通量接口；说明 ADER、CERK、LTS 的不同作用；写出 IMEX 分拆；设计守恒的 h、p 与 hp 转移及时间收敛实验。}
+\studyroute{略去高阶 RK 系数推导、时空预测器的一般非线性迭代及自适应误差估计证明；各具体算法需注明采用的积分和时间表。}{ADER DG; continuous explicit Runge--Kutta; conservative local time stepping; IMEX; hp adaptivity}{对相邻 DG 与 FR 单元使用同一界面求解器，先统一步长验证守恒，再引入二比一 LTS，比较界面时间积分与总量误差。}
+
+\section{共享通量连接不同空间方法}
+对同一守恒律，DG 与 FR 都可将单元平均更新写成外通量积分。
+若接口上选择相同状态、法向和单值通量，并通过各自相容的提升算子回传，
+可将一个 DG 单元与一个 FR 单元连接。非匹配接口使用第~\ref{ch:13}~章的 Mortar。
+耦合的总体阶数受两侧逼近、接口投影和求积精度共同限制；
+两侧原有能量估计还需在共同接口配对下闭合。
+
+\conceptbridge{空间方法分别稳定后，为何组合时还要检查时间与接口？}
+{稳定性估计包含界面通量与时间更新。组合方法改变邻居数据的时刻、投影和配对，
+会改变这些贡献。共享通量积分控制总量平衡，稳定域和相容能量配对控制演化，
+两类检查都需作用于最终组合算子。}
+{局部空间算子 $\longrightarrow$ 接口与时间耦合 $\longrightarrow$ 全离散结构。}
+\section{高阶时间推进：ADER、CERK 与 LTS}\label{sec:v1-time}
+空间离散给出有限维系统
+\[
+M_h\dot U_h=R_h(U_h,t).
+\]
+对固定且可逆的质量矩阵，可写成 $\dot U_h=L_h(U_h,t)$。
+时间格式近似这一系统的演化；其阶数、稳定域和界面时间数据必须与空间离散匹配。
+以下分别讨论步内近似和局部时间调度，第二卷第 5.5 章给出 Maxwell 背景下的展开。
+
+\paragraph{ADER：局部时空预测与守恒更新。}
+ADER（Arbitrary high-order DERivatives）从高阶时间展开发展而来：
+经典构造利用 PDE 将时间导数转为空间导数，现代构造也可在每个单元内求解局部时空弱问题。
+由此得到 $q_K(\bm x,t)$，供体积分和界面数值通量在整个时间步上积分。
+以无源有限体积更新为例，
+\[
+|K|(\bar U_K^{n+1}-\bar U_K^n)
+=-\sum_{f\subset\partial K}\int_{t_n}^{t_{n+1}}\int_f
+\widehat F(q_K,q_{K_f};\bm n_f)\dd S\dd t.
+\]
+单元局部预测之后，校正步骤通过共同通量耦合邻居。精度取决于空间重构、预测器与积分阶数；
+显式双曲更新仍受相应 CFL 条件约束。
+可参见 \href{https://doi.org/10.1016/j.cma.2014.07.019}{Dumbser 的 ADER--LTS 构造}。
+
+在 ADER--DG 中，同一局部预测 $q_K$ 还提供基函数加权的体积残差。
+将 DG 弱形式在一个时间步上积分，得到
+\[
+\begin{aligned}
+\int_Kv_h(u_h^{n+1}-u_h^n)\dd x
+={}&\int_{t_n}^{t_{n+1}}\int_K\nabla v_h\cdot F(q_K)\dd x\dd t\\
+&-\int_{t_n}^{t_{n+1}}\int_{\partial K}v_h\widehat F(q_K,q_{K_f};n)\dd S\dd t.
+\end{aligned}
+\]
+局部预测器给出时空数据，DG 测试与共享通量组成校正；这明确了 ADER 与空间 DG 的耦合位置。
+
+\paragraph{CERK：连续显式 Runge--Kutta。}
+CERK 在显式 RK 阶段导数 $k_i$ 的基础上构造步内连续近似
+\[
+U_h(t_n+\theta\Delta t)\approx
+U_h^n+\Delta t\sum_{i=1}^{s}b_i(\theta)k_i,\qquad 0\le\theta\le1.
+\]
+其中 $b_i(0)=0$，$b_i(1)=b_i$ 与端点 RK 权重一致。
+连续扩展的阶条件控制步内精度，端点 RK 的阶条件控制步末精度；两者分别满足相应的耦合与输出要求。
+该近似可用于输出、耦合时间插值或局部预测器，其构造见
+\href{https://doi.org/10.1137/0913084}{Owren--Zennaro 的连续显式 RK 方法}。
+用于单元局部预测时，RK 阶段按局部问题组织，邻居影响由校正通量接入；
+这种空间时间耦合可见~\cite{altmann2010}。
+
+\paragraph{LTS：局部时间步进。}
+若局部网格尺寸或波速差异较大，统一步长由最严格的单元约束决定。
+LTS（local time stepping）令不同单元采用不同物理时间步长，并在共同时间层同步。
+粗单元一次走过 $\Delta T$、细单元走过 $m$ 个子步时，共享面的时间积分通量须满足
+\[
+\Phi_f^{\mathrm{coarse}}
+=\sum_{r=1}^{m}\Phi_{f,r}^{\mathrm{fine}},
+\]
+其中各项使用同一法向约定，在相邻单元更新中以相反符号出现。
+ADER 或 CERK 可提供步内状态，LTS 还需配套调度、积分及通量累积。
+真实时间 LTS 应保持时间精度；稳态加速中的局部伪时间步并不承担这一要求。
+效率取决于小单元占比、界面预测、积分与同步成本。
+
+\begin{askai}
+\textbf{AI 展开问题：}\par
+\textbf{略去内容与关键词：}ADER predictor--corrector、CERK dense-output order conditions、conservative LTS；这里略去高阶系数求解和调度算法。
+
+对一维平流方程设置相邻粗细单元，令步长比为 $2:1$。分别用时间多项式和 CERK 连续扩展提供界面状态，列出两个细子步的通量积分，并验证粗细单元的总守恒量。
+
+进一步展开：将粗侧状态在整步内冻结，测量时间收敛阶如何变化；再比较统一步长与 LTS 的更新次数。
+\end{askai}
+
+\section{RK 稳定域与 IMEX 分拆}
+若空间物理模态满足 $\dot y=\lambda_hy$，RK 更新为
+$y^{n+1}=\mathcal R(\Delta t\lambda_h)y^n$，
+需将空间谱与时间稳定域共同检查。
+SSP 方法将更新写成适当向前 Euler 步的凸组合，
+其强稳定性继承需要 Euler 步在目标泛函下已有稳定性及相应步长约束。
+空间高阶能量估计与 SSP 性质各有适用条件。
+
+对传播和刚性松弛并存的问题，采用
+\[
+\dot U=F_h(U)+G_h(U)
+\]
+的 IMEX 分拆，$F_h$ 显式、$G_h$ 隐式。
+自治加性 Runge--Kutta 的共同阶段写为
+\[
+\begin{aligned}
+Y_i&=U^n+\Delta t\sum_{j<i}\widetilde a_{ij}F_h(Y_j)
++\Delta t\sum_{j\le i}a_{ij}G_h(Y_j),\\
+U^{n+1}&=U^n+\Delta t\sum_i\widetilde b_iF_h(Y_i)
++\Delta t\sum_i b_iG_h(Y_i).
+\end{aligned}
+\]
+两个系数表须满足加性阶条件~\cite{ascher1997}。
+局部碰撞源的隐式处理可以减少快速松弛的步长限制；
+显式传播仍需相应稳定域，刚性极限还需检验渐近保持性与实际时间阶数。
+第二卷以导电 Maxwell 方程给出具体示例。
+
+\section{h、p 与 hp 自适应}
+$h$ 自适应改变单元尺寸，$p$ 自适应改变局部次数，$hp$ 自适应同时改变两者。
+光滑区域可增加次数，局部间断和几何尺度常需缩小单元并配合稳定化。
+转移算子应满足
+\[
+\int_Ku_{\mathrm{new}}\dd x
+=\int_Ku_{\mathrm{old}}\dd x,
+\]
+细化时对全部子单元求和，粗化时先汇总子单元积分。
+$L^2$ 投影含常数测试函数时保持该平均；正性及其他约束可能还需额外限制。
+重分区后的接口空间、几何测度与积分规则必须一起更新。
+
+\aiexercise{对周期平滑平流，固定空间网格，分别用 RK4 与 Heun 连续扩展测时间收敛，再固定足够小步长测空间收敛。用质量、能量和相位误差说明各指标反映什么。}
+{对带快速 BGK 松弛的离散速度方程选一组有出处的 IMEX 系数，区分传播 CFL、碰撞松弛与未解析极限。将系数出处和实际收敛阶记录为实验的一部分。}

@@ -1,0 +1,110 @@
+\chapter{From the Boltzmann Equation to Lattice Boltzmann Methods}\label{ch:15}
+\begin{chaptersummary}
+The preceding methods discretize macroscopic equations directly. This chapter instead selects discrete velocities and collisions at the kinetic level, recovering macroscopic transport in a long-wave, low-Mach limit. D2Q9 and D3Q27 connect velocity sets, isotropic moments, and exact lattice streaming; Chapman--Enskog expansion links nonequilibrium stress and the discrete-time correction to viscosity.
+\end{chaptersummary}
+\learninggoals{Define discrete populations and conserved moments; construct D2Q9 and D3Q27; perform streaming and collision updates; explain the low-Mach fluid limit and viscosity formula through a multiscale expansion.}
+\studyroute{Full third-order Chapman--Enskog algebra and general thermal-lattice construction are omitted. The model is standard, isothermal, low Mach, and unforced.}{lattice Boltzmann; D2Q9; D3Q27; Chapman--Enskog expansion; lattice viscosity}{Verify second- and fourth-order isotropy of D2Q9, then derive the half-time-step viscosity correction from the second-order Taylor expansion of streaming and collision.}
+
+\section{Discrete Velocities and Mesoscopic Variables}\index{LBM}
+Continuous kinetics contains both coordinate sets $\bm x,\bm v$.
+A discrete-velocity model selects velocities $\bm c_i$ and populations $f_i(\bm x,t)$ satisfying
+\[
+\partial_tf_i+\bm c_i\cdot\nabla f_i=\Omega_i,\qquad
+\rho=\sum_i f_i,\qquad \rho\bm u=\sum_i\bm c_i f_i.
+\]
+Here $f_i$ are mass-density populations with velocity-quadrature weights absorbed,
+unlike the continuous number-density distribution $f$ in Chapter~1.
+Moment matching by the velocity set and equilibrium determines the macroscopic models that can be represented;
+spatial streaming and time discretization then define the numerical update.
+If $\bm c_i\Delta t$ connects lattice nodes exactly, characteristic streaming becomes a direct shift of lattice data.
+
+\conceptbridge{How can finitely many velocity directions recover macroscopic viscous flow?}
+{Macroscopic equations read low-order distribution moments. If velocities, weights, and equilibrium reproduce the required isotropic moments,
+and collisions conserve mass and momentum, a long-wave expansion determines the nonequilibrium stress.
+The recovered equations and their errors depend jointly on these moment conditions, scale ordering, and time discretization.}
+{Discrete velocities and collision moments $\longrightarrow$ nonequilibrium stress $\longrightarrow$ macroscopic transport limit.}
+
+\section{D2Q9 and D3Q27}
+Let $c_\ell=\Delta x/\Delta t$. D2Q9 uses velocities
+\[
+\bm c_i/c_\ell\in\{(0,0),(\pm1,0),(0,\pm1),(\pm1,\pm1)\}.
+\]
+The rest, axial, and diagonal weights are
+$4/9,1/9,1/36$, respectively, with lattice sound speed $c_s^2=c_\ell^2/3$.
+D3Q27 is the tensor product of $\{0,\pm c_\ell\}$ in three directions,
+with one-dimensional weights $w(0)=2/3$, $w(\pm c_\ell)=1/6$; three-dimensional weights are their products.
+Both lattices satisfy, in their respective dimensions,
+\[
+\sum_iw_i=1,\quad \sum_iw_i c_{i\alpha}=0,\quad
+\sum_iw_i c_{i\alpha}c_{i\beta}=c_s^2\delta_{\alpha\beta},
+\]
+\[
+\sum_iw_i c_{i\alpha}c_{i\beta}c_{i\gamma}c_{i\delta}
+=c_s^4(\delta_{\alpha\beta}\delta_{\gamma\delta}
++\delta_{\alpha\gamma}\delta_{\beta\delta}
++\delta_{\alpha\delta}\delta_{\beta\gamma}).
+\]
+Higher-order velocity moments are constrained by the finite lattice.
+
+\section{Equilibrium, Collision, and Streaming}
+The second-order isothermal low-Mach equilibrium is
+\begin{equation}\label{eq:lbm-eq}
+f_i^{\mathrm{eq}}=w_i\rho\left[
+1+\frac{\bm c_i\cdot\bm u}{c_s^2}
++\frac{(\bm c_i\cdot\bm u)^2}{2c_s^4}
+-\frac{|\bm u|^2}{2c_s^2}\right].
+\end{equation}
+The moment identities give
+\[
+\sum_if_i^{\mathrm{eq}}=\rho,\quad
+\sum_i\bm c_if_i^{\mathrm{eq}}=\rho\bm u,\quad
+\sum_i\bm c_i\bm c_if_i^{\mathrm{eq}}=\rho c_s^2I+\rho\bm u\bm u.
+\]
+Each BGK--LBM step performs local collision followed by streaming:
+\begin{equation}\label{eq:lbe}
+f_i^*(\bm x,t)=f_i-\frac{\Delta t}{\tau_{\mathrm{LB}}}(f_i-f_i^{\mathrm{eq}}),
+\qquad
+f_i(\bm x+\bm c_i\Delta t,t+\Delta t)=f_i^*(\bm x,t).
+\end{equation}
+Collision preserves zeroth and first moments; periodic streaming preserves the global sum of populations.
+The relaxation parameter $\tau_{\mathrm{LB}}$ has units of time. In common lattice units $\Delta t=c_\ell=1$,
+the relaxation rate is $s=1/\tau_{\mathrm{LB}}$. Boundary reflection or reconstruction must also account for mass and momentum exchange.
+
+\section{Chapman--Enskog Expansion and Viscosity}\index{Chapman--Enskog expansion}
+Write $D_i=\partial_t+\bm c_i\cdot\nabla$.
+A smooth long-wave Taylor expansion of~\eqref{eq:lbe} gives
+\[
+D_if_i+\frac{\Delta t}{2}D_i^2f_i+\cdots
+=-\frac{f_i-f_i^{\mathrm{eq}}}{\tau_{\mathrm{LB}}}.
+\]
+Order the spatial and temporal derivatives by a small parameter and write
+$f_i=f_i^{(0)}+\epsilon f_i^{(1)}+\epsilon^2f_i^{(2)}+\cdots$,
+Impose zero mass and momentum moments on the nonequilibrium parts.
+Zeroth order gives $f_i^{(0)}=f_i^{\mathrm{eq}}$; first order gives
+\[
+f_i^{(1)}=-\tau_{\mathrm{LB}}D_i^{(1)}f_i^{\mathrm{eq}}.
+\]
+Zeroth and first moments recover the leading isothermal Euler system;
+the second moment converts $f_i^{(1)}$ into viscous stress, while the Taylor term supplies a time-discretization correction.
+On the low-Mach, nearly incompressible viscous scale,
+\[
+\partial_t\rho+\nabla\cdot(\rho\bm u)=0,
+\]
+\[
+\rho_0(\partial_t\bm u+\bm u\cdot\nabla\bm u)
+=-\nabla p+\rho_0\nu\Delta\bm u,\qquad
+\nabla\cdot\bm u=0
+\]
+is the corresponding limiting equation. Here $p$ is the small pressure perturbation associated with $c_s^2\rho$,
+$\rho/\rho_0=1+O(\mathrm{Ma}^2)$, and
+\begin{equation}\label{eq:lbm-viscosity}
+\nu=c_s^2\left(\tau_{\mathrm{LB}}-\frac{\Delta t}{2}\right).
+\end{equation}
+Positive viscosity requires $\tau_{\mathrm{LB}}>\Delta t/2$.
+Positive viscosity sets a basic relaxation-parameter range; stability of the complete update also involves equilibrium positivity, boundaries, and nonhydrodynamic modes.
+The relation between continuous BGK collision time and discrete $\tau_{\mathrm{LB}}$ depends on time integration;
+equation~\eqref{eq:lbm-viscosity} applies to the update specified here.
+The macroscopic limit of this standard second-order isothermal model assumes low Mach number and long wavelengths~\cite{qian1992}.
+
+\aiexercise{List all nine D2Q9 velocities and weights, and compute equilibrium mass, momentum, and second moments directly. Write collision and streaming on a periodic lattice without physical boundaries, and prove global mass conservation step by step.}
+{At fixed target kinematic viscosity, change $\Delta t$ and recompute $\tau_{\mathrm{LB}}$. For a periodic shear wave $u_x(y,0)=U_0\sin ky$, measure the decay rate $\nu k^2$ and distinguish lattice from physical units.}

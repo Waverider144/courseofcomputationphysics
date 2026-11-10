@@ -1,0 +1,747 @@
+{
+  "purpose": "Reference fingerprints for mathematical notation, citations, and book structure; prose is independently editable.",
+  "files": {
+    "Vol0_Linear_Algebra_HPC/chapters/part01_matrix_systems/ch01.tex": {
+      "display": "9edcf077869ef7cb835039cc65dfaa34375c184e3cdd23308259b9cb7a10c181",
+      "inline": "75708ac354496074b0693f2e36924d5a673d2a5dd906f47643b4e58f20108aa7",
+      "labels": "ab5a5c3a4e1893c2f4032d2ddcfe776fee6928b0e782eb6b9549f05297a7940b",
+      "citations": "70b353c31360ed2994665c3d8387d0c7b0f7f8e0c470da49b6e5f260f8b92ade",
+      "structure": "169b08547ddc821d14d0588dbd8c2456784302d373f727f213107fef401834a0"
+    },
+    "Vol0_Linear_Algebra_HPC/chapters/part01_matrix_systems/ch02.tex": {
+      "display": "eceac33035ae45c7812e29fcc11876f73a1112e21549a272a3b28e3dd13c5813",
+      "inline": "779b8c4ba5b6216f1bff96056808e11cf5812b5b5f64e22cba5f982b835f4c17",
+      "labels": "cffd21f34df31e850411c9796ff60afadeb86fcb3e2dc720101b24fd72b3e828",
+      "citations": "d259885a4a752d07b1bc890ce2c5a8fa5e50bdc50234e54e2da355ec36c33482",
+      "structure": "169b08547ddc821d14d0588dbd8c2456784302d373f727f213107fef401834a0"
+    },
+    "Vol0_Linear_Algebra_HPC/chapters/part01_matrix_systems/ch03.tex": {
+      "display": "d0efc2f389d34efa78963ead46dc8345252ef47f5add9a71bed54ee09ab47bb6",
+      "inline": "9ff1ad17133dd6c1d197a09390c292a68d7179ee0fc83d572edbeeea6ed75e04",
+      "labels": "601aed85fab7aacc1cc4c957ff1d123f9af04a8c9ae723fef63816eab641cc50",
+      "citations": "9cd44cc699babb4474947c50af9c71056e2e349b71d8c0f44ce8ef54d9b29a4d",
+      "structure": "169b08547ddc821d14d0588dbd8c2456784302d373f727f213107fef401834a0"
+    },
+    "Vol0_Linear_Algebra_HPC/chapters/part02_factorization/ch04.tex": {
+      "display": "d51d18944e2487ab7887fc855ea26f65a3fb080f34469be0756de7c93f0689f2",
+      "inline": "f84c9be04fb143559b9b3f04798323dab764cd586049ccd80b76ede4f80e0d29",
+      "labels": "bf2a4e896356c52da0d7ddf3880e94716cdd0fb340add4649c23b880d618bb92",
+      "citations": "4593f64b0692d2b336e9d8fe665a7222af605d1266a71734bb0f8e9101cc3017",
+      "structure": "169b08547ddc821d14d0588dbd8c2456784302d373f727f213107fef401834a0"
+    },
+    "Vol0_Linear_Algebra_HPC/chapters/part02_factorization/ch05.tex": {
+      "display": "a1b9f729a921916c270c7403b694ea29b5a0db0895acb9ca627bedd4ad30e571",
+      "inline": "06fe304f6d24e0e5942904f7c3354939363b74c04e498d30cc61628c7002f6a4",
+      "labels": "1c2a29d60fc82881e3291d24617bc8fbd1de22374cbd0b38c0c1db039fe97ba9",
+      "citations": "70b353c31360ed2994665c3d8387d0c7b0f7f8e0c470da49b6e5f260f8b92ade",
+      "structure": "169b08547ddc821d14d0588dbd8c2456784302d373f727f213107fef401834a0"
+    },
+    "Vol0_Linear_Algebra_HPC/chapters/part02_factorization/ch06.tex": {
+      "display": "99b968b455c32d7db4aba7a182558df1454f74fda3f5e7beee1c5fc4598f932f",
+      "inline": "10a89eebf0f5e6093d8191a6229435cd4a95b9081bdba8e94c61dbeb36c7264c",
+      "labels": "b6c6b5d21c6a889c8d23905f604393605955519bae44351e0225ea81d545f63c",
+      "citations": "4593f64b0692d2b336e9d8fe665a7222af605d1266a71734bb0f8e9101cc3017",
+      "structure": "169b08547ddc821d14d0588dbd8c2456784302d373f727f213107fef401834a0"
+    },
+    "Vol0_Linear_Algebra_HPC/chapters/part02_factorization/ch07.tex": {
+      "display": "d5456f123e930c83c4458479ae0ac80d556af061bcc659873b6b67f09e58a266",
+      "inline": "1c4221ae9c696c507a44cef5f5969f32eb6bd41e3ddef79c3aabd4b06270f620",
+      "labels": "97a8a9050cdf02f36804356734e5f72510d5406bca4193a0727c3bc9e1dca897",
+      "citations": "8dd35ca8d05fddb6a57b6cdfd8c4d9b8bc32ccb4f5941aa72fc4940f3e5d27a5",
+      "structure": "169b08547ddc821d14d0588dbd8c2456784302d373f727f213107fef401834a0"
+    },
+    "Vol0_Linear_Algebra_HPC/chapters/part02_factorization/ch08.tex": {
+      "display": "3b58d720d3af51de8635ae001a137dec179d88300dd3941896de041605330eb1",
+      "inline": "2e33b1724698e02517458c713aff37f392c984acd1b605d65070b41b879c4ff4",
+      "labels": "ddfa8eb06c64b4c22be52d7b1f148340a5ce02d4d4dfa6e52cb95367c059e6b9",
+      "citations": "9e0942177aed5c623d2a5c76617a63dc8083d3812ddc50f0f52a9d085d4c4474",
+      "structure": "c1d6bb44837eb1060d2e227b17e4ceaa109d3c27775fbdc1102cc01aa274f2e0"
+    },
+    "Vol0_Linear_Algebra_HPC/chapters/part02_factorization/ch09.tex": {
+      "display": "994f52c65453b3ac4990ec4bfa1cbcebedbcceefc2ef70a79129db34059557c5",
+      "inline": "bb2d450ad836e76af50ab9fac30517d3bf9e15fc85758aa7a807b891148a6be8",
+      "labels": "f32d9ee20b9026a854c3aaf30a4595c99e6cf62f6f97b470da8f98e7823f17c3",
+      "citations": "6a70cf3ff88939c9a147b40ac2397692f3cde4650097a5be25f03466e252666e",
+      "structure": "169b08547ddc821d14d0588dbd8c2456784302d373f727f213107fef401834a0"
+    },
+    "Vol0_Linear_Algebra_HPC/chapters/part03_krylov/ch10.tex": {
+      "display": "10e75a0032d05ab034bc4ff5288a7de9b9769000fdd3cc861cf0c1ef19a0fddf",
+      "inline": "90bcdcab29af7ca533d9104c6fbfab639f1cb15ab9f2b13cd53a99154d200bba",
+      "labels": "5c5307dd27399bc24de9ee6a91920c91e5066b1b85927ef7ded3321df3ba36a0",
+      "citations": "573f95b037918c8efafffdf9312cdaa11612d72ff878a65d719211d13a3585c3",
+      "structure": "169b08547ddc821d14d0588dbd8c2456784302d373f727f213107fef401834a0"
+    },
+    "Vol0_Linear_Algebra_HPC/chapters/part03_krylov/ch11.tex": {
+      "display": "4c7f85db8e67edcb6048db4ac433ea1d497dbd375f8a50df1816a8bb1d51b87d",
+      "inline": "df177e399f2f64343172becdaac81c988b941ecb6d654865820876d5201a9bcf",
+      "labels": "d8a009c369881ce5f313ff495df6c7ebf49c9cfe189f5fb76df9699a06cb751b",
+      "citations": "6a70cf3ff88939c9a147b40ac2397692f3cde4650097a5be25f03466e252666e",
+      "structure": "169b08547ddc821d14d0588dbd8c2456784302d373f727f213107fef401834a0"
+    },
+    "Vol0_Linear_Algebra_HPC/chapters/part03_krylov/ch12.tex": {
+      "display": "9c0e93cfc4323a6e587f7340757b732b58f5ae16dff77b6618b6b7d14c79c96e",
+      "inline": "4d7c20391ebbf395a0ee57e25111a719aefac4ceee7418782be874d89bed333a",
+      "labels": "bc2dd55b08042cf164c0bc01a3c7461287d5fd71d1f0c34692c587c73faaf567",
+      "citations": "c52789814fa7fef03ee4d8e540ccadadabc243913b87dc5acc36e6c88a09e6c7",
+      "structure": "169b08547ddc821d14d0588dbd8c2456784302d373f727f213107fef401834a0"
+    },
+    "Vol0_Linear_Algebra_HPC/chapters/part03_krylov/ch13.tex": {
+      "display": "9dbe86b3194975e6c0a4575e0f878d98aca80bd586d854c9c8987fff9b0d36b9",
+      "inline": "ae424951b7dfac47c59144f7a14073ed5a61734c59eed2c7844bd2719fa7c719",
+      "labels": "5db482187674aa3a427071f922e8683a5c3cffa65f768c59cae464741d1b30f7",
+      "citations": "9e0942177aed5c623d2a5c76617a63dc8083d3812ddc50f0f52a9d085d4c4474",
+      "structure": "169b08547ddc821d14d0588dbd8c2456784302d373f727f213107fef401834a0"
+    },
+    "Vol0_Linear_Algebra_HPC/chapters/part03_krylov/ch14.tex": {
+      "display": "6ad56494a43296261c3e84033cd2544477d68601bf05cbfcc40abcdf0cd89f4c",
+      "inline": "909c6c72acf8ab12e053d59674a63c5e132aadc2c3dda1de93637a8c827451d7",
+      "labels": "b97fbb6d8f23dcfd7ce1d6ede47dbe44e0416cdca6c26ee483a28eee6cf3939f",
+      "citations": "9e0942177aed5c623d2a5c76617a63dc8083d3812ddc50f0f52a9d085d4c4474",
+      "structure": "169b08547ddc821d14d0588dbd8c2456784302d373f727f213107fef401834a0"
+    },
+    "Vol0_Linear_Algebra_HPC/chapters/part03_krylov/ch15.tex": {
+      "display": "18235369b6dbdf550ca1d22b7d939e2fd391419c07268872615559eddad723a8",
+      "inline": "0cddf61d45292fe962c5980d078f5896c456032ec75cab5e9a0d6b3130936a0d",
+      "labels": "92603fbca79718fb35e3364945e76fa2a15dd1106a2ec7224407f821ee9c8a5e",
+      "citations": "168e98535b1d489dcd67f2e29923f7820adf542e019ee418c3570ab378c9908a",
+      "structure": "169b08547ddc821d14d0588dbd8c2456784302d373f727f213107fef401834a0"
+    },
+    "Vol0_Linear_Algebra_HPC/chapters/part04_preconditioning/ch16.tex": {
+      "display": "9c1000a9b165325705bdfdc04f917315243fcae5b19d4b947d073d13bd71ddf0",
+      "inline": "2b415102f062dda652118eeec9257f7c35fef0292309bb4fbabc6b16d1991dba",
+      "labels": "99c24172cd17debdc2d451a8ee89353809a25080fc3297398afdff6a8a8d5c05",
+      "citations": "9e0942177aed5c623d2a5c76617a63dc8083d3812ddc50f0f52a9d085d4c4474",
+      "structure": "c1d6bb44837eb1060d2e227b17e4ceaa109d3c27775fbdc1102cc01aa274f2e0"
+    },
+    "Vol0_Linear_Algebra_HPC/chapters/part04_preconditioning/ch17.tex": {
+      "display": "54d83c725250b29c30392aee09cc9f17c420623a68c96fb3962930f6b0e1abe8",
+      "inline": "3821b9bf25b6daa22aeee787e8302003dd1cc4bf44d6ad0b3a010fd493c9da1a",
+      "labels": "861044a7ef1e09cf8d2746bb883afb734281a1754e986c41498d1c64cb7894f3",
+      "citations": "8d8f0491efdb9de50569b14b860574399eabfb76ba2cd830f99596bdf6e822f4",
+      "structure": "169b08547ddc821d14d0588dbd8c2456784302d373f727f213107fef401834a0"
+    },
+    "Vol0_Linear_Algebra_HPC/chapters/part04_preconditioning/ch18.tex": {
+      "display": "5872621b6732925bcc030bc116243cdc0bc728fdaf114a35d6839bbf87aa273d",
+      "inline": "bd77f33a8622d307ae0bc17ce18eec1918f462070f292e4882c48e77eada8577",
+      "labels": "a742863e5a731022cef165367a92525a85e252abd94cd77bdf7d88dd62435950",
+      "citations": "5c2680ae2927056055e186dd6cdc5196821bdbd963a7b42870d625463f108cd6",
+      "structure": "169b08547ddc821d14d0588dbd8c2456784302d373f727f213107fef401834a0"
+    },
+    "Vol0_Linear_Algebra_HPC/chapters/part04_preconditioning/ch19.tex": {
+      "display": "38f8de778705526f89cb1c116e26d5a9ca537c670d8f54e1a0225157a56596fd",
+      "inline": "3e5ba16ea86a76d7b01d19afff6d1caf2f72e6819cef049b448285900ce07061",
+      "labels": "93423e2c91ca9d1f5fa1be5aca27c0d2e232311308fdc70db68f95bed74588f6",
+      "citations": "a35e294df929fe9dafbbd2b8ffef34560d573abdb7a469282d6d95867837352d",
+      "structure": "169b08547ddc821d14d0588dbd8c2456784302d373f727f213107fef401834a0"
+    },
+    "Vol0_Linear_Algebra_HPC/chapters/part04_preconditioning/ch20.tex": {
+      "display": "ac0efdb32e9171d1484dd31164e99fc751ac2621572d302e8d36f1fbcd34f82b",
+      "inline": "e65a7f19b832ca255f61bf4b3dd5bbe3ba416c173f9158689b01bccb198740e2",
+      "labels": "890e8cb9e7452f35e07bd954267084a1773a9d3a9a95ad0000837f17f1ba1fdf",
+      "citations": "c06e9275a7cd2dff356295da578f690fef0117117b6e4aa472559cc5edde14c1",
+      "structure": "169b08547ddc821d14d0588dbd8c2456784302d373f727f213107fef401834a0"
+    },
+    "Vol0_Linear_Algebra_HPC/chapters/part04_preconditioning/ch21.tex": {
+      "display": "b2351ce6ba1f3ab3085b8206b287ca4268ab1e121f579d0d3ba9bd2dcae2a57c",
+      "inline": "9da1823f62ee37ea8cbd61b6a629aebfed433a7d76689b2d4d187ede2e52583a",
+      "labels": "236091bb7fb1a11bcd5887685f2aa9c15630befe71fd597b410c97c9188c028d",
+      "citations": "5c2680ae2927056055e186dd6cdc5196821bdbd963a7b42870d625463f108cd6",
+      "structure": "169b08547ddc821d14d0588dbd8c2456784302d373f727f213107fef401834a0"
+    },
+    "Vol0_Linear_Algebra_HPC/chapters/part05_roofline_hpc/ch22.tex": {
+      "display": "cb8593e29f065f378ce2eacb8482858b199902056bb04fac9be06fb71fa3050c",
+      "inline": "d79241a256b627197ef5735681d12d04a9cf1fea831f562a0073321874b5a292",
+      "labels": "d675d873e6e12e90e57cdcf4e37cfea8edde486967fac9c56dbe7787c8a1cd48",
+      "citations": "658c5005ce7e56ad3bca79890b7c4157af741ae86dc0c4bcee398536ac1a4964",
+      "structure": "169b08547ddc821d14d0588dbd8c2456784302d373f727f213107fef401834a0"
+    },
+    "Vol0_Linear_Algebra_HPC/chapters/part05_roofline_hpc/ch23.tex": {
+      "display": "f0756751fcdcb568f8aebf8e63b362cd313518bd9d16bfcb8edc6a44c66ed576",
+      "inline": "d0b69b298805d6026b0195ec4b2a09b4b156481e568bd198c6ce72591a0f0fd8",
+      "labels": "feafdb28096bedc6e4adb18df21abcc671af23469c9ad61f5a2ab99a3fdf4c20",
+      "citations": "7672e400a14ba940aeb23eee257474051dffd243efb6aae69e79884967225d5e",
+      "structure": "623503ca2ff853c07d81a4db8b0e037665ae5d7bf1f233260b8142d470582971"
+    },
+    "Vol0_Linear_Algebra_HPC/chapters/part05_roofline_hpc/ch24.tex": {
+      "display": "7b7d264959d67543b4d6e35e802cb02dc0d54e2f8097fef6bd5a248a12bdb189",
+      "inline": "5190d1573ab758238380c232d0ca67dfd22301719b9f87bb0cce0a940ed3c1b1",
+      "labels": "99cffbbd31495f609cc0817359f4cd25e3581c9385477372c205a9b9d1de92b3",
+      "citations": "017f60a38f1c00bf5c79da90eb0658cd8e0714f980479518795719a760596d59",
+      "structure": "623503ca2ff853c07d81a4db8b0e037665ae5d7bf1f233260b8142d470582971"
+    },
+    "Vol0_Linear_Algebra_HPC/chapters/part05_roofline_hpc/ch25.tex": {
+      "display": "316cd970597d17d0f8998e41ef09e5fa4ae8db7629c877f3942fffd9969cb932",
+      "inline": "7d545765dc457bcc4b439f88ec77a719a87b60fbab61a2c7563a952b7bc5145c",
+      "labels": "d3a4c31f01bcc6d7ea48050b47e31066f90b632ccca76d96467c3b5a13d0a66f",
+      "citations": "69746a3233b0eb8f65ec87ebe318e7d61bf84d07ed07db3288251a68e5239106",
+      "structure": "cfa36d271490872a5c53d06f114228c7eb9ef176a760018ffb5d4cc7fbcfac0e"
+    },
+    "Vol0_Linear_Algebra_HPC/chapters/part05_roofline_hpc/ch26.tex": {
+      "display": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "inline": "e6271330087b6e6d45e26d314c23e6dad2db55bc3550eaf59fb9cdaa3e1da469",
+      "labels": "0437e04f17fc3643dfcf79ed2aeb00595ef07d76e0a0012294c65c4c9834f42c",
+      "citations": "ff6a20e745f68bc3bba1962a044f0cdf45a75f8c9066a6bca6eea8fd4eba2193",
+      "structure": "169b08547ddc821d14d0588dbd8c2456784302d373f727f213107fef401834a0"
+    },
+    "Vol0_Linear_Algebra_HPC/chapters/part05_roofline_hpc/ch27.tex": {
+      "display": "2cb263ff97f5e24bc97379cd404ca6b0e05185c3e9a2676cfadf7d7365eb688b",
+      "inline": "8e7ef16d9a6fa22966aad9a6d496537cd00e719ff1bc90bd39bd5fd35490959f",
+      "labels": "de2983ac0bbf2205732333c5b71370bf47b5230c69153b9718d9a5c364e65cea",
+      "citations": "54b03a14a9fbb3ddba4cffe5e664020b1640c1802c42baa9b150f3c908c2349e",
+      "structure": "623503ca2ff853c07d81a4db8b0e037665ae5d7bf1f233260b8142d470582971"
+    },
+    "Vol0_Linear_Algebra_HPC/chapters/part05_roofline_hpc/ch28.tex": {
+      "display": "f6ecabb2fb5326e79977d6239e79fdbf0d5a4e24cc9f1fe90545aa41e37689db",
+      "inline": "5cb9455f9f28a93ecd49297eb618154ba93aa40f87af72b7b81a2d31ccd11d62",
+      "labels": "8beab497ddbc2762efc89ec8d8198f937a8b485acebe9ee1caa7e71e675e38f0",
+      "citations": "ce4001710d68a1ba0a127627939953705630fdfa15310072d02002526b338380",
+      "structure": "169b08547ddc821d14d0588dbd8c2456784302d373f727f213107fef401834a0"
+    },
+    "Vol0_Linear_Algebra_HPC/chapters/part05_roofline_hpc/ch29.tex": {
+      "display": "b9924e4938e1394376d13ca6493ae72b6c9bd2532e179fad801510f91b77a5ae",
+      "inline": "4f852a53c4257b00f2eb1daa2fcf5eeea98fca7dce85dbb59a0ca878628414b9",
+      "labels": "def1c0de56b3fc8460a81b12104555f1753423ba7258101d168e30eff1d569bf",
+      "citations": "e6315d3a150105742af76b71c6994bc707f16e45c5c9cc152bdaccace31b4592",
+      "structure": "2fcb9fd0a38289a9a69c35fc380c19980d874df730b2f4d640f412ba018cfa12"
+    },
+    "Vol0_Linear_Algebra_HPC_EN/chapters/part01_matrix_systems/ch01.tex": {
+      "display": "9edcf077869ef7cb835039cc65dfaa34375c184e3cdd23308259b9cb7a10c181",
+      "inline": "75708ac354496074b0693f2e36924d5a673d2a5dd906f47643b4e58f20108aa7",
+      "labels": "ab5a5c3a4e1893c2f4032d2ddcfe776fee6928b0e782eb6b9549f05297a7940b",
+      "citations": "70b353c31360ed2994665c3d8387d0c7b0f7f8e0c470da49b6e5f260f8b92ade",
+      "structure": "169b08547ddc821d14d0588dbd8c2456784302d373f727f213107fef401834a0"
+    },
+    "Vol0_Linear_Algebra_HPC_EN/chapters/part01_matrix_systems/ch02.tex": {
+      "display": "eceac33035ae45c7812e29fcc11876f73a1112e21549a272a3b28e3dd13c5813",
+      "inline": "779b8c4ba5b6216f1bff96056808e11cf5812b5b5f64e22cba5f982b835f4c17",
+      "labels": "cffd21f34df31e850411c9796ff60afadeb86fcb3e2dc720101b24fd72b3e828",
+      "citations": "d259885a4a752d07b1bc890ce2c5a8fa5e50bdc50234e54e2da355ec36c33482",
+      "structure": "169b08547ddc821d14d0588dbd8c2456784302d373f727f213107fef401834a0"
+    },
+    "Vol0_Linear_Algebra_HPC_EN/chapters/part01_matrix_systems/ch03.tex": {
+      "display": "d0efc2f389d34efa78963ead46dc8345252ef47f5add9a71bed54ee09ab47bb6",
+      "inline": "9ff1ad17133dd6c1d197a09390c292a68d7179ee0fc83d572edbeeea6ed75e04",
+      "labels": "601aed85fab7aacc1cc4c957ff1d123f9af04a8c9ae723fef63816eab641cc50",
+      "citations": "9cd44cc699babb4474947c50af9c71056e2e349b71d8c0f44ce8ef54d9b29a4d",
+      "structure": "169b08547ddc821d14d0588dbd8c2456784302d373f727f213107fef401834a0"
+    },
+    "Vol0_Linear_Algebra_HPC_EN/chapters/part02_factorization/ch04.tex": {
+      "display": "d51d18944e2487ab7887fc855ea26f65a3fb080f34469be0756de7c93f0689f2",
+      "inline": "f84c9be04fb143559b9b3f04798323dab764cd586049ccd80b76ede4f80e0d29",
+      "labels": "bf2a4e896356c52da0d7ddf3880e94716cdd0fb340add4649c23b880d618bb92",
+      "citations": "4593f64b0692d2b336e9d8fe665a7222af605d1266a71734bb0f8e9101cc3017",
+      "structure": "169b08547ddc821d14d0588dbd8c2456784302d373f727f213107fef401834a0"
+    },
+    "Vol0_Linear_Algebra_HPC_EN/chapters/part02_factorization/ch05.tex": {
+      "display": "a1b9f729a921916c270c7403b694ea29b5a0db0895acb9ca627bedd4ad30e571",
+      "inline": "06fe304f6d24e0e5942904f7c3354939363b74c04e498d30cc61628c7002f6a4",
+      "labels": "1c2a29d60fc82881e3291d24617bc8fbd1de22374cbd0b38c0c1db039fe97ba9",
+      "citations": "70b353c31360ed2994665c3d8387d0c7b0f7f8e0c470da49b6e5f260f8b92ade",
+      "structure": "169b08547ddc821d14d0588dbd8c2456784302d373f727f213107fef401834a0"
+    },
+    "Vol0_Linear_Algebra_HPC_EN/chapters/part02_factorization/ch06.tex": {
+      "display": "99b968b455c32d7db4aba7a182558df1454f74fda3f5e7beee1c5fc4598f932f",
+      "inline": "10a89eebf0f5e6093d8191a6229435cd4a95b9081bdba8e94c61dbeb36c7264c",
+      "labels": "b6c6b5d21c6a889c8d23905f604393605955519bae44351e0225ea81d545f63c",
+      "citations": "4593f64b0692d2b336e9d8fe665a7222af605d1266a71734bb0f8e9101cc3017",
+      "structure": "169b08547ddc821d14d0588dbd8c2456784302d373f727f213107fef401834a0"
+    },
+    "Vol0_Linear_Algebra_HPC_EN/chapters/part02_factorization/ch07.tex": {
+      "display": "d5456f123e930c83c4458479ae0ac80d556af061bcc659873b6b67f09e58a266",
+      "inline": "1c4221ae9c696c507a44cef5f5969f32eb6bd41e3ddef79c3aabd4b06270f620",
+      "labels": "97a8a9050cdf02f36804356734e5f72510d5406bca4193a0727c3bc9e1dca897",
+      "citations": "8dd35ca8d05fddb6a57b6cdfd8c4d9b8bc32ccb4f5941aa72fc4940f3e5d27a5",
+      "structure": "169b08547ddc821d14d0588dbd8c2456784302d373f727f213107fef401834a0"
+    },
+    "Vol0_Linear_Algebra_HPC_EN/chapters/part02_factorization/ch08.tex": {
+      "display": "3b58d720d3af51de8635ae001a137dec179d88300dd3941896de041605330eb1",
+      "inline": "2e33b1724698e02517458c713aff37f392c984acd1b605d65070b41b879c4ff4",
+      "labels": "ddfa8eb06c64b4c22be52d7b1f148340a5ce02d4d4dfa6e52cb95367c059e6b9",
+      "citations": "9e0942177aed5c623d2a5c76617a63dc8083d3812ddc50f0f52a9d085d4c4474",
+      "structure": "c1d6bb44837eb1060d2e227b17e4ceaa109d3c27775fbdc1102cc01aa274f2e0"
+    },
+    "Vol0_Linear_Algebra_HPC_EN/chapters/part02_factorization/ch09.tex": {
+      "display": "994f52c65453b3ac4990ec4bfa1cbcebedbcceefc2ef70a79129db34059557c5",
+      "inline": "bb2d450ad836e76af50ab9fac30517d3bf9e15fc85758aa7a807b891148a6be8",
+      "labels": "f32d9ee20b9026a854c3aaf30a4595c99e6cf62f6f97b470da8f98e7823f17c3",
+      "citations": "6a70cf3ff88939c9a147b40ac2397692f3cde4650097a5be25f03466e252666e",
+      "structure": "169b08547ddc821d14d0588dbd8c2456784302d373f727f213107fef401834a0"
+    },
+    "Vol0_Linear_Algebra_HPC_EN/chapters/part03_krylov/ch10.tex": {
+      "display": "10e75a0032d05ab034bc4ff5288a7de9b9769000fdd3cc861cf0c1ef19a0fddf",
+      "inline": "90bcdcab29af7ca533d9104c6fbfab639f1cb15ab9f2b13cd53a99154d200bba",
+      "labels": "5c5307dd27399bc24de9ee6a91920c91e5066b1b85927ef7ded3321df3ba36a0",
+      "citations": "573f95b037918c8efafffdf9312cdaa11612d72ff878a65d719211d13a3585c3",
+      "structure": "169b08547ddc821d14d0588dbd8c2456784302d373f727f213107fef401834a0"
+    },
+    "Vol0_Linear_Algebra_HPC_EN/chapters/part03_krylov/ch11.tex": {
+      "display": "4c7f85db8e67edcb6048db4ac433ea1d497dbd375f8a50df1816a8bb1d51b87d",
+      "inline": "df177e399f2f64343172becdaac81c988b941ecb6d654865820876d5201a9bcf",
+      "labels": "d8a009c369881ce5f313ff495df6c7ebf49c9cfe189f5fb76df9699a06cb751b",
+      "citations": "6a70cf3ff88939c9a147b40ac2397692f3cde4650097a5be25f03466e252666e",
+      "structure": "169b08547ddc821d14d0588dbd8c2456784302d373f727f213107fef401834a0"
+    },
+    "Vol0_Linear_Algebra_HPC_EN/chapters/part03_krylov/ch12.tex": {
+      "display": "9c0e93cfc4323a6e587f7340757b732b58f5ae16dff77b6618b6b7d14c79c96e",
+      "inline": "4d7c20391ebbf395a0ee57e25111a719aefac4ceee7418782be874d89bed333a",
+      "labels": "bc2dd55b08042cf164c0bc01a3c7461287d5fd71d1f0c34692c587c73faaf567",
+      "citations": "c52789814fa7fef03ee4d8e540ccadadabc243913b87dc5acc36e6c88a09e6c7",
+      "structure": "169b08547ddc821d14d0588dbd8c2456784302d373f727f213107fef401834a0"
+    },
+    "Vol0_Linear_Algebra_HPC_EN/chapters/part03_krylov/ch13.tex": {
+      "display": "9dbe86b3194975e6c0a4575e0f878d98aca80bd586d854c9c8987fff9b0d36b9",
+      "inline": "ae424951b7dfac47c59144f7a14073ed5a61734c59eed2c7844bd2719fa7c719",
+      "labels": "5db482187674aa3a427071f922e8683a5c3cffa65f768c59cae464741d1b30f7",
+      "citations": "9e0942177aed5c623d2a5c76617a63dc8083d3812ddc50f0f52a9d085d4c4474",
+      "structure": "169b08547ddc821d14d0588dbd8c2456784302d373f727f213107fef401834a0"
+    },
+    "Vol0_Linear_Algebra_HPC_EN/chapters/part03_krylov/ch14.tex": {
+      "display": "6ad56494a43296261c3e84033cd2544477d68601bf05cbfcc40abcdf0cd89f4c",
+      "inline": "909c6c72acf8ab12e053d59674a63c5e132aadc2c3dda1de93637a8c827451d7",
+      "labels": "b97fbb6d8f23dcfd7ce1d6ede47dbe44e0416cdca6c26ee483a28eee6cf3939f",
+      "citations": "9e0942177aed5c623d2a5c76617a63dc8083d3812ddc50f0f52a9d085d4c4474",
+      "structure": "169b08547ddc821d14d0588dbd8c2456784302d373f727f213107fef401834a0"
+    },
+    "Vol0_Linear_Algebra_HPC_EN/chapters/part03_krylov/ch15.tex": {
+      "display": "18235369b6dbdf550ca1d22b7d939e2fd391419c07268872615559eddad723a8",
+      "inline": "0cddf61d45292fe962c5980d078f5896c456032ec75cab5e9a0d6b3130936a0d",
+      "labels": "92603fbca79718fb35e3364945e76fa2a15dd1106a2ec7224407f821ee9c8a5e",
+      "citations": "168e98535b1d489dcd67f2e29923f7820adf542e019ee418c3570ab378c9908a",
+      "structure": "169b08547ddc821d14d0588dbd8c2456784302d373f727f213107fef401834a0"
+    },
+    "Vol0_Linear_Algebra_HPC_EN/chapters/part04_preconditioning/ch16.tex": {
+      "display": "9c1000a9b165325705bdfdc04f917315243fcae5b19d4b947d073d13bd71ddf0",
+      "inline": "2b415102f062dda652118eeec9257f7c35fef0292309bb4fbabc6b16d1991dba",
+      "labels": "99c24172cd17debdc2d451a8ee89353809a25080fc3297398afdff6a8a8d5c05",
+      "citations": "9e0942177aed5c623d2a5c76617a63dc8083d3812ddc50f0f52a9d085d4c4474",
+      "structure": "c1d6bb44837eb1060d2e227b17e4ceaa109d3c27775fbdc1102cc01aa274f2e0"
+    },
+    "Vol0_Linear_Algebra_HPC_EN/chapters/part04_preconditioning/ch17.tex": {
+      "display": "54d83c725250b29c30392aee09cc9f17c420623a68c96fb3962930f6b0e1abe8",
+      "inline": "3821b9bf25b6daa22aeee787e8302003dd1cc4bf44d6ad0b3a010fd493c9da1a",
+      "labels": "861044a7ef1e09cf8d2746bb883afb734281a1754e986c41498d1c64cb7894f3",
+      "citations": "8d8f0491efdb9de50569b14b860574399eabfb76ba2cd830f99596bdf6e822f4",
+      "structure": "169b08547ddc821d14d0588dbd8c2456784302d373f727f213107fef401834a0"
+    },
+    "Vol0_Linear_Algebra_HPC_EN/chapters/part04_preconditioning/ch18.tex": {
+      "display": "5872621b6732925bcc030bc116243cdc0bc728fdaf114a35d6839bbf87aa273d",
+      "inline": "bd77f33a8622d307ae0bc17ce18eec1918f462070f292e4882c48e77eada8577",
+      "labels": "a742863e5a731022cef165367a92525a85e252abd94cd77bdf7d88dd62435950",
+      "citations": "5c2680ae2927056055e186dd6cdc5196821bdbd963a7b42870d625463f108cd6",
+      "structure": "169b08547ddc821d14d0588dbd8c2456784302d373f727f213107fef401834a0"
+    },
+    "Vol0_Linear_Algebra_HPC_EN/chapters/part04_preconditioning/ch19.tex": {
+      "display": "38f8de778705526f89cb1c116e26d5a9ca537c670d8f54e1a0225157a56596fd",
+      "inline": "3e5ba16ea86a76d7b01d19afff6d1caf2f72e6819cef049b448285900ce07061",
+      "labels": "93423e2c91ca9d1f5fa1be5aca27c0d2e232311308fdc70db68f95bed74588f6",
+      "citations": "a35e294df929fe9dafbbd2b8ffef34560d573abdb7a469282d6d95867837352d",
+      "structure": "169b08547ddc821d14d0588dbd8c2456784302d373f727f213107fef401834a0"
+    },
+    "Vol0_Linear_Algebra_HPC_EN/chapters/part04_preconditioning/ch20.tex": {
+      "display": "ac0efdb32e9171d1484dd31164e99fc751ac2621572d302e8d36f1fbcd34f82b",
+      "inline": "e65a7f19b832ca255f61bf4b3dd5bbe3ba416c173f9158689b01bccb198740e2",
+      "labels": "890e8cb9e7452f35e07bd954267084a1773a9d3a9a95ad0000837f17f1ba1fdf",
+      "citations": "c06e9275a7cd2dff356295da578f690fef0117117b6e4aa472559cc5edde14c1",
+      "structure": "169b08547ddc821d14d0588dbd8c2456784302d373f727f213107fef401834a0"
+    },
+    "Vol0_Linear_Algebra_HPC_EN/chapters/part04_preconditioning/ch21.tex": {
+      "display": "b2351ce6ba1f3ab3085b8206b287ca4268ab1e121f579d0d3ba9bd2dcae2a57c",
+      "inline": "9da1823f62ee37ea8cbd61b6a629aebfed433a7d76689b2d4d187ede2e52583a",
+      "labels": "236091bb7fb1a11bcd5887685f2aa9c15630befe71fd597b410c97c9188c028d",
+      "citations": "5c2680ae2927056055e186dd6cdc5196821bdbd963a7b42870d625463f108cd6",
+      "structure": "169b08547ddc821d14d0588dbd8c2456784302d373f727f213107fef401834a0"
+    },
+    "Vol0_Linear_Algebra_HPC_EN/chapters/part05_roofline_hpc/ch22.tex": {
+      "display": "cb8593e29f065f378ce2eacb8482858b199902056bb04fac9be06fb71fa3050c",
+      "inline": "d79241a256b627197ef5735681d12d04a9cf1fea831f562a0073321874b5a292",
+      "labels": "d675d873e6e12e90e57cdcf4e37cfea8edde486967fac9c56dbe7787c8a1cd48",
+      "citations": "658c5005ce7e56ad3bca79890b7c4157af741ae86dc0c4bcee398536ac1a4964",
+      "structure": "169b08547ddc821d14d0588dbd8c2456784302d373f727f213107fef401834a0"
+    },
+    "Vol0_Linear_Algebra_HPC_EN/chapters/part05_roofline_hpc/ch23.tex": {
+      "display": "f0756751fcdcb568f8aebf8e63b362cd313518bd9d16bfcb8edc6a44c66ed576",
+      "inline": "d0b69b298805d6026b0195ec4b2a09b4b156481e568bd198c6ce72591a0f0fd8",
+      "labels": "feafdb28096bedc6e4adb18df21abcc671af23469c9ad61f5a2ab99a3fdf4c20",
+      "citations": "7672e400a14ba940aeb23eee257474051dffd243efb6aae69e79884967225d5e",
+      "structure": "623503ca2ff853c07d81a4db8b0e037665ae5d7bf1f233260b8142d470582971"
+    },
+    "Vol0_Linear_Algebra_HPC_EN/chapters/part05_roofline_hpc/ch24.tex": {
+      "display": "7b7d264959d67543b4d6e35e802cb02dc0d54e2f8097fef6bd5a248a12bdb189",
+      "inline": "5190d1573ab758238380c232d0ca67dfd22301719b9f87bb0cce0a940ed3c1b1",
+      "labels": "99cffbbd31495f609cc0817359f4cd25e3581c9385477372c205a9b9d1de92b3",
+      "citations": "017f60a38f1c00bf5c79da90eb0658cd8e0714f980479518795719a760596d59",
+      "structure": "623503ca2ff853c07d81a4db8b0e037665ae5d7bf1f233260b8142d470582971"
+    },
+    "Vol0_Linear_Algebra_HPC_EN/chapters/part05_roofline_hpc/ch25.tex": {
+      "display": "316cd970597d17d0f8998e41ef09e5fa4ae8db7629c877f3942fffd9969cb932",
+      "inline": "7d545765dc457bcc4b439f88ec77a719a87b60fbab61a2c7563a952b7bc5145c",
+      "labels": "d3a4c31f01bcc6d7ea48050b47e31066f90b632ccca76d96467c3b5a13d0a66f",
+      "citations": "69746a3233b0eb8f65ec87ebe318e7d61bf84d07ed07db3288251a68e5239106",
+      "structure": "cfa36d271490872a5c53d06f114228c7eb9ef176a760018ffb5d4cc7fbcfac0e"
+    },
+    "Vol0_Linear_Algebra_HPC_EN/chapters/part05_roofline_hpc/ch26.tex": {
+      "display": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "inline": "e6271330087b6e6d45e26d314c23e6dad2db55bc3550eaf59fb9cdaa3e1da469",
+      "labels": "0437e04f17fc3643dfcf79ed2aeb00595ef07d76e0a0012294c65c4c9834f42c",
+      "citations": "ff6a20e745f68bc3bba1962a044f0cdf45a75f8c9066a6bca6eea8fd4eba2193",
+      "structure": "169b08547ddc821d14d0588dbd8c2456784302d373f727f213107fef401834a0"
+    },
+    "Vol0_Linear_Algebra_HPC_EN/chapters/part05_roofline_hpc/ch27.tex": {
+      "display": "2cb263ff97f5e24bc97379cd404ca6b0e05185c3e9a2676cfadf7d7365eb688b",
+      "inline": "8e7ef16d9a6fa22966aad9a6d496537cd00e719ff1bc90bd39bd5fd35490959f",
+      "labels": "de2983ac0bbf2205732333c5b71370bf47b5230c69153b9718d9a5c364e65cea",
+      "citations": "54b03a14a9fbb3ddba4cffe5e664020b1640c1802c42baa9b150f3c908c2349e",
+      "structure": "623503ca2ff853c07d81a4db8b0e037665ae5d7bf1f233260b8142d470582971"
+    },
+    "Vol0_Linear_Algebra_HPC_EN/chapters/part05_roofline_hpc/ch28.tex": {
+      "display": "f6ecabb2fb5326e79977d6239e79fdbf0d5a4e24cc9f1fe90545aa41e37689db",
+      "inline": "5cb9455f9f28a93ecd49297eb618154ba93aa40f87af72b7b81a2d31ccd11d62",
+      "labels": "8beab497ddbc2762efc89ec8d8198f937a8b485acebe9ee1caa7e71e675e38f0",
+      "citations": "ce4001710d68a1ba0a127627939953705630fdfa15310072d02002526b338380",
+      "structure": "169b08547ddc821d14d0588dbd8c2456784302d373f727f213107fef401834a0"
+    },
+    "Vol0_Linear_Algebra_HPC_EN/chapters/part05_roofline_hpc/ch29.tex": {
+      "display": "b9924e4938e1394376d13ca6493ae72b6c9bd2532e179fad801510f91b77a5ae",
+      "inline": "4f852a53c4257b00f2eb1daa2fcf5eeea98fca7dce85dbb59a0ca878628414b9",
+      "labels": "def1c0de56b3fc8460a81b12104555f1753423ba7258101d168e30eff1d569bf",
+      "citations": "e6315d3a150105742af76b71c6994bc707f16e45c5c9cc152bdaccace31b4592",
+      "structure": "2fcb9fd0a38289a9a69c35fc380c19980d874df730b2f4d640f412ba018cfa12"
+    },
+    "vol1_revised/chapters/ch01.tex": {
+      "display": "b1a2d101aa6793e81151cfea4118ff8c61dd2bf4e3df28eb022756281dd40dee",
+      "inline": "145d7611fd507a6d2f73f9a3aa4c1f3b4f5332752babe886e0beb664e5bd3471",
+      "labels": "cbd77814bda690996c2246616044cc9f2f36922c8dc2db223a0125a2448341a4",
+      "citations": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "structure": "2d8d18ca826d19f1b15ff9df320fc9686e886ee1c6d4246d26964344ddd064f9"
+    },
+    "vol1_revised/chapters/ch02.tex": {
+      "display": "bef5d08665c52e8a98deeb4e5fa320a590f1d7cfee2a9571864a70f0f71ba227",
+      "inline": "bdafe015c1a42fff86403f5de77a83d065b85916e29583d79a8857570977741d",
+      "labels": "d1d38b38ba7022eac8c47f05d6df366d8d435fe36c3704464dfef2cd571a93c3",
+      "citations": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "structure": "5689fe9f8da407e7d219d84f2ca26e579565d2eb61c5639254cb31d5989a6202"
+    },
+    "vol1_revised/chapters/ch03.tex": {
+      "display": "2087b691a21364735060db9f0a859401ef4056414042aa5d347e9af800b255de",
+      "inline": "0c42517471952c794efc79051f17c0e0827088483f271485da3c598a3ea89a7e",
+      "labels": "de8c4c41542f4d908071e37aee284712fba62e2c71724ac5fcc54cc7d6f1c926",
+      "citations": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "structure": "b17df806019a506bde0b86e8ec728a114a1f5106b5d5732a046b900d6c20f8c2"
+    },
+    "vol1_revised/chapters/ch04.tex": {
+      "display": "e190e3aa31102ed6dd80d2b9bbb606d096945014bac55e0009b00777259995c6",
+      "inline": "5e53e807098683d7886d32b15e540c20552efb6d5ca9cb5e489d4bf045737298",
+      "labels": "8e85035007b5e9fcda9abec0bc08ec4a233d20c300603b78a0577f01bed022a0",
+      "citations": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "structure": "77e8e89a7ec8647d070ad2238dbc7e2280c91f1f7f07b287155e3844819591ee"
+    },
+    "vol1_revised/chapters/ch05.tex": {
+      "display": "dc35fe41d08f3dfde1252581ca36e2b16185f3de65e61d8e769e6775e2da4761",
+      "inline": "cefe018d799f885c582a08849dfc8746df0dceee1877dfc6c0360eb809e62e9b",
+      "labels": "2870b75f943aba17d19a8e1644c9935c3e6b45f96983a074ca5000ace04bc0ec",
+      "citations": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "structure": "1bc6920d06c59da4626338a08b9bb2bfd3ebe48892c25fbd862fb8d4bc79ddcc"
+    },
+    "vol1_revised/chapters/ch06.tex": {
+      "display": "196f0fdf91ffe580452907eee2f409a0beff6222c2ca9a1ce3889e496e05f43a",
+      "inline": "d193dac7a8b4f94e1889767e5e85cd5cc7e133d72e847f93b9a2c579ea3c74f4",
+      "labels": "a39bd8f5a0fdcc114f1d381bf09b0e99519b3a542ea390f237fe6b985dacb826",
+      "citations": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "structure": "7e2ab4286c9e13dd952f2be589a9d7ed541b3ee999513b0771447b634dc436cf"
+    },
+    "vol1_revised/chapters/ch07.tex": {
+      "display": "5e110a9283eab67fb5a94e7106ff4f30f872c98c54508050e37b999bf0eaa972",
+      "inline": "e261d7d5ecba2df666bc3fd01a12ee079509cecb03fffcdee71907dfc0daa76f",
+      "labels": "cc57f85810fb7eb88dae309ff84ff12fa709a98e99cc4df0b27939b6a83641ce",
+      "citations": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "structure": "e38e920be509b633da8c35e9dfef9771091fe035a270d082fd19f95d356b7d04"
+    },
+    "vol1_revised/chapters/ch08.tex": {
+      "display": "8d3d6dc8bedd26df4071a96f75e0ee71b8242e9a8e1ff707e45107e2dcae7b95",
+      "inline": "b694aa94dd6b8927e602f3ebd51fbd2339030293aa56129c29da9132abeec8e3",
+      "labels": "83ee05da700eb242994eded6c12a777ec3ec200ed3930d2586db341b3eba01a8",
+      "citations": "a5c587d89ac5234973d86f43e1813b051bb59763e71aaced6e35c9fc07b1af58",
+      "structure": "8b80a33572fa0f0881f18625f8f575f89ad2e0424a047a902a91b2b08853c530"
+    },
+    "vol1_revised/chapters/ch09.tex": {
+      "display": "78ae19881c5ae24c75e25b884705877aad7a7ca04fa1b44758b0dd9be9ecaae0",
+      "inline": "8f5f1e3a2868c071c90b9cf516697ba2f6ee65fffcdca3f74cabc2560829b7ad",
+      "labels": "6237ec7fcb3c18aea132a469ea2135223349ae437e1846cbc6208d8a92eaee6c",
+      "citations": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "structure": "2bf7ff7ecde2ef9d8025600c941e003555fb6dc39e5e1f44be63984f46f340b8"
+    },
+    "vol1_revised/chapters/ch10.tex": {
+      "display": "578160b0300af1ac3575ddab41988f67648223089e42b9e4cd87762ea4883ddb",
+      "inline": "3260638c356c4aefff0ca79f773d30ba89dfaf6fccdd834b6f4b1eb878a4babd",
+      "labels": "9ec7775d07fce5a1f58c8d31de2093ef91d26ca695f6e704479aedeccbbafea6",
+      "citations": "21d04616e6b2927c5110d115ca533e52c01ce72090fa45d1486e44cc7ec17fcc",
+      "structure": "623503ca2ff853c07d81a4db8b0e037665ae5d7bf1f233260b8142d470582971"
+    },
+    "vol1_revised/chapters/ch11.tex": {
+      "display": "002cedf8ab72d14ca46b6a58765ee915db589903fa5cbc421bce33908295699b",
+      "inline": "93bdaaa7703662ac45e72ec04092e963ff0a7b651bea00f278e4ca1d67565dd1",
+      "labels": "d3b0ef4807f66a9e5cc5651ebc550ec23cded9c9a09790246990dee8519c153e",
+      "citations": "24640982ef710a44de008cc38e19c5d1c14c31e06f6a5fd8cdc32a201278c8c4",
+      "structure": "623503ca2ff853c07d81a4db8b0e037665ae5d7bf1f233260b8142d470582971"
+    },
+    "vol1_revised/chapters/ch12.tex": {
+      "display": "8fe3295c0dd4b3b73b84619a9233b373fe24d0c70d7c0786433c5d9d6d5bacc2",
+      "inline": "63b76c83172596d5ec191c834c43ad59903eb7ca520ee9d17721ff165cc347b2",
+      "labels": "0122f22efd44d05af3bc8cf19e90b4486818f7443c3f61b37f6d3830d8776e7c",
+      "citations": "47777b09060ba4c47dd128ab00cb3d044ddd6757220a326a2527efb0ed0ed2d3",
+      "structure": "623503ca2ff853c07d81a4db8b0e037665ae5d7bf1f233260b8142d470582971"
+    },
+    "vol1_revised/chapters/ch13.tex": {
+      "display": "ac926a9a697f5ebf77ad5246f7654c230e1e24000238539971c14f1fa1a4a725",
+      "inline": "ef7ddc8664d7c5089b5225f7c77f26ac23643849fa2c8d2cf9a9b3899c9ad81e",
+      "labels": "1aab1de6f7e1facfc78e087e206016b084bc5091370a3e1dafc0d09cda31bd52",
+      "citations": "c119036cb69015b8722d92dd1b17bfe24f48cde40fe05ee1c8836c02132b8769",
+      "structure": "623503ca2ff853c07d81a4db8b0e037665ae5d7bf1f233260b8142d470582971"
+    },
+    "vol1_revised/chapters/ch14.tex": {
+      "display": "56377e5cb93fd863ebc8edf0be24d02cd714b0e47ff933d2cdd8ea5367a83ed9",
+      "inline": "70f5fe10934633e84aa2f16c12be3fcb32cc0905696f00a6ec4a406bb6070f43",
+      "labels": "c138f55176677d747ce94d846cdb6800798c0a839a114bcb44580bdb543f01c5",
+      "citations": "1f0bb3dc9177846580329c2a10dbf0972ee6d5dcb0b7851b3fe74b56ffbcf82b",
+      "structure": "6b9aa6f3c038186123cfe0f2396ccf8f01dea793b664e9e1b54567c0880ac1b5"
+    },
+    "vol1_revised/chapters/ch15.tex": {
+      "display": "1a6bcd449ac40eab4b83fafa6f12fa6f6475887e4e89855d6f1e439ad4d9af1e",
+      "inline": "d36589aede6002bb0a5253addafd46edc84ca6be67bf8a11a9848e15ccc56894",
+      "labels": "b8de650a0c4616b5ee6daadd5ef897a596a61952b26f3e501b5713f5145cde50",
+      "citations": "e7f1049beb5d58fd73244cc4f355e91d235e314ad1c2f6005aa2dd03547650db",
+      "structure": "623503ca2ff853c07d81a4db8b0e037665ae5d7bf1f233260b8142d470582971"
+    },
+    "vol1_revised/chapters/ch16.tex": {
+      "display": "defef672b4dd092f2deeaba3125d6e4e9d159f46a06de268eb1f1b4d01a8f699",
+      "inline": "eeda81dd009ff3641cd604325e0d6d0b42e78d928908de4cf0b96b42630e7dd8",
+      "labels": "fa020990a9284350077e95b29d3ef08551b589a61bcb5c3388d5ef9389ab4cf9",
+      "citations": "5a8c53f01a8817e0432c72ba40c3646c5478f387af32f232272f4e0979830e4c",
+      "structure": "cfa36d271490872a5c53d06f114228c7eb9ef176a760018ffb5d4cc7fbcfac0e"
+    },
+    "vol1_revised/chapters/ch17.tex": {
+      "display": "15e28132244fe5a21ce4a5f3d535d4dcaeff1a64d2516fab62de3b396cc5e971",
+      "inline": "13e049f43f653ca9ba01cfbdc274a62f6bd1c77a32a0a7b3253f5d2d609dba4a",
+      "labels": "27955f86a7a8bdd8185cf71fb34312555f1065ee04920122149117c02218bb0a",
+      "citations": "52b6c54f12dce0edfc7ae05f65c2e8f55bbbd21a59c28cfa5480a3ecea7c383e",
+      "structure": "623503ca2ff853c07d81a4db8b0e037665ae5d7bf1f233260b8142d470582971"
+    },
+    "vol1_revised/chapters/ch18.tex": {
+      "display": "3979b38cee0fe820d2b83923edf27956cd617bbab9c0f47f882964e7b03fd4ee",
+      "inline": "49bfe6e375fea4cb9954656c00a3ffe0cd23290e69c5be272fbcfbd8d6f6d9d8",
+      "labels": "3abca97311d1db12d552c318b64e81d5a0910e2e7e5fe82ed3b6de9cb8d048e3",
+      "citations": "92cbe2d591798081600b9e6fe43a7334aa554344b2083e97797d53b0a544f38f",
+      "structure": "623503ca2ff853c07d81a4db8b0e037665ae5d7bf1f233260b8142d470582971"
+    },
+    "vol1_revised/chapters/ch19.tex": {
+      "display": "6e305380207ce1360ea82332c2384c5a118a440df4a34c58da241bcd814d4a9f",
+      "inline": "febf00394b71cf6ab6893ad3f7118243e0985d728a819e2a67d1f66a89dff2b6",
+      "labels": "0445fd926c1bc5bba20239cb8515f1091bc401be8c1a1019cb15e43ab8195de7",
+      "citations": "0d08a3bbc5491e01b2b7f5c6d371c97cf58993b796b7ff9bedf8c4e9d6e1d478",
+      "structure": "cfa36d271490872a5c53d06f114228c7eb9ef176a760018ffb5d4cc7fbcfac0e"
+    },
+    "vol1_revised/chapters/ch20.tex": {
+      "display": "590015dd6560ad7fc483c327b15ec552343215e285ad206a9f1043377b6a65c4",
+      "inline": "3bb8775cb5e0b0e4ade5f8daca32b3b265c082f025cd1de8c6e8dfc213f4a38d",
+      "labels": "ef1d9555efb08c26019d2c7eb0fe3aa13ad844754b7d86f39f4f65ea9beb67f6",
+      "citations": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "structure": "0c58794b39ff6861da183cb9e9aa1e6bb1a688aa11fd262b09f10ee3c823e4cd"
+    },
+    "vol1_revised/chapters/ch21.tex": {
+      "display": "889e6e999ce1b463aaa55ecf1e6e1c522138a87037019bf184791349056d5221",
+      "inline": "8db1927834de6ebd627d8f4e64e409bfeaf0ee45e0b94b0000296094a9ba2340",
+      "labels": "4a259de739c0ed62e1834440625622e651a5bf4eefaa65fb081665f08cea3e53",
+      "citations": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "structure": "939513aab78ff55087c6dc85762185982e39a79517c16b30a226f88216b44084"
+    },
+    "vol1_revised/chapters/ch22.tex": {
+      "display": "cadb5c25869b6fd7a1d2fa053e799d2f9edc8f945651e9098a6fc68dbe1d30e6",
+      "inline": "150cb5a25ebc073fed0372aa1cf8849f51ecd35bef3d59106bbd8c89d51407ac",
+      "labels": "cbda0ec4b0e58b17d11ed2796e9d9b98fa23c53b678d4df0f9a20e963e1931bb",
+      "citations": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "structure": "619418dc72f5aa39049731c67089e76779203f111ab4c034e8092f7c22d3ed80"
+    },
+    "vol1_revised_en/chapters/ch01.tex": {
+      "display": "b1a2d101aa6793e81151cfea4118ff8c61dd2bf4e3df28eb022756281dd40dee",
+      "inline": "145d7611fd507a6d2f73f9a3aa4c1f3b4f5332752babe886e0beb664e5bd3471",
+      "labels": "cbd77814bda690996c2246616044cc9f2f36922c8dc2db223a0125a2448341a4",
+      "citations": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "structure": "2d8d18ca826d19f1b15ff9df320fc9686e886ee1c6d4246d26964344ddd064f9"
+    },
+    "vol1_revised_en/chapters/ch02.tex": {
+      "display": "bef5d08665c52e8a98deeb4e5fa320a590f1d7cfee2a9571864a70f0f71ba227",
+      "inline": "bdafe015c1a42fff86403f5de77a83d065b85916e29583d79a8857570977741d",
+      "labels": "d1d38b38ba7022eac8c47f05d6df366d8d435fe36c3704464dfef2cd571a93c3",
+      "citations": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "structure": "5689fe9f8da407e7d219d84f2ca26e579565d2eb61c5639254cb31d5989a6202"
+    },
+    "vol1_revised_en/chapters/ch03.tex": {
+      "display": "2087b691a21364735060db9f0a859401ef4056414042aa5d347e9af800b255de",
+      "inline": "0c42517471952c794efc79051f17c0e0827088483f271485da3c598a3ea89a7e",
+      "labels": "de8c4c41542f4d908071e37aee284712fba62e2c71724ac5fcc54cc7d6f1c926",
+      "citations": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "structure": "b17df806019a506bde0b86e8ec728a114a1f5106b5d5732a046b900d6c20f8c2"
+    },
+    "vol1_revised_en/chapters/ch04.tex": {
+      "display": "e190e3aa31102ed6dd80d2b9bbb606d096945014bac55e0009b00777259995c6",
+      "inline": "5e53e807098683d7886d32b15e540c20552efb6d5ca9cb5e489d4bf045737298",
+      "labels": "8e85035007b5e9fcda9abec0bc08ec4a233d20c300603b78a0577f01bed022a0",
+      "citations": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "structure": "77e8e89a7ec8647d070ad2238dbc7e2280c91f1f7f07b287155e3844819591ee"
+    },
+    "vol1_revised_en/chapters/ch05.tex": {
+      "display": "dc35fe41d08f3dfde1252581ca36e2b16185f3de65e61d8e769e6775e2da4761",
+      "inline": "cefe018d799f885c582a08849dfc8746df0dceee1877dfc6c0360eb809e62e9b",
+      "labels": "2870b75f943aba17d19a8e1644c9935c3e6b45f96983a074ca5000ace04bc0ec",
+      "citations": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "structure": "1bc6920d06c59da4626338a08b9bb2bfd3ebe48892c25fbd862fb8d4bc79ddcc"
+    },
+    "vol1_revised_en/chapters/ch06.tex": {
+      "display": "196f0fdf91ffe580452907eee2f409a0beff6222c2ca9a1ce3889e496e05f43a",
+      "inline": "d193dac7a8b4f94e1889767e5e85cd5cc7e133d72e847f93b9a2c579ea3c74f4",
+      "labels": "a39bd8f5a0fdcc114f1d381bf09b0e99519b3a542ea390f237fe6b985dacb826",
+      "citations": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "structure": "7e2ab4286c9e13dd952f2be589a9d7ed541b3ee999513b0771447b634dc436cf"
+    },
+    "vol1_revised_en/chapters/ch07.tex": {
+      "display": "5e110a9283eab67fb5a94e7106ff4f30f872c98c54508050e37b999bf0eaa972",
+      "inline": "e261d7d5ecba2df666bc3fd01a12ee079509cecb03fffcdee71907dfc0daa76f",
+      "labels": "cc57f85810fb7eb88dae309ff84ff12fa709a98e99cc4df0b27939b6a83641ce",
+      "citations": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "structure": "e38e920be509b633da8c35e9dfef9771091fe035a270d082fd19f95d356b7d04"
+    },
+    "vol1_revised_en/chapters/ch08.tex": {
+      "display": "8d3d6dc8bedd26df4071a96f75e0ee71b8242e9a8e1ff707e45107e2dcae7b95",
+      "inline": "b694aa94dd6b8927e602f3ebd51fbd2339030293aa56129c29da9132abeec8e3",
+      "labels": "83ee05da700eb242994eded6c12a777ec3ec200ed3930d2586db341b3eba01a8",
+      "citations": "a5c587d89ac5234973d86f43e1813b051bb59763e71aaced6e35c9fc07b1af58",
+      "structure": "8b80a33572fa0f0881f18625f8f575f89ad2e0424a047a902a91b2b08853c530"
+    },
+    "vol1_revised_en/chapters/ch09.tex": {
+      "display": "78ae19881c5ae24c75e25b884705877aad7a7ca04fa1b44758b0dd9be9ecaae0",
+      "inline": "8f5f1e3a2868c071c90b9cf516697ba2f6ee65fffcdca3f74cabc2560829b7ad",
+      "labels": "6237ec7fcb3c18aea132a469ea2135223349ae437e1846cbc6208d8a92eaee6c",
+      "citations": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "structure": "2bf7ff7ecde2ef9d8025600c941e003555fb6dc39e5e1f44be63984f46f340b8"
+    },
+    "vol1_revised_en/chapters/ch10.tex": {
+      "display": "578160b0300af1ac3575ddab41988f67648223089e42b9e4cd87762ea4883ddb",
+      "inline": "3260638c356c4aefff0ca79f773d30ba89dfaf6fccdd834b6f4b1eb878a4babd",
+      "labels": "9ec7775d07fce5a1f58c8d31de2093ef91d26ca695f6e704479aedeccbbafea6",
+      "citations": "21d04616e6b2927c5110d115ca533e52c01ce72090fa45d1486e44cc7ec17fcc",
+      "structure": "623503ca2ff853c07d81a4db8b0e037665ae5d7bf1f233260b8142d470582971"
+    },
+    "vol1_revised_en/chapters/ch11.tex": {
+      "display": "002cedf8ab72d14ca46b6a58765ee915db589903fa5cbc421bce33908295699b",
+      "inline": "93bdaaa7703662ac45e72ec04092e963ff0a7b651bea00f278e4ca1d67565dd1",
+      "labels": "d3b0ef4807f66a9e5cc5651ebc550ec23cded9c9a09790246990dee8519c153e",
+      "citations": "24640982ef710a44de008cc38e19c5d1c14c31e06f6a5fd8cdc32a201278c8c4",
+      "structure": "623503ca2ff853c07d81a4db8b0e037665ae5d7bf1f233260b8142d470582971"
+    },
+    "vol1_revised_en/chapters/ch12.tex": {
+      "display": "8fe3295c0dd4b3b73b84619a9233b373fe24d0c70d7c0786433c5d9d6d5bacc2",
+      "inline": "63b76c83172596d5ec191c834c43ad59903eb7ca520ee9d17721ff165cc347b2",
+      "labels": "0122f22efd44d05af3bc8cf19e90b4486818f7443c3f61b37f6d3830d8776e7c",
+      "citations": "47777b09060ba4c47dd128ab00cb3d044ddd6757220a326a2527efb0ed0ed2d3",
+      "structure": "623503ca2ff853c07d81a4db8b0e037665ae5d7bf1f233260b8142d470582971"
+    },
+    "vol1_revised_en/chapters/ch13.tex": {
+      "display": "ac926a9a697f5ebf77ad5246f7654c230e1e24000238539971c14f1fa1a4a725",
+      "inline": "ef7ddc8664d7c5089b5225f7c77f26ac23643849fa2c8d2cf9a9b3899c9ad81e",
+      "labels": "1aab1de6f7e1facfc78e087e206016b084bc5091370a3e1dafc0d09cda31bd52",
+      "citations": "c119036cb69015b8722d92dd1b17bfe24f48cde40fe05ee1c8836c02132b8769",
+      "structure": "623503ca2ff853c07d81a4db8b0e037665ae5d7bf1f233260b8142d470582971"
+    },
+    "vol1_revised_en/chapters/ch14.tex": {
+      "display": "56377e5cb93fd863ebc8edf0be24d02cd714b0e47ff933d2cdd8ea5367a83ed9",
+      "inline": "70f5fe10934633e84aa2f16c12be3fcb32cc0905696f00a6ec4a406bb6070f43",
+      "labels": "c138f55176677d747ce94d846cdb6800798c0a839a114bcb44580bdb543f01c5",
+      "citations": "1f0bb3dc9177846580329c2a10dbf0972ee6d5dcb0b7851b3fe74b56ffbcf82b",
+      "structure": "6b9aa6f3c038186123cfe0f2396ccf8f01dea793b664e9e1b54567c0880ac1b5"
+    },
+    "vol1_revised_en/chapters/ch15.tex": {
+      "display": "1a6bcd449ac40eab4b83fafa6f12fa6f6475887e4e89855d6f1e439ad4d9af1e",
+      "inline": "d36589aede6002bb0a5253addafd46edc84ca6be67bf8a11a9848e15ccc56894",
+      "labels": "b8de650a0c4616b5ee6daadd5ef897a596a61952b26f3e501b5713f5145cde50",
+      "citations": "e7f1049beb5d58fd73244cc4f355e91d235e314ad1c2f6005aa2dd03547650db",
+      "structure": "623503ca2ff853c07d81a4db8b0e037665ae5d7bf1f233260b8142d470582971"
+    },
+    "vol1_revised_en/chapters/ch16.tex": {
+      "display": "defef672b4dd092f2deeaba3125d6e4e9d159f46a06de268eb1f1b4d01a8f699",
+      "inline": "eeda81dd009ff3641cd604325e0d6d0b42e78d928908de4cf0b96b42630e7dd8",
+      "labels": "fa020990a9284350077e95b29d3ef08551b589a61bcb5c3388d5ef9389ab4cf9",
+      "citations": "5a8c53f01a8817e0432c72ba40c3646c5478f387af32f232272f4e0979830e4c",
+      "structure": "cfa36d271490872a5c53d06f114228c7eb9ef176a760018ffb5d4cc7fbcfac0e"
+    },
+    "vol1_revised_en/chapters/ch17.tex": {
+      "display": "15e28132244fe5a21ce4a5f3d535d4dcaeff1a64d2516fab62de3b396cc5e971",
+      "inline": "13e049f43f653ca9ba01cfbdc274a62f6bd1c77a32a0a7b3253f5d2d609dba4a",
+      "labels": "27955f86a7a8bdd8185cf71fb34312555f1065ee04920122149117c02218bb0a",
+      "citations": "52b6c54f12dce0edfc7ae05f65c2e8f55bbbd21a59c28cfa5480a3ecea7c383e",
+      "structure": "623503ca2ff853c07d81a4db8b0e037665ae5d7bf1f233260b8142d470582971"
+    },
+    "vol1_revised_en/chapters/ch18.tex": {
+      "display": "3979b38cee0fe820d2b83923edf27956cd617bbab9c0f47f882964e7b03fd4ee",
+      "inline": "49bfe6e375fea4cb9954656c00a3ffe0cd23290e69c5be272fbcfbd8d6f6d9d8",
+      "labels": "3abca97311d1db12d552c318b64e81d5a0910e2e7e5fe82ed3b6de9cb8d048e3",
+      "citations": "92cbe2d591798081600b9e6fe43a7334aa554344b2083e97797d53b0a544f38f",
+      "structure": "623503ca2ff853c07d81a4db8b0e037665ae5d7bf1f233260b8142d470582971"
+    },
+    "vol1_revised_en/chapters/ch19.tex": {
+      "display": "6e305380207ce1360ea82332c2384c5a118a440df4a34c58da241bcd814d4a9f",
+      "inline": "febf00394b71cf6ab6893ad3f7118243e0985d728a819e2a67d1f66a89dff2b6",
+      "labels": "0445fd926c1bc5bba20239cb8515f1091bc401be8c1a1019cb15e43ab8195de7",
+      "citations": "0d08a3bbc5491e01b2b7f5c6d371c97cf58993b796b7ff9bedf8c4e9d6e1d478",
+      "structure": "cfa36d271490872a5c53d06f114228c7eb9ef176a760018ffb5d4cc7fbcfac0e"
+    },
+    "vol1_revised_en/chapters/ch20.tex": {
+      "display": "590015dd6560ad7fc483c327b15ec552343215e285ad206a9f1043377b6a65c4",
+      "inline": "3bb8775cb5e0b0e4ade5f8daca32b3b265c082f025cd1de8c6e8dfc213f4a38d",
+      "labels": "ef1d9555efb08c26019d2c7eb0fe3aa13ad844754b7d86f39f4f65ea9beb67f6",
+      "citations": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "structure": "0c58794b39ff6861da183cb9e9aa1e6bb1a688aa11fd262b09f10ee3c823e4cd"
+    },
+    "vol1_revised_en/chapters/ch21.tex": {
+      "display": "889e6e999ce1b463aaa55ecf1e6e1c522138a87037019bf184791349056d5221",
+      "inline": "8db1927834de6ebd627d8f4e64e409bfeaf0ee45e0b94b0000296094a9ba2340",
+      "labels": "4a259de739c0ed62e1834440625622e651a5bf4eefaa65fb081665f08cea3e53",
+      "citations": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "structure": "939513aab78ff55087c6dc85762185982e39a79517c16b30a226f88216b44084"
+    },
+    "vol1_revised_en/chapters/ch22.tex": {
+      "display": "cadb5c25869b6fd7a1d2fa053e799d2f9edc8f945651e9098a6fc68dbe1d30e6",
+      "inline": "150cb5a25ebc073fed0372aa1cf8849f51ecd35bef3d59106bbd8c89d51407ac",
+      "labels": "cbda0ec4b0e58b17d11ed2796e9d9b98fa23c53b678d4df0f9a20e963e1931bb",
+      "citations": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "structure": "619418dc72f5aa39049731c67089e76779203f111ab4c034e8092f7c22d3ed80"
+    },
+    "Vol0_Linear_Algebra_HPC/main.tex": {
+      "display": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "inline": "e99d1e7ce518c8852eb8ee5ffc61ce246845787575c72c9c300eea5bf84327c6",
+      "labels": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "citations": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "structure": "4321aaf58aed796a8c034d32e7b1a2ea2a052d7a7ed4b7996cbee8745bf95aac"
+    },
+    "Vol0_Linear_Algebra_HPC_EN/main.tex": {
+      "display": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "inline": "e99d1e7ce518c8852eb8ee5ffc61ce246845787575c72c9c300eea5bf84327c6",
+      "labels": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "citations": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "structure": "4321aaf58aed796a8c034d32e7b1a2ea2a052d7a7ed4b7996cbee8745bf95aac"
+    },
+    "Course_of_Computational_Physics_Vol1_Revised.tex": {
+      "display": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "inline": "316b1c53c851b5d719a4c3a9e7d3d54e76e7ddcd864851aaa295328400d8e130",
+      "labels": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "citations": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "structure": "4321aaf58aed796a8c034d32e7b1a2ea2a052d7a7ed4b7996cbee8745bf95aac"
+    },
+    "Course_of_Computational_Physics_Vol1_EN.tex": {
+      "display": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "inline": "316b1c53c851b5d719a4c3a9e7d3d54e76e7ddcd864851aaa295328400d8e130",
+      "labels": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "citations": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "structure": "4321aaf58aed796a8c034d32e7b1a2ea2a052d7a7ed4b7996cbee8745bf95aac"
+    }
+  }
+}

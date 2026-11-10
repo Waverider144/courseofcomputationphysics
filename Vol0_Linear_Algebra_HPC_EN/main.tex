@@ -1,0 +1,56 @@
+\documentclass[11pt,openany]{book}
+\input{Vol0_Linear_Algebra_HPC_EN/preamble}
+\title{Numerical Linear Algebra\\and Modern High-Performance Computing}
+\author{A Concise Course of Computational Physics\\Volume 0}
+\date{November 2026}
+\begin{document}
+\frontmatter
+\maketitle
+\chapter*{Reading Routes}\addcontentsline{toc}{chapter}{Reading Routes}
+Spatial discretization produces finite-dimensional operators. Their structure constrains solvers, and the solvers' data dependencies constrain machine execution. This volume follows that chain through factorization, Krylov spaces, preconditioning, multigrid, and performance analysis.
+Volume I develops physical modeling and spatial discretization; Volume II develops field geometry, constraints, and structure-preserving discretization. Here these results become inputs to reliable and efficient computation.
+\par
+The first three chapters establish matrix, residual, and error terminology. Parts II and III study factorization and projection; Part IV combines them through preconditioning and multilevel methods. Part V uses Roofline to connect operators, time integration, and parallel communication. A first pass may follow Chapters 1, 2, 3, 4, 10, 12, 16, 19, 22, 24, and 29 before returning to assumptions and variants.
+\par
+Each chapter supplies objectives, conceptual connections, minimal examples, and specific AI expansion questions. Omitted proofs and implementation details have search terms. Scalars are real unless stated otherwise; replace transpose by conjugate transpose for complex problems. $N$ usually counts algebraic unknowns; $n$ counts grid points per direction. CPU experiments use double precision. Code, figures, and measurement records are shared with the Chinese edition under \path{Vol0_Linear_Algebra_HPC/}. Models, timings, and unexecuted experiments are identified separately.
+\tableofcontents
+\mainmatter
+\part{From Discrete Equations to Matrix Systems}
+\input{Vol0_Linear_Algebra_HPC_EN/chapters/part01_matrix_systems/ch01}
+\input{Vol0_Linear_Algebra_HPC_EN/chapters/part01_matrix_systems/ch02}
+\input{Vol0_Linear_Algebra_HPC_EN/chapters/part01_matrix_systems/ch03}
+\part{Matrix Factorization Methods}
+\input{Vol0_Linear_Algebra_HPC_EN/chapters/part02_factorization/ch04}
+\input{Vol0_Linear_Algebra_HPC_EN/chapters/part02_factorization/ch05}
+\input{Vol0_Linear_Algebra_HPC_EN/chapters/part02_factorization/ch06}
+\input{Vol0_Linear_Algebra_HPC_EN/chapters/part02_factorization/ch07}
+\input{Vol0_Linear_Algebra_HPC_EN/chapters/part02_factorization/ch08}
+\input{Vol0_Linear_Algebra_HPC_EN/chapters/part02_factorization/ch09}
+\part{Krylov Subspace Methods}
+\input{Vol0_Linear_Algebra_HPC_EN/chapters/part03_krylov/ch10}
+\input{Vol0_Linear_Algebra_HPC_EN/chapters/part03_krylov/ch11}
+\input{Vol0_Linear_Algebra_HPC_EN/chapters/part03_krylov/ch12}
+\input{Vol0_Linear_Algebra_HPC_EN/chapters/part03_krylov/ch13}
+\input{Vol0_Linear_Algebra_HPC_EN/chapters/part03_krylov/ch14}
+\input{Vol0_Linear_Algebra_HPC_EN/chapters/part03_krylov/ch15}
+\part{Preconditioning and Multilevel Methods}
+\input{Vol0_Linear_Algebra_HPC_EN/chapters/part04_preconditioning/ch16}
+\input{Vol0_Linear_Algebra_HPC_EN/chapters/part04_preconditioning/ch17}
+\input{Vol0_Linear_Algebra_HPC_EN/chapters/part04_preconditioning/ch18}
+\input{Vol0_Linear_Algebra_HPC_EN/chapters/part04_preconditioning/ch19}
+\input{Vol0_Linear_Algebra_HPC_EN/chapters/part04_preconditioning/ch20}
+\input{Vol0_Linear_Algebra_HPC_EN/chapters/part04_preconditioning/ch21}
+\part{Roofline-Driven High-Performance Computing}
+\input{Vol0_Linear_Algebra_HPC_EN/chapters/part05_roofline_hpc/ch22}
+\input{Vol0_Linear_Algebra_HPC_EN/chapters/part05_roofline_hpc/ch23}
+\input{Vol0_Linear_Algebra_HPC_EN/chapters/part05_roofline_hpc/ch24}
+\input{Vol0_Linear_Algebra_HPC_EN/chapters/part05_roofline_hpc/ch25}
+\input{Vol0_Linear_Algebra_HPC_EN/chapters/part05_roofline_hpc/ch26}
+\input{Vol0_Linear_Algebra_HPC_EN/chapters/part05_roofline_hpc/ch27}
+\input{Vol0_Linear_Algebra_HPC_EN/chapters/part05_roofline_hpc/ch28}
+\input{Vol0_Linear_Algebra_HPC_EN/chapters/part05_roofline_hpc/ch29}
+\appendix
+\input{Vol0_Linear_Algebra_HPC_EN/appendices/reproducibility}
+\backmatter
+\input{Vol0_Linear_Algebra_HPC_EN/references/bibliography}
+\end{document}

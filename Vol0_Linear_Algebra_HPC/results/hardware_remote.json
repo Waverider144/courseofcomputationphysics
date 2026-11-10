@@ -1,0 +1,487 @@
+{
+  "host": "remote",
+  "workspace": "<WORKSPACE>",
+  "utc": "2026-11-10T02:41:27.984948+00:00",
+  "remote": true,
+  "gpu_index": "1",
+  "commands": [
+    {
+      "command": [
+        "nvidia-smi",
+        "--query-gpu=name,memory.total,memory.used,utilization.gpu,driver_version",
+        "--format=csv,noheader"
+      ],
+      "returncode": 0,
+      "stdout": "NVIDIA GeForce RTX 4090, 24564 MiB, 13061 MiB, 46 %, 565.77\nNVIDIA GeForce RTX 4090, 24564 MiB, 10841 MiB, 30 %, 565.77\nNVIDIA GeForce RTX 4090, 24564 MiB, 11731 MiB, 32 %, 565.77\nNVIDIA GeForce RTX 4090, 24564 MiB, 11825 MiB, 27 %, 565.77\nNVIDIA GeForce RTX 4090, 24564 MiB, 12463 MiB, 40 %, 565.77\nNVIDIA GeForce RTX 4090, 24564 MiB, 11393 MiB, 30 %, 565.77\nNVIDIA GeForce RTX 4090, 24564 MiB, 12143 MiB, 28 %, 565.77\nNVIDIA GeForce RTX 4090, 24564 MiB, 14513 MiB, 48 %, 565.77\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/usr/local/cuda-12.9/bin/nvcc",
+        "--version"
+      ],
+      "returncode": 0,
+      "stdout": "nvcc: NVIDIA (R) Cuda compiler driver\nCopyright (c) 2005-2025 NVIDIA Corporation\nBuilt on Tue_May_27_02:21:03_PDT_2025\nCuda compilation tools, release 12.9, V12.9.86\nBuild cuda_12.9.r12.9/compiler.36037853_0\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "mpirun",
+        "--version"
+      ],
+      "returncode": 0,
+      "stdout": "mpirun (Open MPI) 4.1.7a1\n\nReport bugs to http://www.open-mpi.org/community/help/\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/usr/local/cuda-12.9/bin/nvcc",
+        "-arch=native",
+        "-ccbin",
+        "/usr/bin/g++",
+        "-O3",
+        "-std=c++17",
+        "<WORKSPACE>/code_examples/gpu/yee_layout.cu",
+        "-o",
+        "<WORKSPACE>/build/yee_layout"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "<WORKSPACE>/build/yee_layout",
+        "32"
+      ],
+      "returncode": 0,
+      "stdout": "{\"status\":\"executed_gpu\",\"gpu\":\"NVIDIA GeForce RTX 4090\",\"n\":32,\"dofs\":196608,\"dtype\":\"float64\",\"steps\":30,\"dt\":0.0125,\"T\":0.375,\"seconds_device_advance\":0.000174495995,\"max_cpu_difference\":3.36970035e-16,\"error_E_L2\":0.00226679187,\"seconds_with_transfers\":0.000885588,\"general_field_cpu_difference\":6.9388939e-18,\"soa_copy_seconds\":0.000147456005,\"aos_copy_seconds\":0.000162816003,\"layout_repeats\":100,\"threads\":128,\"dram_bytes_measured\":null,\"flops_model\":29491200,\"bytes_model\":141557760,\"work_model\":\"uniform-grid dt/h fusion: 30 FLOPs/cell/step; ideal two-phase bytes\",\"timing_scope\":\"events; H2D/D2H excluded; resident fields\"}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "<WORKSPACE>/build/yee_layout",
+        "64"
+      ],
+      "returncode": 0,
+      "stdout": "{\"status\":\"executed_gpu\",\"gpu\":\"NVIDIA GeForce RTX 4090\",\"n\":64,\"dofs\":1572864,\"dtype\":\"float64\",\"steps\":30,\"dt\":0.00625,\"T\":0.1875,\"seconds_device_advance\":0.000479232013,\"max_cpu_difference\":4.4408921e-16,\"error_E_L2\":0.000285066621,\"seconds_with_transfers\":0.005302736,\"general_field_cpu_difference\":6.9388939e-18,\"soa_copy_seconds\":0.000238751993,\"aos_copy_seconds\":0.000328864008,\"layout_repeats\":100,\"threads\":128,\"dram_bytes_measured\":null,\"flops_model\":235929600,\"bytes_model\":1132462080,\"work_model\":\"uniform-grid dt/h fusion: 30 FLOPs/cell/step; ideal two-phase bytes\",\"timing_scope\":\"events; H2D/D2H excluded; resident fields\"}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "mpicxx",
+        "-O3",
+        "-std=c++17",
+        "<WORKSPACE>/code_examples/mpi/halo.cpp",
+        "-o",
+        "<WORKSPACE>/build/halo"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "mpirun",
+        "-n",
+        "1",
+        "<WORKSPACE>/build/halo",
+        "32"
+      ],
+      "returncode": 0,
+      "stdout": "{\"status\":\"executed_mpi\",\"mode\":\"sendrecv\",\"ranks\":1,\"global_n\":32,\"local_nx\":32,\"dtype\":\"float64\",\"repeats\":30,\"max_rank_seconds\":0.000109541567,\"max_error\":2.21689334e-12,\"send_bytes_per_rank\":16384,\"scope\":\"same-host slab stencil; not cross-node scaling\"}\n{\"status\":\"executed_mpi\",\"mode\":\"nonblocking\",\"ranks\":1,\"global_n\":32,\"local_nx\":32,\"dtype\":\"float64\",\"repeats\":30,\"max_rank_seconds\":0.000109378667,\"max_error\":2.21689334e-12,\"send_bytes_per_rank\":16384,\"scope\":\"same-host slab stencil; not cross-node scaling\"}\n",
+      "stderr": "--------------------------------------------------------------------------\nWARNING: An invalid value was given for oob_tcp_if_include.  This\nvalue will be ignored.\n\n  Local host: remote\n  Value:      192.168.104.0/24\n  Message:    Did not find interface matching this subnet\n--------------------------------------------------------------------------\n--------------------------------------------------------------------------\nWARNING: An invalid value was given for btl_tcp_if_include.  This\nvalue will be ignored.\n\n  Local host: remote\n  Value:      192.168.104.0/24\n  Message:    Did not find interface matching this subnet\n--------------------------------------------------------------------------\n[remote:239029] PMIX ERROR: NOT-FOUND in file dstore_base.c at line 217\n[remote:239029] PMIX ERROR: NO-PERMISSIONS in file dstore_base.c at line 237\n"
+    },
+    {
+      "command": [
+        "mpirun",
+        "-n",
+        "2",
+        "<WORKSPACE>/build/halo",
+        "32"
+      ],
+      "returncode": 0,
+      "stdout": "{\"status\":\"executed_mpi\",\"mode\":\"sendrecv\",\"ranks\":2,\"global_n\":32,\"local_nx\":16,\"dtype\":\"float64\",\"repeats\":30,\"max_rank_seconds\":6.07645333e-05,\"max_error\":2.21689334e-12,\"send_bytes_per_rank\":16384,\"scope\":\"same-host slab stencil; not cross-node scaling\"}\n{\"status\":\"executed_mpi\",\"mode\":\"nonblocking\",\"ranks\":2,\"global_n\":32,\"local_nx\":16,\"dtype\":\"float64\",\"repeats\":30,\"max_rank_seconds\":5.73670667e-05,\"max_error\":2.21689334e-12,\"send_bytes_per_rank\":16384,\"scope\":\"same-host slab stencil; not cross-node scaling\"}\n",
+      "stderr": "--------------------------------------------------------------------------\nWARNING: An invalid value was given for oob_tcp_if_include.  This\nvalue will be ignored.\n\n  Local host: remote\n  Value:      192.168.104.0/24\n  Message:    Did not find interface matching this subnet\n--------------------------------------------------------------------------\n--------------------------------------------------------------------------\nWARNING: An invalid value was given for btl_tcp_if_include.  This\nvalue will be ignored.\n\n  Local host: remote\n  Value:      192.168.104.0/24\n  Message:    Did not find interface matching this subnet\n--------------------------------------------------------------------------\n[remote:239039] PMIX ERROR: NO-PERMISSIONS in file dstore_base.c at line 237\n[remote:239039] 1 more process has sent help message help-mpi-btl-tcp.txt / invalid if_inexclude\n[remote:239039] Set MCA parameter \"orte_base_help_aggregate\" to 0 to see all help / error messages\n"
+    },
+    {
+      "command": [
+        "mpicxx",
+        "-O3",
+        "-std=c++17",
+        "<WORKSPACE>/code_examples/mpi/yee.cpp",
+        "-o",
+        "<WORKSPACE>/build/yee_mpi"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "mpirun",
+        "-n",
+        "1",
+        "<WORKSPACE>/build/yee_mpi",
+        "12"
+      ],
+      "returncode": 0,
+      "stdout": "{\"status\":\"executed_mpi\",\"case\":\"full_yee\",\"ranks\":1,\"n\":12,\"dofs\":10368,\"steps\":14,\"dt\":0.03571428571428571,\"T\":0.5,\"dtype\":\"float64\",\"max_rank_seconds\":0.00021824,\"error_E_L2\":0.0207575730518,\"divB_max\":0,\"divE_max\":0,\"modified_energy_relative_drift\":1.12418469e-16,\"flops_model\":725760,\"send_bytes_per_rank_step\":6912,\"scope\":\"advance includes two-phase packed halos; diagnostics excluded\"}\n",
+      "stderr": "--------------------------------------------------------------------------\nWARNING: An invalid value was given for oob_tcp_if_include.  This\nvalue will be ignored.\n\n  Local host: remote\n  Value:      192.168.104.0/24\n  Message:    Did not find interface matching this subnet\n--------------------------------------------------------------------------\n--------------------------------------------------------------------------\nWARNING: An invalid value was given for btl_tcp_if_include.  This\nvalue will be ignored.\n\n  Local host: remote\n  Value:      192.168.104.0/24\n  Message:    Did not find interface matching this subnet\n--------------------------------------------------------------------------\n[remote:239061] PMIX ERROR: NO-PERMISSIONS in file dstore_base.c at line 237\n"
+    },
+    {
+      "command": [
+        "mpirun",
+        "-n",
+        "1",
+        "<WORKSPACE>/build/yee_mpi",
+        "24"
+      ],
+      "returncode": 0,
+      "stdout": "{\"status\":\"executed_mpi\",\"case\":\"full_yee\",\"ranks\":1,\"n\":24,\"dofs\":82944,\"steps\":27,\"dt\":0.01851851851851852,\"T\":0.5,\"dtype\":\"float64\",\"max_rank_seconds\":0.003096711,\"error_E_L2\":0.00509416734184,\"divB_max\":0,\"divE_max\":0,\"modified_energy_relative_drift\":5.52534361e-14,\"flops_model\":11197440,\"send_bytes_per_rank_step\":27648,\"scope\":\"advance includes two-phase packed halos; diagnostics excluded\"}\n",
+      "stderr": "--------------------------------------------------------------------------\nWARNING: An invalid value was given for oob_tcp_if_include.  This\nvalue will be ignored.\n\n  Local host: remote\n  Value:      192.168.104.0/24\n  Message:    Did not find interface matching this subnet\n--------------------------------------------------------------------------\n--------------------------------------------------------------------------\nWARNING: An invalid value was given for btl_tcp_if_include.  This\nvalue will be ignored.\n\n  Local host: remote\n  Value:      192.168.104.0/24\n  Message:    Did not find interface matching this subnet\n--------------------------------------------------------------------------\n[remote:239072] PMIX ERROR: NO-PERMISSIONS in file dstore_base.c at line 237\n"
+    },
+    {
+      "command": [
+        "mpirun",
+        "-n",
+        "2",
+        "<WORKSPACE>/build/yee_mpi",
+        "12"
+      ],
+      "returncode": 0,
+      "stdout": "{\"status\":\"executed_mpi\",\"case\":\"full_yee\",\"ranks\":2,\"n\":12,\"dofs\":10368,\"steps\":14,\"dt\":0.03571428571428571,\"T\":0.5,\"dtype\":\"float64\",\"max_rank_seconds\":0.000130357,\"error_E_L2\":0.0207575730518,\"divB_max\":0,\"divE_max\":0,\"modified_energy_relative_drift\":1.58510042e-14,\"flops_model\":725760,\"send_bytes_per_rank_step\":6912,\"scope\":\"advance includes two-phase packed halos; diagnostics excluded\"}\n",
+      "stderr": "--------------------------------------------------------------------------\nWARNING: An invalid value was given for oob_tcp_if_include.  This\nvalue will be ignored.\n\n  Local host: remote\n  Value:      192.168.104.0/24\n  Message:    Did not find interface matching this subnet\n--------------------------------------------------------------------------\n--------------------------------------------------------------------------\nWARNING: An invalid value was given for btl_tcp_if_include.  This\nvalue will be ignored.\n\n  Local host: remote\n  Value:      192.168.104.0/24\n  Message:    Did not find interface matching this subnet\n--------------------------------------------------------------------------\n[remote:239083] PMIX ERROR: NO-PERMISSIONS in file dstore_base.c at line 237\n[remote:239083] 1 more process has sent help message help-mpi-btl-tcp.txt / invalid if_inexclude\n[remote:239083] Set MCA parameter \"orte_base_help_aggregate\" to 0 to see all help / error messages\n"
+    },
+    {
+      "command": [
+        "mpirun",
+        "-n",
+        "2",
+        "<WORKSPACE>/build/yee_mpi",
+        "24"
+      ],
+      "returncode": 0,
+      "stdout": "{\"status\":\"executed_mpi\",\"case\":\"full_yee\",\"ranks\":2,\"n\":24,\"dofs\":82944,\"steps\":27,\"dt\":0.01851851851851852,\"T\":0.5,\"dtype\":\"float64\",\"max_rank_seconds\":0.001767542,\"error_E_L2\":0.00509416734184,\"divB_max\":0,\"divE_max\":0,\"modified_energy_relative_drift\":5.26912808e-14,\"flops_model\":11197440,\"send_bytes_per_rank_step\":27648,\"scope\":\"advance includes two-phase packed halos; diagnostics excluded\"}\n",
+      "stderr": "--------------------------------------------------------------------------\nWARNING: An invalid value was given for oob_tcp_if_include.  This\nvalue will be ignored.\n\n  Local host: remote\n  Value:      192.168.104.0/24\n  Message:    Did not find interface matching this subnet\n--------------------------------------------------------------------------\n--------------------------------------------------------------------------\nWARNING: An invalid value was given for btl_tcp_if_include.  This\nvalue will be ignored.\n\n  Local host: remote\n  Value:      192.168.104.0/24\n  Message:    Did not find interface matching this subnet\n--------------------------------------------------------------------------\n[remote:239099] PMIX ERROR: NO-PERMISSIONS in file dstore_base.c at line 237\n[remote:239099] 1 more process has sent help message help-mpi-btl-tcp.txt / invalid if_inexclude\n[remote:239099] Set MCA parameter \"orte_base_help_aggregate\" to 0 to see all help / error messages\n"
+    },
+    {
+      "command": [
+        "mpicxx",
+        "-O3",
+        "-std=c++17",
+        "<WORKSPACE>/code_examples/mpi/dg_transport.cpp",
+        "-o",
+        "<WORKSPACE>/build/dg_mpi"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "mpirun",
+        "-n",
+        "1",
+        "<WORKSPACE>/build/dg_mpi",
+        "8",
+        "3"
+      ],
+      "returncode": 0,
+      "stdout": "{\"status\":\"executed_mpi\",\"case\":\"full_dg\",\"ranks\":1,\"elements\":8,\"p\":3,\"dofs\":32,\"dtype\":\"float64\",\"steps\":236,\"dt\":0.000635593220338983,\"T\":0.15,\"max_rank_seconds\":0.000233433,\"seconds_per_step\":9.89122881e-07,\"error_L2\":7.96970126737e-05,\"mass_drift\":8.32667268e-17,\"send_bytes_per_rank_step\":32,\"scope\":\"RK4 advance includes upwind trace exchange per stage; setup excluded\"}\n",
+      "stderr": "--------------------------------------------------------------------------\nWARNING: An invalid value was given for oob_tcp_if_include.  This\nvalue will be ignored.\n\n  Local host: remote\n  Value:      192.168.104.0/24\n  Message:    Did not find interface matching this subnet\n--------------------------------------------------------------------------\n--------------------------------------------------------------------------\nWARNING: An invalid value was given for btl_tcp_if_include.  This\nvalue will be ignored.\n\n  Local host: remote\n  Value:      192.168.104.0/24\n  Message:    Did not find interface matching this subnet\n--------------------------------------------------------------------------\n[remote:239126] PMIX ERROR: NO-PERMISSIONS in file dstore_base.c at line 237\n"
+    },
+    {
+      "command": [
+        "mpirun",
+        "-n",
+        "1",
+        "<WORKSPACE>/build/dg_mpi",
+        "16",
+        "3"
+      ],
+      "returncode": 0,
+      "stdout": "{\"status\":\"executed_mpi\",\"case\":\"full_dg\",\"ranks\":1,\"elements\":16,\"p\":3,\"dofs\":64,\"dtype\":\"float64\",\"steps\":471,\"dt\":0.0003184713375796178,\"T\":0.15,\"max_rank_seconds\":0.000586687,\"seconds_per_step\":1.24561996e-06,\"error_L2\":5.29481749026e-06,\"mass_drift\":1.2490009e-16,\"send_bytes_per_rank_step\":32,\"scope\":\"RK4 advance includes upwind trace exchange per stage; setup excluded\"}\n",
+      "stderr": "--------------------------------------------------------------------------\nWARNING: An invalid value was given for oob_tcp_if_include.  This\nvalue will be ignored.\n\n  Local host: remote\n  Value:      192.168.104.0/24\n  Message:    Did not find interface matching this subnet\n--------------------------------------------------------------------------\n--------------------------------------------------------------------------\nWARNING: An invalid value was given for btl_tcp_if_include.  This\nvalue will be ignored.\n\n  Local host: remote\n  Value:      192.168.104.0/24\n  Message:    Did not find interface matching this subnet\n--------------------------------------------------------------------------\n[remote:239138] PMIX ERROR: NO-PERMISSIONS in file dstore_base.c at line 237\n"
+    },
+    {
+      "command": [
+        "mpirun",
+        "-n",
+        "2",
+        "<WORKSPACE>/build/dg_mpi",
+        "8",
+        "3"
+      ],
+      "returncode": 0,
+      "stdout": "{\"status\":\"executed_mpi\",\"case\":\"full_dg\",\"ranks\":2,\"elements\":8,\"p\":3,\"dofs\":32,\"dtype\":\"float64\",\"steps\":236,\"dt\":0.000635593220338983,\"T\":0.15,\"max_rank_seconds\":0.000296208,\"seconds_per_step\":1.25511864e-06,\"error_L2\":7.96970126737e-05,\"mass_drift\":1.38777878e-16,\"send_bytes_per_rank_step\":32,\"scope\":\"RK4 advance includes upwind trace exchange per stage; setup excluded\"}\n",
+      "stderr": "--------------------------------------------------------------------------\nWARNING: An invalid value was given for oob_tcp_if_include.  This\nvalue will be ignored.\n\n  Local host: remote\n  Value:      192.168.104.0/24\n  Message:    Did not find interface matching this subnet\n--------------------------------------------------------------------------\n--------------------------------------------------------------------------\nWARNING: An invalid value was given for btl_tcp_if_include.  This\nvalue will be ignored.\n\n  Local host: remote\n  Value:      192.168.104.0/24\n  Message:    Did not find interface matching this subnet\n--------------------------------------------------------------------------\n[remote:239148] PMIX ERROR: NO-PERMISSIONS in file dstore_base.c at line 237\n[remote:239148] PMIX ERROR: NO-PERMISSIONS in file dstore_base.c at line 237\n[remote:239148] 1 more process has sent help message help-mpi-btl-tcp.txt / invalid if_inexclude\n[remote:239148] Set MCA parameter \"orte_base_help_aggregate\" to 0 to see all help / error messages\n"
+    },
+    {
+      "command": [
+        "mpirun",
+        "-n",
+        "2",
+        "<WORKSPACE>/build/dg_mpi",
+        "16",
+        "3"
+      ],
+      "returncode": 0,
+      "stdout": "{\"status\":\"executed_mpi\",\"case\":\"full_dg\",\"ranks\":2,\"elements\":16,\"p\":3,\"dofs\":64,\"dtype\":\"float64\",\"steps\":471,\"dt\":0.0003184713375796178,\"T\":0.15,\"max_rank_seconds\":0.00067485,\"seconds_per_step\":1.43280255e-06,\"error_L2\":5.29481749026e-06,\"mass_drift\":1.11022302e-16,\"send_bytes_per_rank_step\":32,\"scope\":\"RK4 advance includes upwind trace exchange per stage; setup excluded\"}\n",
+      "stderr": "--------------------------------------------------------------------------\nWARNING: An invalid value was given for oob_tcp_if_include.  This\nvalue will be ignored.\n\n  Local host: remote\n  Value:      192.168.104.0/24\n  Message:    Did not find interface matching this subnet\n--------------------------------------------------------------------------\n--------------------------------------------------------------------------\nWARNING: An invalid value was given for btl_tcp_if_include.  This\nvalue will be ignored.\n\n  Local host: remote\n  Value:      192.168.104.0/24\n  Message:    Did not find interface matching this subnet\n--------------------------------------------------------------------------\n[remote:239164] PMIX ERROR: NO-PERMISSIONS in file dstore_base.c at line 237\n[remote:239164] 1 more process has sent help message help-mpi-btl-tcp.txt / invalid if_inexclude\n[remote:239164] Set MCA parameter \"orte_base_help_aggregate\" to 0 to see all help / error messages\n"
+    }
+  ],
+  "measurements": [
+    {
+      "status": "executed_gpu",
+      "gpu": "NVIDIA GeForce RTX 4090",
+      "n": 32,
+      "dofs": 196608,
+      "dtype": "float64",
+      "steps": 30,
+      "dt": 0.0125,
+      "T": 0.375,
+      "seconds_device_advance": 0.000174495995,
+      "max_cpu_difference": 3.36970035e-16,
+      "error_E_L2": 0.00226679187,
+      "seconds_with_transfers": 0.000885588,
+      "general_field_cpu_difference": 6.9388939e-18,
+      "soa_copy_seconds": 0.000147456005,
+      "aos_copy_seconds": 0.000162816003,
+      "layout_repeats": 100,
+      "threads": 128,
+      "dram_bytes_measured": null,
+      "flops_model": 29491200,
+      "bytes_model": 141557760,
+      "work_model": "uniform-grid dt/h fusion: 30 FLOPs/cell/step; ideal two-phase bytes",
+      "timing_scope": "events; H2D/D2H excluded; resident fields"
+    },
+    {
+      "status": "executed_gpu",
+      "gpu": "NVIDIA GeForce RTX 4090",
+      "n": 64,
+      "dofs": 1572864,
+      "dtype": "float64",
+      "steps": 30,
+      "dt": 0.00625,
+      "T": 0.1875,
+      "seconds_device_advance": 0.000479232013,
+      "max_cpu_difference": 4.4408921e-16,
+      "error_E_L2": 0.000285066621,
+      "seconds_with_transfers": 0.005302736,
+      "general_field_cpu_difference": 6.9388939e-18,
+      "soa_copy_seconds": 0.000238751993,
+      "aos_copy_seconds": 0.000328864008,
+      "layout_repeats": 100,
+      "threads": 128,
+      "dram_bytes_measured": null,
+      "flops_model": 235929600,
+      "bytes_model": 1132462080,
+      "work_model": "uniform-grid dt/h fusion: 30 FLOPs/cell/step; ideal two-phase bytes",
+      "timing_scope": "events; H2D/D2H excluded; resident fields"
+    },
+    {
+      "status": "executed_mpi",
+      "mode": "sendrecv",
+      "ranks": 1,
+      "global_n": 32,
+      "local_nx": 32,
+      "dtype": "float64",
+      "repeats": 30,
+      "max_rank_seconds": 0.000109541567,
+      "max_error": 2.21689334e-12,
+      "send_bytes_per_rank": 16384,
+      "scope": "same-host slab stencil; not cross-node scaling"
+    },
+    {
+      "status": "executed_mpi",
+      "mode": "nonblocking",
+      "ranks": 1,
+      "global_n": 32,
+      "local_nx": 32,
+      "dtype": "float64",
+      "repeats": 30,
+      "max_rank_seconds": 0.000109378667,
+      "max_error": 2.21689334e-12,
+      "send_bytes_per_rank": 16384,
+      "scope": "same-host slab stencil; not cross-node scaling"
+    },
+    {
+      "status": "executed_mpi",
+      "mode": "sendrecv",
+      "ranks": 2,
+      "global_n": 32,
+      "local_nx": 16,
+      "dtype": "float64",
+      "repeats": 30,
+      "max_rank_seconds": 0.0000607645333,
+      "max_error": 2.21689334e-12,
+      "send_bytes_per_rank": 16384,
+      "scope": "same-host slab stencil; not cross-node scaling"
+    },
+    {
+      "status": "executed_mpi",
+      "mode": "nonblocking",
+      "ranks": 2,
+      "global_n": 32,
+      "local_nx": 16,
+      "dtype": "float64",
+      "repeats": 30,
+      "max_rank_seconds": 0.0000573670667,
+      "max_error": 2.21689334e-12,
+      "send_bytes_per_rank": 16384,
+      "scope": "same-host slab stencil; not cross-node scaling"
+    },
+    {
+      "status": "executed_mpi",
+      "case": "full_yee",
+      "ranks": 1,
+      "n": 12,
+      "dofs": 10368,
+      "steps": 14,
+      "dt": 0.03571428571428571,
+      "T": 0.5,
+      "dtype": "float64",
+      "max_rank_seconds": 0.00021824,
+      "error_E_L2": 0.0207575730518,
+      "divB_max": 0,
+      "divE_max": 0,
+      "modified_energy_relative_drift": 1.12418469e-16,
+      "flops_model": 725760,
+      "send_bytes_per_rank_step": 6912,
+      "scope": "advance includes two-phase packed halos; diagnostics excluded"
+    },
+    {
+      "status": "executed_mpi",
+      "case": "full_yee",
+      "ranks": 1,
+      "n": 24,
+      "dofs": 82944,
+      "steps": 27,
+      "dt": 0.01851851851851852,
+      "T": 0.5,
+      "dtype": "float64",
+      "max_rank_seconds": 0.003096711,
+      "error_E_L2": 0.00509416734184,
+      "divB_max": 0,
+      "divE_max": 0,
+      "modified_energy_relative_drift": 5.52534361e-14,
+      "flops_model": 11197440,
+      "send_bytes_per_rank_step": 27648,
+      "scope": "advance includes two-phase packed halos; diagnostics excluded"
+    },
+    {
+      "status": "executed_mpi",
+      "case": "full_yee",
+      "ranks": 2,
+      "n": 12,
+      "dofs": 10368,
+      "steps": 14,
+      "dt": 0.03571428571428571,
+      "T": 0.5,
+      "dtype": "float64",
+      "max_rank_seconds": 0.000130357,
+      "error_E_L2": 0.0207575730518,
+      "divB_max": 0,
+      "divE_max": 0,
+      "modified_energy_relative_drift": 1.58510042e-14,
+      "flops_model": 725760,
+      "send_bytes_per_rank_step": 6912,
+      "scope": "advance includes two-phase packed halos; diagnostics excluded"
+    },
+    {
+      "status": "executed_mpi",
+      "case": "full_yee",
+      "ranks": 2,
+      "n": 24,
+      "dofs": 82944,
+      "steps": 27,
+      "dt": 0.01851851851851852,
+      "T": 0.5,
+      "dtype": "float64",
+      "max_rank_seconds": 0.001767542,
+      "error_E_L2": 0.00509416734184,
+      "divB_max": 0,
+      "divE_max": 0,
+      "modified_energy_relative_drift": 5.26912808e-14,
+      "flops_model": 11197440,
+      "send_bytes_per_rank_step": 27648,
+      "scope": "advance includes two-phase packed halos; diagnostics excluded"
+    },
+    {
+      "status": "executed_mpi",
+      "case": "full_dg",
+      "ranks": 1,
+      "elements": 8,
+      "p": 3,
+      "dofs": 32,
+      "dtype": "float64",
+      "steps": 236,
+      "dt": 0.000635593220338983,
+      "T": 0.15,
+      "max_rank_seconds": 0.000233433,
+      "seconds_per_step": 9.89122881e-7,
+      "error_L2": 0.0000796970126737,
+      "mass_drift": 8.32667268e-17,
+      "send_bytes_per_rank_step": 32,
+      "scope": "RK4 advance includes upwind trace exchange per stage; setup excluded"
+    },
+    {
+      "status": "executed_mpi",
+      "case": "full_dg",
+      "ranks": 1,
+      "elements": 16,
+      "p": 3,
+      "dofs": 64,
+      "dtype": "float64",
+      "steps": 471,
+      "dt": 0.0003184713375796178,
+      "T": 0.15,
+      "max_rank_seconds": 0.000586687,
+      "seconds_per_step": 0.00000124561996,
+      "error_L2": 0.00000529481749026,
+      "mass_drift": 1.2490009e-16,
+      "send_bytes_per_rank_step": 32,
+      "scope": "RK4 advance includes upwind trace exchange per stage; setup excluded"
+    },
+    {
+      "status": "executed_mpi",
+      "case": "full_dg",
+      "ranks": 2,
+      "elements": 8,
+      "p": 3,
+      "dofs": 32,
+      "dtype": "float64",
+      "steps": 236,
+      "dt": 0.000635593220338983,
+      "T": 0.15,
+      "max_rank_seconds": 0.000296208,
+      "seconds_per_step": 0.00000125511864,
+      "error_L2": 0.0000796970126737,
+      "mass_drift": 1.38777878e-16,
+      "send_bytes_per_rank_step": 32,
+      "scope": "RK4 advance includes upwind trace exchange per stage; setup excluded"
+    },
+    {
+      "status": "executed_mpi",
+      "case": "full_dg",
+      "ranks": 2,
+      "elements": 16,
+      "p": 3,
+      "dofs": 64,
+      "dtype": "float64",
+      "steps": 471,
+      "dt": 0.0003184713375796178,
+      "T": 0.15,
+      "max_rank_seconds": 0.00067485,
+      "seconds_per_step": 0.00000143280255,
+      "error_L2": 0.00000529481749026,
+      "mass_drift": 1.11022302e-16,
+      "send_bytes_per_rank_step": 32,
+      "scope": "RK4 advance includes upwind trace exchange per stage; setup excluded"
+    }
+  ],
+  "scope": "same-host MPI; shared GPU short tests, no cross-node scaling",
+  "expected_measurements": 14,
+  "all_executed_checks_passed": true
+}

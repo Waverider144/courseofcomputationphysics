@@ -1,0 +1,40 @@
+{
+  "status": "passed",
+  "chapters": 29,
+  "summaries": 29,
+  "author_supplements": 29,
+  "AI_boxes": 29,
+  "references": 21,
+  "CPU_experiments": 41,
+  "hardware_records": {
+    "hardware_local.json": 14,
+    "hardware_remote.json": 14
+  },
+  "mathematical_checks": {
+    "lu_4x4": true,
+    "arnoldi_2_steps": true,
+    "gmres_small_ls": true,
+    "cg_2_steps": true,
+    "fr_p1_exact_mass_equivalence": true,
+    "fem_assembled_matrix_free": true,
+    "yee": {
+      "random_field_divB_drift": 2.2737367544323206e-13,
+      "random_field_divE_drift": 2.5579538487363607e-13,
+      "modified_energy_relative_drift": 2.00053833867113e-16,
+      "G_shape": [
+        12,
+        8
+      ],
+      "C_shape": [
+        6,
+        12
+      ],
+      "D_shape": [
+        1,
+        6
+      ],
+      "CG_max": 0,
+      "DC_max": 0
+    }
+  }
+}

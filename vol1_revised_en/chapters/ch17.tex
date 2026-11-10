@@ -1,0 +1,77 @@
+\chapter{Rarefied Gas Dynamics and Nonequilibrium Closure}\label{ch:17}
+\begin{chaptersummary}
+Velocity moments connected kinetics to continuum models in Chapters 1 and 2. Stronger nonequilibrium calls for reconsidering the retained state and closure. Knudsen-number comparisons organize Chapman--Enskog, Grad, and simplified collision models, followed by DSMC's stochastic-particle approximation of Boltzmann dynamics. Model, closure, and sampling errors can then be tracked separately.
+\end{chaptersummary}
+\learninggoals{Distinguish Chapman--Enskog and finite-moment closure; identify the variables in Grad 13-moment and ES--BGK models; assess continuum validity using local scales; identify DSMC sampling error.}
+\studyroute{Hyperbolicity proofs for higher-moment systems, general H theorems, and full DSMC collision-sampling constructions are omitted. Transport coefficients depend on the chosen collision kernel.}{Grad 13 moment; Chapman--Enskog; ES BGK; Knudsen layer; DSMC}{For planar Couette flow, compare Newtonian stress, Grad stress, and the kinetic distribution. Identify what boundary data and bulk closure each omit in a Knudsen layer.}
+
+\section{Knudsen Number and Nonequilibrium Information}\index{Rarefied gases}
+The ratio $\mathrm{Kn}=\lambda/L$ compares mean free path with a macroscopic length.
+Conventional continuum, slip, transition, and free-molecular ranges are modeling guidelines;
+local gradients, wall layers, and accuracy targets also determine applicability.
+For example, $L_T=T/|\nabla T|$ gives a temperature-gradient Knudsen number $\lambda/L_T$.
+Even for small global $\lambda/L$, shocks and wall regions may require nonequilibrium descriptions.
+
+\section{Two Closure Routes: Asymptotic Manifolds and Moment Systems}
+At small Knudsen number, the Chapman--Enskog expansion is
+\[
+f=M[n,\bm u,T]+\mathrm{Kn}\,f^{(1)}
++\mathrm{Kn}^2f^{(2)}+\cdots.
+\]
+Nonequilibrium corrections have zero conserved moments, so $n,\bm u,T$ are defined by Maxwellian parameters.
+Velocity integration of the first correction gives Newtonian stress and Fourier heat flux;
+their transport coefficients depend on the linearized collision operator.
+
+Grad methods instead retain higher moments as independent evolving variables.
+For a three-dimensional monatomic gas, the 13 moments are
+$n$, $\bm u$, $T$, five traceless-stress components, and three heat-flux components.
+A corresponding distribution representation has the structure
+\[
+f_{13}=M\left[1+
+A_{ij}\left(c_ic_j-\tfrac13|\bm c|^2\delta_{ij}\right)
++B_i c_i(|\bm c|^2-5\theta)\right],
+\qquad \theta=k_BT/m.
+\]
+Here $A_{ij}$ is symmetric and traceless, with $A,B$ determined by the prescribed stress and heat flux.
+Substitution into higher moments gives a finite-moment closure~\cite{grad1949}.
+Polynomial corrections can become negative in velocity tails, so realizability and hyperbolicity require explicit checks;
+regularized moment models must be selected for their stated regimes.
+
+\conceptbridge{Why do asymptotic and Grad closures differ if both describe stress and heat flux?}
+{An asymptotic closure uses small Knudsen number to constrain the nonequilibrium distribution, expressing stress and heat flux through macroscopic gradients.
+Grad models retain these moments as independent variables and close the higher moments in their evolution equations.
+They therefore use different state spaces and time scales, with different errors and validity regions.}
+{Small-parameter asymptotic relations / independent higher moments $\longrightarrow$ two closure families.}
+
+\section{BGK and ES--BGK}
+Continuous BGK relaxes toward a Maxwellian while preserving mass, momentum, and energy;
+its single relaxation time links transport processes, giving $\mathrm{Pr}=1$ for the standard monatomic model.
+ES--BGK uses an anisotropic Gaussian:
+\[
+G_\chi=\frac{n}{(2\pi)^{3/2}\sqrt{\det\mathcal T_\chi}}
+\exp\left(-\frac12\bm c^{\mathsf T}\mathcal T_\chi^{-1}\bm c\right),
+\]
+\[
+\mathcal T_\chi=(1-\chi)\theta I+\chi\Theta,\qquad
+\Theta=\bm P/\rho,\qquad
+C[f]=\frac{G_\chi-f}{\tau_c}.
+\]
+The identity $\tr\Theta=3\theta$ preserves energy; the covariance must remain positive definite.
+This parameterization allows $\mathrm{Pr}=1/(1-\chi)$;
+a common monatomic choice is $\chi=-1/2$, giving $\mathrm{Pr}=2/3$,
+with viscosity matched to the model's collision-frequency definition~\cite{holway1966}.
+Changes in discrete velocities, quadrature, or time stepping require renewed checks of collision invariants and entropy.
+
+\section{DSMC and Error Separation}
+DSMC represents a distribution with weighted simulation particles, alternating free streaming and random collisions in small cells.
+Collision partners and scattering angles are sampled from the Boltzmann kernel;
+wall or inlet distributions generate incoming particles~\cite{bird1994}.
+Finite particle counts introduce statistical fluctuations; cell size and time step introduce numerical bias.
+Resolving mean free paths, collision times, and local gradients guides refinement.
+
+To compare continuum and kinetic models, first fix collision physics,
+then reduce mesh, time-step, and sampling errors separately.
+This separates closure error from numerical error.
+
+\aiexercise{Multiply a standard normal density by $1+\alpha H_3(v)$, with $H_3(v)=v^3-3v$. Explain why any nonzero $\alpha$ can produce negative velocity tails. Calculate zeroth, first, and second moments, and distinguish low-order moment matching from positivity.}
+{Design Couette-flow comparisons varying Knudsen number, velocity-space resolution, and DSMC sample count separately. Measure slip velocity and stress, distinguishing closure, boundary-model, and sampling errors.}

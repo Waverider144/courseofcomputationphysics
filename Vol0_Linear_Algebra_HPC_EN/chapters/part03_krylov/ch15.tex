@@ -1,0 +1,33 @@
+\chapter{Choosing and Extending Krylov Methods}\label{v0ch:15}
+\begin{chaptersummary}
+The preceding chapters established common Krylov spaces and principal recurrences. Matrix structure, projection objectives, and preconditioner variability now organize extensions to symmetric indefinite systems, two-sided projection, flexible preconditioning, and multiple right-hand sides. These distinctions place each algorithm within an appropriate solver workflow.
+\end{chaptersummary}
+\learninggoals{Match assumptions to MINRES, FOM, QMR, TFQMR, and FGMRES; explain block and recycled Krylov spaces.}
+\paragraph{Core Question}Which structural differences define the methods, and when must the outer iteration change?
+
+\section{Structure and Projection Choices}
+\begin{center}\small
+\begin{tabularx}{\textwidth}{lXX}
+\toprule Method&Structure and objective&Important conditions\\\midrule
+MINRES&Real symmetric, possibly indefinite; minimum residual&Standard preconditioning must be fixed SPD, not arbitrarily indefinite\\
+FOM&Galerkin condition on an Arnoldi basis&The projected system may be singular; residual need not be minimal\\
+QMR&Two-sided Lanczos quasi-minimum residual&Usually needs transpose action; two-sided breakdown remains possible\\
+TFQMR&Transpose-free quasi-minimum residual&Short recurrence and monitoring differ from GMRES\\
+FGMRES&Variable or nonlinear preconditioning&Stores actual correction directions, increasing memory\\
+Block Krylov&Several related right-hand sides&Block rank deficiency, orthogonalization, and storage costs\\\bottomrule
+\end{tabularx}
+\end{center}
+Symmetric semidefinite and singular problems additionally require compatibility and nullspace handling; invertible-case conclusions do not replace these conditions.
+\section{Actual Directions in FGMRES}
+At right-preconditioned step $j$, take $\bm z_j=M_j^{-1}\bm v_j$ and orthogonalize $A\bm z_j$, obtaining
+\[
+ AZ_m=V_{m+1}\bar H_m,\qquad
+ \bm x_m=\bm x_0+Z_m\bm y_m.
+\]
+For fixed linear preconditioning, $Z_m$ is the image of the basis under one inverse action. Variable-accuracy inner iterations, changing AMG, or nonlinear smoothing generally lack that interpretation. FGMRES stores actual $\bm z_j$, retaining a valid projection relation.\cite{petsc}
+\conceptbridge{Why use a flexible outer method if the inner problems are nearly identical?}{Residual-dependent inner stopping need not define the same fixed linear map on every call. An outer method assuming a fixed preconditioner can then mismatch its basis and update relations. A flexible method retains the directions actually generated.}{Changing inner action $\longrightarrow$ actual correction directions $\longrightarrow$ flexible projection.}
+\section{Combinations and Minimal Examples}
+Compare MINRES and GMRES on a symmetric indefinite two-by-two system. For Poisson, alternate one and two relaxation sweeps and write the first two columns of $Z_m$. Block methods share information across right-hand sides; recycling can help consecutive time steps or parameter solves, with additional storage and update costs.
+\costnote{First verify matrix structure, then determine whether preconditioning is fixed and symmetric, and compare operator counts, reductions, and storage. Return codes, true residuals, and physical errors form the final verification record.}
+\aiexercise{Write the first MINRES and CG steps for a symmetric indefinite two-by-two system. Explain why MINRES applies but CG's positive-definiteness argument fails.}{Derive the FGMRES least-squares problem from $AZ_m=V_{m+1}\bar H_m$ and explain why the update uses $Z_m$, not $V_m$.}
+\studyroute{Lanczos biorthogonality proofs, block rank revelation, and recycling algorithms are omitted. See \cite{saad,templates,petsc}.}{MINRES; FOM; QMR; TFQMR; flexible GMRES; block Krylov; recycling}

@@ -1,0 +1,100 @@
+\chapter{Discontinuous Galerkin Methods}\label{ch:10}
+\begin{chaptersummary}
+Finite volumes enforce intercell conservation through shared fluxes; finite elements constrain residuals through testing. DG combines both mechanisms with local high-order polynomials and elementwise weak forms. One-dimensional advection gives the mass matrix and local evolution, while tests with constants and the solution yield conservation and energy identities. Elliptic penalties then address diffusion interfaces.
+\end{chaptersummary}
+\learninggoals{Construct broken trial spaces and traces; derive one-dimensional DG matrices; prove local and global conservation; distinguish hyperbolic upwind stability from elliptic penalty coercivity.}
+\studyroute{General nonlinear entropy stability, multidimensional boundary estimates, and elliptic DG error theorems are omitted. The derivation assumes constant coefficients, affine elements, and exact integration.}{discontinuous Galerkin; broken polynomial space; upwind flux; symmetric interior penalty; modal nodal DG}{For a quadratic Legendre basis, assemble the advection mass matrix, volume matrix, and endpoint vectors, then sum interface contributions to verify the energy estimate.}
+
+\section{Local Spaces, Degrees of Freedom, and Traces}\index{DG methods}
+On a periodic interval, let $K_j=(x_{j-1/2},x_{j+1/2})$ have length $h_j$.
+Take
+\[
+V_h^p=\{v\in L^2:v|_{K_j}\in\Poly_p(K_j)\}.
+\]
+Each element has $p+1$ scalar degrees of freedom; neighboring traces are independent. Consider
+\[
+u_t+a u_x=0,\qquad F(u)=au,\qquad a\in\R.
+\]
+Fix the interface orientation from left to right, with traces $u^-$ and $u^+$,
+$[u]=u^+-u^-$, and $\{u\}=(u^-+u^+)/2$. A consistent upwind flux is
+\[
+\widehat f=a\{u\}-\frac{|a|}{2}[u].
+\]
+For $a>0$, $\widehat f=au^-$.
+
+\conceptbridge{When elementwise approximations may jump, how does information cross interfaces?}
+{The broken space permits independent element approximations. Integration by parts generates interface fluxes; a shared Riemann flux couples the two traces and their local residuals. Constant test functions give cell conservation, while higher-order test functions determine the evolution of the internal polynomial.}
+{Broken polynomials $\longrightarrow$ elementwise weak form $\longrightarrow$ shared numerical flux.}
+
+\section{The Complete Weak Form for One-Dimensional Advection}
+For any $v_h\in\Poly_p(K_j)$, multiply the equation and integrate by parts:
+\[
+\int_{K_j}v_h\partial_tu_h\dd x
+-\int_{K_j}a u_h\partial_xv_h\dd x
++\widehat f_{j+1/2}v_h(x_{j+1/2}^{-})
+-\widehat f_{j-1/2}v_h(x_{j-1/2}^{+})=0.
+\]
+Map $x=x_j+J_j\xi$, with $\xi\in[-1,1]$ and $J_j=h_j/2$.
+Expand $u_h=\sum_{\ell=0}^pU_{j\ell}\phi_\ell(\xi)$ and define
+\[
+M_{i\ell}=\int_{-1}^1\phi_i\phi_\ell\dd\xi,\quad
+S_{i\ell}=\int_{-1}^1\phi_i'\phi_\ell\dd\xi,\quad
+r_i=\phi_i(1),\quad l_i=\phi_i(-1).
+\]
+Testing with each basis function gives
+\begin{equation}\label{eq:dg-local}
+J_jM\dot U_j=a S U_j-r\widehat f_{j+1/2}+l\widehat f_{j-1/2}
+=:R_j(U).
+\end{equation}
+The volume matrix acts only within the element; interface residuals use neighboring traces.
+In a Legendre modal basis,
+$M_{ii}=2/(2i+1)$. For $p=1$,
+\[
+M=\begin{pmatrix}2&0\\0&2/3\end{pmatrix},\quad
+S=\begin{pmatrix}0&0\\2&0\end{pmatrix},\quad
+r=\begin{pmatrix}1\\1\end{pmatrix},\quad
+l=\begin{pmatrix}1\\-1\end{pmatrix}.
+\]
+With $a>0$ and $Q_j=U_{j0}+U_{j1}$,
+\[
+h_j\dot U_{j0}=-aQ_j+aQ_{j-1},\qquad
+\frac{h_j}{3}\dot U_{j1}=2aU_{j0}-aQ_j-aQ_{j-1}.
+\]
+This is a directly implementable local ODE for the degrees of freedom.
+
+\section{Local Conservation and the Energy Identity}
+Taking $v_h=1$ gives
+\[
+\frac{\dd}{\dd t}\int_{K_j}u_h\dd x
+=-\widehat f_{j+1/2}+\widehat f_{j-1/2}.
+\]
+Shared fluxes cancel when summed over all cells. Upwind DG with $p=0$ recovers first-order finite-volume spatial discretization.
+Taking $v_h=u_h$ and combining the two sides of each interface gives
+\[
+\frac12\frac{\dd}{\dd t}\sum_j\int_{K_j}u_h^2\dd x
+=\sum_f\left(\widehat f-a\{u_h\}\right)[u_h]
+=-\frac{|a|}{2}\sum_f[u_h]^2.
+\]
+Periodicity, constant coefficients, and exact integration close this identity. A central flux gives a zero right-hand side.
+Fully discrete stability additionally requires compatibility between the time integrator and spatial spectrum. Physical boundaries contribute boundary fluxes to the energy identity.
+
+\section{Modal and Nodal Forms; Elliptic Problems}
+Modal DG stores basis coefficients; nodal DG stores values at interpolation nodes.
+If both represent the same polynomial space with identical integration and fluxes, a basis transformation connects their semidiscrete equations.
+Mass lumping or altered quadrature can change the discrete operator.
+
+For periodic one-dimensional Poisson, the symmetric interior penalty form can be used on the mean-zero broken space:
+\begin{equation}\label{eq:sip}
+\begin{aligned}
+b_h(u,v)={}&\sum_K\int_Ku'v'\dd x
++\sum_f\bigl(\{u'\}[v]+\{v'\}[u]\bigr)\\
+&+\sum_f\frac{\sigma(p+1)^2}{h_f}[u][v].
+\end{aligned}
+\end{equation}
+The scalar jump remains right trace minus left trace, so the consistency terms have positive signs.
+Choose $h_f$ as an appropriate minimum of neighboring sizes. For sufficiently large $\sigma$,
+inverse trace estimates absorb the interface cross terms into the volume and penalty terms, giving discrete coercivity.
+Dirichlet boundaries require compatible boundary consistency and penalty terms; see~\cite{arnold2002}.
+
+\aiexercise{For a uniform periodic mesh with $p=2$, calculate $M,S,l,r$ from~\eqref{eq:dg-local} and construct the global block coupling. Test with constants and the solution itself to verify total mass conservation and the upwind energy identity.}
+{Insert a smooth exact solution into~\eqref{eq:sip} and check all interface signs. Use a discrete trace inequality to identify the cross terms controlled by the penalty parameter.}

@@ -1,0 +1,233 @@
+\chapter{从多粒子动力学到动理学方程}\label{ch:1}
+
+\begin{chaptersummary}
+从粒子轨道走向可计算模型，需要逐步选择保留的信息。本章依次引入概率密度、边缘化与闭合：概率描述表征微观状态的不确定性，边缘积分减少显式坐标，闭合近似处理低阶分布演化中的高阶关联。这条约化路线构成后续连续介质与等离子体模型的共同起点。
+\end{chaptersummary}
+\learninggoals{说明轨道与概率描述的关系；区分边缘积分、关联层级与碰撞闭合；核对分布函数的归一化和守恒矩。}
+\studyroute{这里略去 Liouville 方程到 BBGKY 层级的逐项积分，以及由双粒子关联构造碰撞算子的极限过程。}{Liouville equation; marginal distribution; BBGKY hierarchy; molecular chaos}{设两粒子受成对力作用，写出单粒子边缘分布的积分定义，并推导其方程中依赖双粒子分布的项。}
+
+\section{Hamilton 动力学与相空间输运}\index{Liouville 方程}
+设系统中有 \(N\) 个粒子，第 \(i\) 个粒子的位置和动量为
+\[
+\bm x_i,\qquad \bm p_i.
+\]
+整个系统的状态是 \(6N\) 维相空间中的一点：
+\[
+\Gamma=
+(\bm x_1,\dots,\bm x_N,\bm p_1,\dots,\bm p_N).
+\]
+
+若 Hamiltonian 为 \(H\)，粒子运动满足
+\[
+\dot{\bm x}_i=\frac{\partial H}{\partial \bm p_i},
+\qquad
+\dot{\bm p}_i=-\frac{\partial H}{\partial \bm x_i}.
+\]
+
+当研究目标是宏观统计量且逐粒子计算成本过高时，可引入相空间概率密度
+\[
+\rho_N(\Gamma,t).
+\]
+
+\begin{authornote}
+\textbf{潜在疑问：}
+“为什么从确定性的 \(N\) 粒子轨道转向概率密度？”
+
+\textbf{作者补充：}
+许多工程问题关注密度、温度或平均流速，而非每个粒子的精确轨道。对于粒子数巨大的系统，逐一追踪所有自由度通常代价过高；若直接计算所有粒子对之间的相互作用，仅力的计算就有 $O(N^2)$ 的成本。概率描述将关注点转向可能状态及其统计规律，也允许描述对初始微观状态的不确定性。需要追踪特定粒子时，仍可使用粒子方法或欧拉--拉格朗日混合方法。
+
+\textbf{核心概念联系：}
+\[
+\text{deterministic particle trajectory}
+\longrightarrow
+\text{phase-space probability description}
+\]
+\end{authornote}
+
+概率守恒给出高维连续性方程
+\[
+\frac{\partial \rho_N}{\partial t}
++
+\nabla_\Gamma\cdot(\rho_N\dot\Gamma)=0.
+\]
+
+\begin{askai}
+AI 展开问题：
+\begin{quote}
+从普通三维连续性方程开始，逐步类比到 \(6N\) 维相空间，解释为什么概率密度 \(\rho_N(\Gamma,t)\) 满足
+\[
+\partial_t\rho_N+\nabla_\Gamma\cdot(\rho_N\dot\Gamma)=0.
+\]
+请明确相空间中“通量”的含义。
+\end{quote}
+
+进一步展开：
+\begin{quote}
+用一个一维位置加一维动量的 Hamilton 系统作为最小示例，说明概率云团如何被相空间速度场搬运。
+\end{quote}
+\end{askai}
+
+Hamilton 系统满足
+\[
+\nabla_\Gamma\cdot\dot\Gamma=0,
+\]
+故有
+\[
+\frac{\partial \rho_N}{\partial t}
++
+\dot\Gamma\cdot\nabla_\Gamma\rho_N=0,
+\]
+或
+\[
+\frac{\partial \rho_N}{\partial t}+\{\rho_N,H\}=0.
+\]
+
+刘维尔方程描述概率密度随微观动力学输运；Hamilton 流保持相空间体积。它仍然是 \(6N\) 维方程，后续边缘化才减少显式坐标的数量。
+
+\begin{authornote}
+\textbf{潜在疑问：}
+“概率描述为何仍然具有高维性？边缘化保留和消去了哪些信息？”
+
+\textbf{作者补充：}
+概率密度 \(\rho_N\) 依赖整个系统的 \(6N\) 个相空间坐标，因此改用概率描述本身并未降低维数。即使降到单粒子分布 \(f(\bm x,\bm v,t)\)，直接张量网格离散仍需约 \(N_x^3N_v^3\) 个自由度：每个空间网格点都要存储一份三维速度分布。例如每个坐标方向取 100 点便有 \(10^{12}\) 个数，仅以双精度存储一个标量数组就约需 8 TB。实际代价还取决于维度约化、网格、碰撞模型及并行实现。
+
+边缘化通过积分保留所选粒子的统计状态，将其余粒子的具体位置、速度及单粒子分布所不能表达的联合关联消去。相互作用仍通过这些关联影响保留变量的演化，因此需要闭合近似。三类操作各有作用：边缘化定义保留变量，闭合规定未解关联的影响，初值和边界条件规定模型的时空数据。
+
+\textbf{核心概念联系：}
+\[
+\rho_N(\Gamma,t)
+\longrightarrow
+f(\bm x,\bm v,t)
+\]
+\end{authornote}
+
+\section{边缘分布、归一化与关联层级}\index{边缘化}
+对同种质量 $m$ 的粒子，将动量坐标改为速度坐标，令
+\[
+\varrho_N(\bm x_1,\bm v_1,\ldots,\bm x_N,\bm v_N,t)
+=m^{3N}\rho_N(\bm x_1,\ldots,m\bm v_N,t),\qquad
+\int\varrho_N\dd z_1\cdots\dd z_N=1,
+\]
+其中 $z_i=(\bm x_i,\bm v_i)$，右端 $\rho_N$ 的全部动量均取 $\bm p_i=m\bm v_i$。
+概率型边缘和数密度型边缘分别为
+\[
+g_s(z_1,\ldots,z_s)=\int\varrho_N\dd z_{s+1}\cdots\dd z_N,\qquad
+f_s=\frac{N!}{(N-s)!}g_s.
+\]
+于是 $\int g_s=1$、$\int f_1=N$、$\int f_2=N(N-1)$。以下 $f=f_1$。
+边缘化的积分在每一固定时刻进行，保留变量的演化通过对 Liouville 方程积分获得。
+
+定义单粒子分布函数
+\[
+f(\bm x,\bm v,t),
+\]
+使
+\[
+f(\bm x,\bm v,t)\dd\bm x\dd\bm v
+\]
+表示位置和速度落在相应微元中的粒子期望数。
+
+从 \(N\) 粒子方程对其余变量积分，会出现
+\[
+f_1\longrightarrow f_2\longrightarrow f_3\longrightarrow\cdots,
+\]
+即 BBGKY 层级。单粒子方程依赖双粒子关联，双粒子方程又依赖三粒子关联。要得到封闭模型，必须对关联作假设。
+
+\begin{authornote}
+\textbf{潜在疑问：}
+“为什么从边缘化会自然出现 \(f_1,f_2,f_3,\dots\) 这个层级，而不是直接得到一个单粒子方程？”
+
+\textbf{作者补充：}
+单粒子受到其他粒子的作用，其平均效果依赖于这些粒子与所选粒子同时处于不同状态的概率，也就是双粒子分布。对其余变量积分虽消去了它们的显式坐标，却没有消除相互作用；同理，双粒子分布的演化又依赖三粒子分布。要只求解低阶方程，就需要在适用条件下近似高阶关联，这一步称为闭合。
+
+\textbf{核心概念联系：}
+\[
+\text{marginalization}
+\longrightarrow
+\text{BBGKY hierarchy}
+\longrightarrow
+\text{closure problem}
+\]
+\end{authornote}
+
+\section{动理学方程与碰撞模型}\index{Boltzmann 方程}
+一般动理学方程写成
+\[
+\frac{\partial f}{\partial t}
++\bm v\cdot\nabla_{\bm x}f
++\frac{\bm F}{m}\cdot\nabla_{\bm v}f
+=C[f].
+\]
+左侧是相空间输运，右侧是碰撞或松弛效应。此处使用 $\nabla_{\bm v}\cdot\bm F=0$ 的力场，包括速度无关力和 Lorentz 力；一般速度依赖力应写成速度空间的散度形式。
+
+若忽略离散碰撞，带电粒子满足 Vlasov 方程：
+\[
+\frac{\partial f_s}{\partial t}
++\bm v\cdot\nabla_{\bm x}f_s
++\frac{q_s}{m_s}
+(\bm E+\bm v\times\bm B)\cdot\nabla_{\bm v}f_s=0.
+\]
+电荷密度和电流密度由
+\[
+\rho_c=\sum_s q_s\int f_s\dd\bm v,
+\qquad
+\bm J=\sum_s q_s\int \bm v f_s\dd\bm v
+\]
+给出，再反馈到 Maxwell 方程中。由此形成 Vlasov--Maxwell 自洽系统。
+
+对于稀薄中性气体，把碰撞近似为瞬时二体碰撞，可得玻尔兹曼方程
+\[
+\frac{\partial f}{\partial t}
++\bm v\cdot\nabla_{\bm x}f
++\frac{\bm F}{m}\cdot\nabla_{\bm v}f
+=Q(f,f),
+\]
+其中
+\[
+Q(f,f)
+=
+\int B\left(f'f_*'-ff_*\right)\dd\Omega\dd\bm v_*.
+\]
+对碰撞前粒子作分子混沌近似，并在局部碰撞对的归一化下写成：
+\[
+f_2(\bm v,\bm v_*)\approx f(\bm v)f(\bm v_*).
+\]
+
+对于前述有限 $N$ 数密度归一化，独立粒子的精确乘积还含 $(N-1)/N$ 因子；常用碰撞闭合在大粒子数极限吸收该因子。碰撞前无关联的假设只在相应稀薄极限和入射粒子统计中使用。
+
+\begin{askai}
+AI 展开问题：
+\begin{quote}
+用两个粒子的速度分布做一个最小例子，解释 \(f_2(\bm v,\bm v_*)\approx f(\bm v)f(\bm v_*)\) 意味着什么。请分别说明“无关联”在概率论上、物理碰撞上、以及 Boltzmann 方程封闭上各是什么意思。
+\end{quote}
+
+进一步展开：
+\begin{quote}
+给出一个 \(f_2\neq f f_*\) 的反例，并说明这种相关性会让单粒子 Boltzmann 方程少掉哪些信息。
+\end{quote}
+\end{askai}
+
+完整碰撞积分计算昂贵，BGK 模型用单一松弛过程替代：
+\[
+C[f]=\frac{f^{\mathrm{eq}}-f}{\tau},
+\]
+其中
+\[
+f^{\mathrm{eq}}
+=
+n\left(\frac{m}{2\pi k_BT}\right)^{3/2}
+\exp\left[
+-\frac{m|\bm v-\bm u|^2}{2k_BT}
+\right].
+\]
+
+对于等离子体中的长程 Coulomb 相互作用，粒子常经历大量小角度偏转。此时可得到 Landau 或 Fokker--Planck 型算子，把碰撞理解为速度空间中的漂移和扩散。
+
+因此，碰撞项的不同假设对应一组模型层级：
+\[
+\text{无碰撞 Vlasov}
+\longrightarrow
+\text{弱碰撞 Vlasov--Fokker--Planck}
+\longrightarrow
+\text{强碰撞流体模型}.
+\]

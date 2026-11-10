@@ -1,0 +1,9 @@
+{
+  "purpose": "SHA-256 reference for the unchanged current Volume II editions.",
+  "files": {
+    "CourseofComputationPhysics_Vol2_CN.tex": "6c036c1df76c519a593f63244d788d9b49a3250c4d09fdbcf9c6da7f74f52016",
+    "CourseofComputationPhysics_Vol2_EN.tex": "82892f0d02687dcad973e3b10fc5da8b33abe5e78cd7ef48868b3cc1c2524b25",
+    "CourseofComputationPhysics_Vol2_CN.pdf": "6711c05312e3ca73cc78d1c733fe862cc235998cdb866172f74bf6a7e2fe960a",
+    "CourseofComputationPhysics_Vol2_EN.pdf": "00c3a7e9273ea21c7eb21fb1188ee4e71696ce43a11d3ca0fa90363d82a29884"
+  }
+}

@@ -1,0 +1,136 @@
+\chapter{投影、插值与 Galerkin 框架}\label{ch:6}
+\begin{chaptersummary}
+弱形式规定了解与测试函数所在的连续空间，离散计算则进一步选择有限维表示及残差约束。本章据此比较插值、正交投影、Galerkin、配置点与控制体守恒，再用误差正交性联系空间逼近与数值解。后续各方法将在这一共同框架下定义自由度、算子和界面耦合。
+\end{chaptersummary}
+\learninggoals{写出试探与测试空间；区分五类逼近或残差机制；说明能量投影的适用条件；由局部基函数构造质量矩阵、残差和稀疏耦合。}
+\studyroute{这里给出强制问题的基本误差估计，略去一般 Petrov--Galerkin 的离散 inf--sup 理论和非协调误差估计。}{Galerkin orthogonality; Riesz representation; Cea lemma; Petrov--Galerkin inf-sup}{对 $-\!u''=f$ 比较两种线性有限元网格的能量误差，再以对流问题解释测试空间改变后的稳定性问题。}
+
+\section{从连续算子到残差约束}
+设连续问题为 $\mathcal A u=f$，允许的场属于 $V$，测试空间为 $W$。
+弱形式可写为 $b(u,v)=\ell(v)$。
+选择有限维试探空间 $V_h$ 和测试空间 $W_h$，得到
+\begin{equation}\label{eq:galerkin-general}
+\text{求 }u_h\in V_h:\qquad b(u_h,v_h)=\ell(v_h)
+\quad\forall v_h\in W_h.
+\end{equation}
+残差泛函 $r_h(v)=\ell(v)-b(u_h,v)$ 在 $W_h$ 上为零；
+它在其余测试方向上通常仍有误差。相同空间称为 Galerkin；
+不同试探和测试空间构成 Petrov--Galerkin。对非线性问题，残差与解的关系相应成为非线性。
+
+\conceptbridge{有限维表示确定之后，还缺少哪一步才能得到数值方程？}
+{基函数只给出了候选解的表示。数值方程还需规定哪些测试方向、网格点或控制体上的残差为零。这一约束机制与界面处理共同定义离散算子。}
+{表示空间 $\longrightarrow$ 残差约束 $\longrightarrow$ 有限维方程。}
+
+\section{插值与正交投影}\index{Galerkin 方法}\index{插值}
+插值算子 $I_h$ 通过指定自由度 $\lambda_i$ 满足
+$\lambda_i(I_hu)=\lambda_i(u)$。节点插值要求点值有意义；
+在一般高维 $H^1$ 空间中，点值未必是连续泛函，可改用局部平均型自由度。
+
+Hilbert 空间内的正交投影 $P_h$ 则满足
+\[
+P_hu\in V_h,\qquad (u-P_hu,v_h)_V=0\quad\forall v_h\in V_h.
+\]
+对 $u(x)=x^2$、$V_h=\Poly_1(-1,1)$，端点线性插值得到 $I_hu=1$，
+而 $L^2$ 正交投影得到 $P_hu=1/3$。
+同一个表示空间可以对应不同的逼近算子。
+
+\section{Riesz 表示、能量范数与误差估计}
+Hilbert 空间的 Riesz 映射 $R_V:V\to V'$ 由
+$\langle R_Vw,v\rangle=(w,v)_V$ 定义，
+使每个连续线性泛函对应唯一的内积表示向量。具体 PDE 的双线性形式还需核对对称性和强制性。
+对 $V_h\subset V$ 的协调 Galerkin 近似，连续与离散方程相减得
+\[
+b(u-u_h,v_h)=0\quad\forall v_h\in V_h.
+\]
+若 $b$ 对称正定，它定义能量范数 $\norm{v}_b^2=b(v,v)$，并有
+\[
+\norm{u-u_h}_b=\inf_{w_h\in V_h}\norm{u-w_h}_b.
+\]
+对有界且强制、但未必对称的 $b$，由任意 $w_h\in V_h$ 可得
+\[
+\alpha\norm{u-u_h}_V^2
+\le b(u-u_h,u-w_h)
+\le M\norm{u-u_h}_V\norm{u-w_h}_V.
+\]
+约去误差范数即得到 C\'ea 估计
+\[
+\norm{u-u_h}_V\le\frac{M}{\alpha}
+\inf_{w_h\in V_h}\norm{u-w_h}_V.
+\]
+这一结论把数值误差联系到空间逼近能力。Petrov--Galerkin 与非强制问题需离散 inf--sup 条件。
+
+\section{不同方法的自由度与残差机制}
+\begin{center}\small
+\begin{tabularx}{\textwidth}{@{}l>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
+\toprule
+方法 & 表示与自由度 & 方程或残差约束\\
+\midrule
+FDM & 网格函数、节点值 & 差分算子在网格点满足方程\\
+FVM & 单元平均与局部重构 & 每个控制体的积分守恒\\
+FEM & 局部基函数、迹相容自由度 & 对有限维测试空间满足弱形式\\
+谱 Galerkin & 全局模式系数 & 对所选全局测试模式残差为零\\
+谱配置 & 全局插值多项式的节点值 & 配置点满足微分方程\\
+DG / FR & 单元局部多项式 & 弱残差 / 修正通量导数及共享界面通量\\
+LBM & 各离散速度的粒子群密度 & 迁移与碰撞及其守恒矩\\
+\bottomrule
+\end{tabularx}
+\end{center}
+这些方法可共享有限维表示、残差和结构分析的语言。
+Hilbert 正交投影的具体解释由内积、试探空间与残差条件共同决定。
+
+\aiexercise{在 $[-1,1]$ 上分别求 $x^2$ 到 $\Poly_1$ 的端点插值与 $L^2$ 投影，显式计算两个误差。再说明对称 Poisson Galerkin 的正交性使用哪一个内积。}
+{比较中心差分、单元平均 FVM 和线性 FEM 对同一 Poisson 问题的自由度及残差约束；列出均匀网格上产生相同矩阵所需的积分和边界条件。}
+
+\section{有限维代数系统的形成}
+偏微分方程离散后通常得到
+\[
+\bm A\bm x=\bm b
+\]
+或非线性残差系统
+\[
+\bm R(\bm U)=0.
+\]
+
+\begin{authornote}
+\textbf{潜在疑问：}
+“为什么一个连续 PDE 离散后会变成有限维向量方程？自由度、残差和矩阵条目分别来自哪里？”
+
+\textbf{作者补充：}
+连续场在每一点都有取值，计算机只能保存有限个参数。离散化先用网格值或基函数系数表示近似场，再通过节点配点、控制体守恒或对测试函数积分等方式，要求方程在有限个意义下成立。于是连续问题转化为有限维代数方程；非线性或含时问题还需进一步线性化或时间离散。
+
+\textbf{核心概念联系：}
+\[
+\text{continuous PDE}
+\longrightarrow
+\text{finite-dimensional DOFs}
+\longrightarrow
+\text{algebraic system}
+\]
+\end{authornote}
+
+局部微分算子通常产生稀疏矩阵，边界积分算子常产生稠密矩阵。矩阵结构直接反映物理耦合范围。
+
+\begin{authornote}
+\textbf{潜在疑问：}
+“为什么 differential operator 的局部性会变成 matrix sparsity？为什么积分方程又会变稠密？”
+
+\textbf{作者补充：}
+矩阵的一行记录一个离散方程依赖哪些自由度。局部微分算子配合局部基函数或有限差分模板时，该方程通常只涉及附近自由度，因此每行只有少量非零项。若采用全局基函数或积分算子，一个自由度可能与许多远处自由度耦合，矩阵就可能变稠密；稀疏性取决于算子与离散方式的共同选择。
+
+\textbf{核心概念联系：}
+\[
+\text{operator locality}
+\longrightarrow
+\text{matrix sparsity or density}
+\]
+\end{authornote}
+
+
+取基函数 $\phi_j$，$u_h=\sum_jU_j\phi_j$，式~\eqref{eq:galerkin-general}~产生
+$A_{ij}=b(\phi_j,\psi_i)$ 与 $b_i=\ell(\psi_i)$。
+对含时问题，
+\[
+M_{ij}=(\phi_j,\psi_i),\qquad M_h\dot U_h=R_h(U_h,t).
+\]
+质量矩阵表示时间导数的配对，残差包含体积、边界及源项。
+它们的结构由表示与约束产生；代数求解算法在第 0 卷展开。

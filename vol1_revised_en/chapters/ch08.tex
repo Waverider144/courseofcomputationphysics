@@ -1,0 +1,145 @@
+\chapter{Finite Volumes: Numerical Fluxes and High-Resolution Schemes}\label{ch:8}
+\begin{chaptersummary}
+The weak form of a conservation law describes discontinuities through control-volume flux balances. Cell averages, Riemann problems, and shared fluxes lead to finite-volume methods; Godunov's order barrier motivates nonlinear reconstruction. Conservation, monotonicity, and entropy stability impose distinct constraints on fluxes and updates, providing the basis for DG and FR interface design.
+\end{chaptersummary}
+\learninggoals{Construct cell updates from integral conservation; explain Riemann fluxes; distinguish Godunov's theorem, TVD, and high-order reconstruction; check reconstructed averages and units.}
+\studyroute{The chapter develops Godunov, MUSCL, TVD, and WENO in sequence. Characteristic decomposition for systems, full smoothness indicators, and nonlinear entropy-convergence proofs are left for further study.}{finite volume; Riemann problem; Godunov order barrier; MUSCL; WENO}{Calculate a minmod reconstruction from three cell averages, then apply the Rusanov flux to two adjacent control volumes and check the signs of their internal fluxes.}
+\section{Control Volumes, Cell Averages, and Shared Fluxes}\index{Finite volume method}
+Finite-volume methods start from control-volume conservation:
+\[
+\frac{\dd}{\dd t}
+\int_{\Omega_i}U\dd V
++
+\int_{\partial\Omega_i}
+\bm F\cdot\bm n\dd S
+=
+\int_{\Omega_i}S\dd V.
+\]
+Adjacent cells use the same interface flux with opposite signs. Internal fluxes therefore cancel in a global sum, giving local and global conservation.
+
+
+Define $\bar U_K=|K|^{-1}\int_KU$. Degrees of freedom are cell averages; interface states are reconstructed from them.
+A consistent numerical normal flux satisfies $\widehat F(U,U;n)=F(U)\cdot n$ and changes sign when the states are exchanged and the normal is reversed.
+For a one-dimensional scalar equation, Riemann initial data are constant states $U_L,U_R$ on either side of an interface.
+The exact interface flux is the Godunov flux; approximate solvers use computable wave-speed estimates.
+For example,
+\[
+\widehat F(U_L,U_R)=\frac{F(U_L)+F(U_R)}2-\frac{\alpha}2(U_R-U_L),
+\qquad
+\alpha\ge\max_{[U_L,U_R]}|F'(U)|.
+\]
+For linear advection $F(U)=aU$ with $a>0$, the exact flux is $aU_L$.
+A cell update also integrates the flux over one time step. High-order spatial reconstruction and time integration jointly determine fully discrete accuracy.
+
+\section{Godunov's Theorem and Nonlinear Reconstruction}
+Godunov's theorem is a basic limitation in numerical conservation laws. For linear scalar advection, consider a scheme that is
+
+\begin{enumerate}
+  \item linear;
+  \item monotone, creating no new extrema;
+  \item consistent.
+\end{enumerate}
+
+For general noninteger Courant numbers, a linear monotone consistent scheme has at most first-order accuracy. Exact grid translation at integer Courant numbers for constant-speed advection is a special case.
+
+Higher-order linear reconstruction generally requires alternating positive and negative weights, whereas monotonicity requires a convex-combination update. These requirements are generally incompatible.
+
+Improving the accuracy of monotone schemes therefore requires changing these conditions. Modern high-resolution methods commonly use nonlinear reconstruction:
+
+\begin{authornote}
+\textbf{Potential Question:}
+"Why does Godunov's theorem motivate nonlinear reconstruction? Which restriction does nonlinearity remove?"
+
+\textbf{Author Supplement:}
+Under the theorem's assumptions, linear monotone schemes are at most first order. High-resolution methods therefore make reconstruction or limiting depend on the local solution: retain higher order in smooth regions and adjust slopes near steep gradients to suppress oscillation. The scheme becomes nonlinear and leaves the class of linear schemes restricted by the theorem.
+
+\textbf{Core Conceptual Connection:}
+\[
+\text{Godunov theorem}
+\longrightarrow
+\text{nonlinear reconstruction}
+\longrightarrow
+\text{high-resolution schemes}
+\]
+\end{authornote}
+
+\begin{itemize}
+  \item Preserve conservation.
+  \item Allow a nonlinear algorithm.
+  \item Recover high order in smooth regions.
+  \item Reduce to a first-order monotone scheme near discontinuities.
+\end{itemize}
+
+For a finite-volume method,
+\[
+\frac{\dd \bar U_i}{\dd t}
+=
+-\frac{1}{\Delta x}
+\left(
+\widehat F_{i+1/2}
+-
+\widehat F_{i-1/2}
+\right).
+\]
+the key step is constructing left and right interface states
+\[
+U_{i+1/2}^{L},
+\qquad
+U_{i+1/2}^{R},
+\]
+and evaluating a numerical flux with an exact or approximate Riemann solver.
+
+MUSCL uses piecewise-linear reconstruction, for example,
+\[
+U_{i+1/2}^{L}
+=
+U_i+\frac12\sigma_i,
+\]
+
+\begin{askai}
+Ask AI:
+\begin{quote}
+Construct MUSCL reconstruction from three neighboring cell averages. Calculate \(U_{i+1/2}^L\) using an unlimited slope and a minmod limiter, and explain how limiting retains second order in smooth regions and reverts to first order near discontinuities.
+\end{quote}
+
+Follow-up:
+\begin{quote}
+For data containing a discontinuity, calculate and compare minmod, van Leer, and Superbee slopes.
+\end{quote}
+\end{askai}
+
+Here $\sigma_i$ is the increment across one cell width and has the same units as $U_i$.
+For example, $\sigma_i=\operatorname{minmod}(U_i-U_{i-1},U_{i+1}-U_i)$,
+where minmod returns the argument of smaller magnitude for equal signs, and zero otherwise.
+The slope \(\sigma_i\) adapts to local smoothness; minmod, van Leer, and Superbee impose different restrictions. This retains approximately second-order behavior in smooth regions and reduces reconstruction order near shocks or discontinuities to suppress oscillations.
+
+A TVD method requires nonincreasing discrete total variation:
+\[
+TV(U^{n+1})\le TV(U^n),
+\qquad
+TV(U)=\sum_i|U_{i+1}-U_i|.
+\]
+This turns suppression of spurious oscillations into an analyzable discrete condition.
+
+ENO/WENO selects or weights several candidate stencils rather than directly limiting one slope. WENO uses a high-order combination in smooth regions and reduces weights on stencils containing a discontinuity.
+
+Godunov's theorem exposes a structural tradeoff:
+\[
+\text{High-order accuracy}
+\quad\leftrightarrow\quad
+\text{Monotonicity and nonoscillation}.
+\]
+Scheme design adjusts reconstruction and dissipation to local solution smoothness.
+
+\section{Conservation, Entropy, and High Order in Smooth Regions}
+WENO combines candidate reconstructions $q_r$ with nonlinear weights:
+\[
+U_{i+1/2}^{L}=\sum_r\omega_rq_r,\qquad
+\omega_r=\frac{\alpha_r}{\sum_s\alpha_s},\qquad
+\alpha_r=\frac{d_r}{(\epsilon_W+\beta_r)^2}.
+\]
+$\beta_r$ measures stencil smoothness and $d_r$ gives the ideal weights of the corresponding high-order linear combination;
+the scale of $\epsilon_W$ must be compatible with the variables and mesh.
+Smooth-region order depends on how rapidly the weights recover their ideal values; extrema require separate analysis.
+Fully discrete scalar TVD results depend on the flux, limiter, and time step.
+Entropy-stable systems additionally require entropy variables and compatible numerical entropy fluxes. For the original WENO construction, see~\cite{jiang1996}.

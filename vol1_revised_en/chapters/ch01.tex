@@ -1,0 +1,235 @@
+\chapter{From Many-Particle Dynamics to Kinetic Equations}\label{ch:1}
+
+\begin{chaptersummary}
+Moving from particle trajectories to computable models requires choosing which information to retain. Probability density represents uncertainty in the microscopic state, marginal integration reduces explicit coordinates, and closure approximates higher correlations entering lower-order evolution. This reduction chain provides the starting point for continuum and plasma models.
+\end{chaptersummary}
+\learninggoals{Relate trajectory and probability descriptions; distinguish marginal integration, correlation hierarchies, and collision closure; check distribution normalizations and conserved moments.}
+\studyroute{The term-by-term integration from the Liouville equation to the BBGKY hierarchy and the limiting construction of collision operators from two-particle correlations are omitted.}{Liouville equation; marginal distribution; BBGKY hierarchy; molecular chaos}{For two particles interacting through pair forces, define the one-particle marginal by integration and derive the term in its equation that depends on the two-particle distribution.}
+
+\section{Hamiltonian Dynamics and Phase-Space Transport}\index{Liouville equation}
+Consider \(N\) particles, with the position and momentum of particle \(i\) denoted by
+\[
+\bm x_i,\qquad \bm p_i.
+\]
+The full system state is a point in \(6N\)-dimensional phase space:
+\[
+\Gamma=
+(\bm x_1,\dots,\bm x_N,\bm p_1,\dots,\bm p_N).
+\]
+
+For a Hamiltonian \(H\), the equations of motion are
+\[
+\dot{\bm x}_i=\frac{\partial H}{\partial \bm p_i},
+\qquad
+\dot{\bm p}_i=-\frac{\partial H}{\partial \bm x_i}.
+\]
+
+When macroscopic statistics are the quantities of interest and particle-by-particle computation is too expensive, introduce a phase-space probability density
+\[
+\rho_N(\Gamma,t).
+\]
+
+\begin{authornote}
+\textbf{Potential Question:}
+"Why move from deterministic \(N\)-particle trajectories to a probability density?"
+
+\textbf{Author Supplement:}
+Many engineering problems concern density, temperature, or mean flow rather than individual trajectories. For systems containing enormous numbers of particles, tracking every degree of freedom is usually prohibitively expensive; direct evaluation of all pair interactions alone costs $O(N^2)$. A probability description focuses on possible states and their statistical laws, and represents uncertainty in the initial microscopic state. Particle methods or Eulerian--Lagrangian hybrid methods remain available when particular particles must be tracked.
+
+\textbf{Core Conceptual Connection:}
+\[
+\text{deterministic particle trajectory}
+\longrightarrow
+\text{phase-space probability description}
+\]
+\end{authornote}
+
+Conservation of probability gives a high-dimensional continuity equation:
+\[
+\frac{\partial \rho_N}{\partial t}
++
+\nabla_\Gamma\cdot(\rho_N\dot\Gamma)=0.
+\]
+
+\begin{askai}
+Ask AI:
+\begin{quote}
+Starting from the ordinary three-dimensional continuity equation, extend the analogy to \(6N\)-dimensional phase space and explain step by step why \(\rho_N(\Gamma,t)\) satisfies
+\[
+\partial_t\rho_N+\nabla_\Gamma\cdot(\rho_N\dot\Gamma)=0.
+\]
+Explain explicitly what flux means in phase space.
+\end{quote}
+
+Follow-up:
+\begin{quote}
+Use a Hamiltonian system with one position and one momentum coordinate to show how the phase-space velocity field transports a probability cloud.
+\end{quote}
+\end{askai}
+
+Hamiltonian systems satisfy
+\[
+\nabla_\Gamma\cdot\dot\Gamma=0,
+\]
+Hence
+\[
+\frac{\partial \rho_N}{\partial t}
++
+\dot\Gamma\cdot\nabla_\Gamma\rho_N=0,
+\]
+or
+\[
+\frac{\partial \rho_N}{\partial t}+\{\rho_N,H\}=0.
+\]
+
+The Liouville equation describes transport of probability density by microscopic dynamics; Hamiltonian flow preserves phase-space volume. The equation remains \(6N\)-dimensional. Only subsequent marginalization reduces the number of explicit coordinates.
+
+\begin{authornote}
+\textbf{Potential Question:}
+"Why does a probability description remain high-dimensional, and which information does marginalization retain or discard?"
+
+\textbf{Author Supplement:}
+The density \(\rho_N\) depends on all \(6N\) phase-space coordinates, so a probability description alone does not reduce dimension. Even the one-particle distribution \(f(\bm x,\bm v,t)\) requires approximately \(N_x^3N_v^3\) degrees of freedom on a direct tensor-product grid: every spatial point carries a three-dimensional velocity distribution. With 100 points per coordinate direction, there are \(10^{12}\) values; one double-precision scalar array alone occupies approximately 8 TB. Actual cost also depends on dimensional reduction, mesh design, collision model, and parallel implementation.
+
+Marginalization integrates out the other particles' explicit positions, velocities, and joint information unavailable in a one-particle distribution. Interactions still transmit the effects of these correlations to the retained variables, motivating closure. The roles are distinct: marginalization defines retained variables, closure models unresolved correlations, and initial and boundary conditions supply space-time data.
+
+\textbf{Core Conceptual Connection:}
+\[
+\rho_N(\Gamma,t)
+\longrightarrow
+f(\bm x,\bm v,t)
+\]
+\end{authornote}
+
+\section{Marginal Distributions, Normalization, and Correlation Hierarchies}\index{Marginalization}
+For particles of the same mass $m$, replace momentum coordinates by velocity coordinates and define
+\[
+\varrho_N(\bm x_1,\bm v_1,\ldots,\bm x_N,\bm v_N,t)
+=m^{3N}\rho_N(\bm x_1,\ldots,m\bm v_N,t),\qquad
+\int\varrho_N\dd z_1\cdots\dd z_N=1,
+\]
+Here $z_i=(\bm x_i,\bm v_i)$, and every momentum argument of $\rho_N$ on the right is evaluated at $\bm p_i=m\bm v_i$.
+Probability-normalized and number-density marginals are, respectively,
+\[
+g_s(z_1,\ldots,z_s)=\int\varrho_N\dd z_{s+1}\cdots\dd z_N,\qquad
+f_s=\frac{N!}{(N-s)!}g_s.
+\]
+Thus $\int g_s=1$, $\int f_1=N$, and $\int f_2=N(N-1)$. Below, $f=f_1$.
+Marginalization is performed at each fixed time; the evolution of the retained variables follows by integrating the Liouville equation.
+
+Define the one-particle distribution
+\[
+f(\bm x,\bm v,t),
+\]
+so that
+\[
+f(\bm x,\bm v,t)\dd\bm x\dd\bm v
+\]
+is the expected number of particles in the corresponding position and velocity elements.
+
+Integrating the \(N\)-particle equation over the other variables produces
+\[
+f_1\longrightarrow f_2\longrightarrow f_3\longrightarrow\cdots,
+\]
+the BBGKY hierarchy. The one-particle equation depends on two-particle correlations, and the two-particle equation depends on three-particle correlations. Closing the model requires assumptions about these correlations.
+
+\begin{authornote}
+\textbf{Potential Question:}
+"Why does marginalization produce a hierarchy \(f_1,f_2,f_3,\dots\), rather than a closed one-particle equation?"
+
+\textbf{Author Supplement:}
+The mean force on a selected particle depends on the probability that it and another particle occupy particular states simultaneously: the two-particle distribution. Integration removes explicit coordinates but not interactions. Similarly, the evolution of the two-particle distribution involves the three-particle distribution. Solving only lower-order equations therefore requires approximating higher-order correlations under stated conditions. This step is called closure.
+
+\textbf{Core Conceptual Connection:}
+\[
+\text{marginalization}
+\longrightarrow
+\text{BBGKY hierarchy}
+\longrightarrow
+\text{closure problem}
+\]
+\end{authornote}
+
+\section{Kinetic Equations and Collision Models}\index{Boltzmann equation}
+A general kinetic equation has the form
+\[
+\frac{\partial f}{\partial t}
++\bm v\cdot\nabla_{\bm x}f
++\frac{\bm F}{m}\cdot\nabla_{\bm v}f
+=C[f].
+\]
+The left side describes phase-space transport; the right side describes collisions or relaxation. The displayed form assumes $\nabla_{\bm v}\cdot\bm F=0$, as for velocity-independent forces and the Lorentz force. A general velocity-dependent force requires the velocity-space divergence form.
+
+Neglecting discrete collisions gives the Vlasov equation for charged particles:
+\[
+\frac{\partial f_s}{\partial t}
++\bm v\cdot\nabla_{\bm x}f_s
++\frac{q_s}{m_s}
+(\bm E+\bm v\times\bm B)\cdot\nabla_{\bm v}f_s=0.
+\]
+Charge and current densities are given by
+\[
+\rho_c=\sum_s q_s\int f_s\dd\bm v,
+\qquad
+\bm J=\sum_s q_s\int \bm v f_s\dd\bm v
+\]
+and feed back into Maxwell's equations, forming the self-consistent Vlasov--Maxwell system.
+
+For a dilute neutral gas, approximating collisions as instantaneous binary encounters gives the Boltzmann equation:
+\[
+\frac{\partial f}{\partial t}
++\bm v\cdot\nabla_{\bm x}f
++\frac{\bm F}{m}\cdot\nabla_{\bm v}f
+=Q(f,f),
+\]
+where
+\[
+Q(f,f)
+=
+\int B\left(f'f_*'-ff_*\right)\dd\Omega\dd\bm v_*.
+\]
+Apply molecular chaos to incoming particles, using the normalization of a local collision pair:
+\[
+f_2(\bm v,\bm v_*)\approx f(\bm v)f(\bm v_*).
+\]
+
+For the finite-$N$ number-density normalization above, the exact product for independent particles also contains a factor $(N-1)/N$; the usual collision closure absorbs this factor in the large-particle-number limit. The assumption of uncorrelated particles applies to incoming-particle statistics in the corresponding dilute limit.
+
+\begin{askai}
+Ask AI:
+\begin{quote}
+Use a minimal example with two particle velocities to explain \(f_2(\bm v,\bm v_*)\approx f(\bm v)f(\bm v_*)\). Distinguish the meanings of "uncorrelated" in probability theory, collision physics, and closure of the Boltzmann equation.
+\end{quote}
+
+Follow-up:
+\begin{quote}
+Construct a counterexample with \(f_2\neq f f_*\), and identify the information absent from the one-particle Boltzmann equation.
+\end{quote}
+\end{askai}
+
+The full collision integral is expensive. The BGK model replaces it with a single relaxation process:
+\[
+C[f]=\frac{f^{\mathrm{eq}}-f}{\tau},
+\]
+where
+\[
+f^{\mathrm{eq}}
+=
+n\left(\frac{m}{2\pi k_BT}\right)^{3/2}
+\exp\left[
+-\frac{m|\bm v-\bm u|^2}{2k_BT}
+\right].
+\]
+
+For long-range Coulomb interactions in plasmas, particles typically undergo many small-angle deflections. This leads to Landau or Fokker--Planck operators, which describe collisions as velocity-space drift and diffusion.
+
+Different collision assumptions therefore define a model hierarchy:
+\[
+\begin{gathered}
+\text{Collisionless Vlasov}
+\longrightarrow\\
+\text{Weakly collisional Vlasov--Fokker--Planck}\\
+\longrightarrow
+\text{Strongly collisional fluid model}.
+\end{gathered}
+\]

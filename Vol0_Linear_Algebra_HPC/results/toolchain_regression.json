@@ -1,0 +1,19 @@
+{
+  "date": "2026-11-10",
+  "host": "remote",
+  "toolkit": "CUDA 12.9.86",
+  "test": "three-step general three-component periodic Yee vs CPU",
+  "default_target": {
+    "status": "failed",
+    "max_cpu_differences": {
+      "32": 0.028265922534978116,
+      "64": 0.03142930094577079
+    }
+  },
+  "native_target": {
+    "status": "passed",
+    "max_cpu_difference": 6.9388939e-18
+  },
+  "root_cause": "not established; explicit native target is the validated build configuration",
+  "note": "Historical diagnostic, not a performance record. System headers and compiler installations were not modified."
+}

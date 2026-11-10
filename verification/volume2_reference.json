@@ -1,9 +1,9 @@
 {
   "purpose": "SHA-256 integrity reference for current Volume II source and PDF editions.",
   "files": {
-    "CourseofComputationPhysics_Vol2_CN.tex": "69874df1921902fb76695a90143f887f0c06525f23133ec5dde2c06808ea728f",
-    "CourseofComputationPhysics_Vol2_EN.tex": "3d6c418b482571640e71e90f0969ae928336a1ec1f1090dbbba1e4125eee5ade",
-    "CourseofComputationPhysics_Vol2_CN.pdf": "0b0a4761f4498e57ab30440748910ca79b7d215e6d91a7ef651f2cdef51edbe5",
-    "CourseofComputationPhysics_Vol2_EN.pdf": "5b0600d39bceac8466bf900b8579f7431f6437ef75c275588b2f9e1ed9a5020c"
+    "CourseofComputationPhysics_Vol2_CN.tex": "b3014d3e644ef527f53f439bb3f72cf1f26dceb2a5e8e752a0f1041da99ace11",
+    "CourseofComputationPhysics_Vol2_EN.tex": "3ac5acaf94c39a6ac2033c4d3b52e8bff42a20cafb0d2fcb662e30ce46087bd4",
+    "CourseofComputationPhysics_Vol2_CN.pdf": "ddac221ff04d863599cbb39eae19b42594151847a165185a38390b807ae17267",
+    "CourseofComputationPhysics_Vol2_EN.pdf": "95e273db232e826d27f2d2679af15b2a1a6d3a4ffe2bcf83825ff1c93e4a285a"
   }
 }

@@ -6,6 +6,11 @@ Initiated by Harvey Tan.
 
 A concise route from physical models to numerical algorithms and reproducible computation, for readers with a background in mathematics. The three volumes connect modeling assumptions, PDE structure, discretization, matrix solvers, and modern computer architecture.
 
+> [!IMPORTANT]
+> **Do not study from the text alone. Use AI explanations and code experiments alongside these books.**
+>
+> The text is a highly compressed knowledge map. When a conceptual link, derivation, or prerequisite is unclear, give AI the current notation, assumptions, and precise question and request a step-by-step explanation. Run the [companion code](Vol0_Linear_Algebra_HPC/code_examples/) or a minimal example, vary parameters, and inspect error, conservation, or stability. Check AI explanations, derivations, and code against the stated assumptions, references, and numerical results.
+
 ## Read the Books
 
 | Volume | Chinese PDF | English PDF | Chinese source | English source |

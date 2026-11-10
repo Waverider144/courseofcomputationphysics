@@ -72,6 +72,11 @@
 \maketitle
 \chapter*{前言}
 \addcontentsline{toc}{chapter}{前言}
+\begin{quote}
+\itshape
+此书献给朗道与栗夫席次。\\
+感谢你们为无数后来者引路，让我们得见理论之美，并为之震撼。
+\end{quote}
 \begin{tcolorbox}[colback=red!3,colframe=red!65!black,title={使用要求：AI 讲解与代码实验},fonttitle=\bfseries,boxrule=0.8pt,arc=1mm,breakable]
 \textbf{请勿仅凭正文孤立自学；本书须结合 AI 讲解与代码实验使用。}
 正文提供高度压缩的知识地图。遇到难以理解的概念联系、推导或先备知识，
@@ -79,7 +84,7 @@
 同时运行配套代码或构造最小算例，改变参数并检查误差、守恒量或稳定性。
 AI 的解释、推导与代码须对照正文假设、参考文献及数值结果核验。
 \end{tcolorbox}
-第一卷从粒子和连续介质出发，建立了偏微分方程、离散化与求解器之间的联系。本卷以 Maxwell 方程为贯穿实例，进一步研究场方程的几何结构及其对数值计算的影响。
+\noindent 第一卷建立了粒子与连续介质模型、偏微分方程和离散求解之间的联系。本卷以 Maxwell 方程为主线，研究场方程的几何结构及其对数值计算的影响。
 
 本卷依次讨论：电磁场的四维表示；演化方程与约束的时空分解；对称双曲性、能量估计和守恒型；以及散度约束在数值离散中的保持。
 
@@ -275,25 +280,129 @@ $\Phi:z\mapsto\Phi(z)$ 称为\emph{保辛}，如果
 \item 对振子 $H=(p^2+\omega^2q^2)/2$，验证显式 Euler 一步矩阵行列式大于 $1$，解释这与面积保持的关系。
 \end{enumerate}
 
-\chapter{从 Lorentz 协变性到四维 Maxwell 方程}
+\chapter[从 Lorentz 协变性到四维 Maxwell 方程]{从 Lorentz 协变性\\到四维 Maxwell 方程}
 \label{ch:lorentz}
 \begin{chaptersummary}
-有了微分形式和 Hodge 星，本章将已知的三维 Maxwell 方程写成四维场强与电流之间的关系。协变性约束表达方式，物理方程提供动力学内容；外微分恒等式进一步给出电荷守恒的相容性。这个四维表达为下一章区分演化与约束提供共同起点。
+三维 Maxwell 方程在不同惯性系中描述同一电磁现象，但 Lorentz 变换会混合时间与空间导数。本章先从一个分量的实际变换发现电场与磁场的混合，再用反对称张量统一六个分量，核对四维方程与电荷守恒。这一统一为下一章选择时间方向、区分演化与约束提供起点。
 \end{chaptersummary}
-\studyroute{这里略去 Lorentz boost 的分量推导及作用量变分，采用已知 Maxwell 方程作为物理输入。}{electromagnetic field tensor; Lorentz covariance; Maxwell action}{按本卷号差与取向，显式计算沿 $x$ 方向 boost 后的 $F_{\mu\nu}$，并核对电磁分量。}
-\section{物理输入与协变表达}
-假定我们已熟悉真空中带源的三维 Maxwell 方程：
+\studyroute{这里给出沿坐标轴的 boost；略去任意方向的变换推导与作用量变分。Maxwell 方程作为物理输入。}{passive Lorentz boost; electromagnetic field transformation; covariant Maxwell equations}{取本章被动 boost，先令仅有 $E_y$ 非零，再令仅有 $B_z$ 非零；逐项计算变换后的场，并用 $-v$ 的逆变换核验。}
+
+\paragraph{从一次惯性系变换开始}
+同一电磁现象在不同惯性系中应满足相同的物理规律。我们的出发点是已经由实验建立的三维 Maxwell 方程：
 \begin{equation}\label{eq:maxwell3}
 \begin{aligned}
 \partial_t\bm B+\curl\bm E&=0,&\Div\bm B&=0,\\
 \partial_t\bm E-\curl\bm B&=-\bm j,&\Div\bm E&=\rho.
 \end{aligned}
 \end{equation}
-Lorentz 变换混合时间与空间坐标，同时混合电场与磁场分量。将已知方程组织成四维张量表达，可以统一描述不同惯性观察者测得的电磁场。
+设惯性系 $S'$ 相对 $S$ 沿 $+x$ 方向以速度 $v$ 运动，$|v|<1$。同一事件的坐标满足
+\[
+t'=\gamma(t-vx),\qquad x'=\gamma(x-vt),\qquad
+y'=y,\quad z'=z,\qquad \gamma=(1-v^2)^{-1/2}.
+\]
+这是被动坐标变换 $x'=\Lambda x$；撇号表示同一物理场在新坐标中的分量，
+未撇分量均在对应事件 $x=\Lambda^{-1}x'$ 取值，并非主动移动场分布。
+链式法则给出
+\[
+\partial_t=\gamma(\partial_{t'}-v\partial_{x'}),\qquad
+\partial_x=\gamma(\partial_{x'}-v\partial_{t'}).
+\]
+把它代入 Faraday 方程的 $z$ 分量，得到
+\[
+\begin{aligned}
+0&=\partial_tB_z+\partial_xE_y-\partial_yE_x\\
+ &=\partial_{t'}\!\left[\gamma(B_z-vE_y)\right]
+  +\partial_{x'}\!\left[\gamma(E_y-vB_z)\right]-\partial_{y'}E_x.
+\end{aligned}
+\]
+进入新时间导数的已经是 $B_z-vE_y$，而非单独的 $B_z$。
+要把结果重新组织为新观察者的 Faraday 方程，就出现
+$B_z'=\gamma(B_z-vE_y)$、$E_y'=\gamma(E_y-vB_z)$ 这两个组合。
+其余分量及源方程还须同时满足；下面的张量构造将完成这一核对。
+
+\paragraph{六个分量的共同变换}
+将场分量排列为
+\[
+(F_{\mu\nu})=
+\begin{pmatrix}
+0&-E_x&-E_y&-E_z\\
+E_x&0&B_z&-B_y\\
+E_y&-B_z&0&B_x\\
+E_z&B_y&-B_x&0
+\end{pmatrix},\qquad F_{\nu\mu}=-F_{\mu\nu}.
+\]
+这里始终采用 $F_{0i}=-E_i$、$F_{ij}=\epsilon_{ijk}B_k$，$\epsilon_{123}=1$。
+反对称性把两个有序指标的交换变为符号改变，独立分量恰为
+$\binom42=6$，与三个电场和三个磁场分量相符。
+令这一对象按协变二阶张量变换：
+\[
+F'_{\mu\nu}(x')=K^\alpha{}_\mu K^\beta{}_\nu F_{\alpha\beta}(x),
+\qquad K^\alpha{}_\mu=\frac{\partial x^\alpha}{\partial x'^\mu}
+=(\Lambda^{-1})^\alpha{}_\mu.
+\]
+逆 Jacobian 的时间--空间块满足
+$K^0{}_0=K^1{}_1=\gamma$、$K^0{}_1=K^1{}_0=\gamma v$；
+例如
+\[
+F'_{02}=\gamma F_{02}+\gamma vF_{12}
+=-\gamma(E_y-vB_z).
+\]
+同样计算六个独立分量，得到
+\[
+\boxed{\begin{aligned}
+E_x'&=E_x,& B_x'&=B_x,\\
+E_y'&=\gamma(E_y-vB_z),& B_y'&=\gamma(B_y+vE_z),\\
+E_z'&=\gamma(E_z+vB_y),& B_z'&=\gamma(B_z-vE_y).
+\end{aligned}}
+\]
+这与刚才的分量计算一致。电场与磁场是同一四维场相对于观察者的两部分；
+四维统一的依据是它们共同的变换规律，而非给两个三维矢量添上时间坐标。
+
+\paragraph{从分量方程到协变方程}
+用 $\eta=\operatorname{diag}(-1,1,1,1)$ 升指标后，
+$F^{0i}=E_i$、$F^{i0}=-E_i$，空间分量不变。
+因此
+\[
+\partial_\mu F^{0\mu}=\Div\bm E,\qquad
+\partial_\mu F^{i\mu}=(\curl\bm B)_i-\partial_tE_i.
+\]
+它们分别等于 $\rho$ 和 $j_i$；反对称导数的 $(123)$ 与 $(0ij)$ 分量
+则分别给出无磁单极约束和 Faraday 方程。四条三维方程由此组织为
+\[
+\partial_{[\lambda}F_{\mu\nu]}=0,\qquad
+\partial_\mu F^{\nu\mu}=j^\nu,\qquad j^\nu=(\rho,\bm j).
+\]
+其中方括号表示指标的完全反对称化。
+电流按四矢量变换 $j'^\nu=\Lambda^\nu{}_\beta j^\beta$，特别有
+$\rho'=\gamma(\rho-vj_x)$、$j_x'=\gamma(j_x-v\rho)$。
+由 $\partial'_\mu=K^\alpha{}_\mu\partial_\alpha$ 和 Lorentz 变换保持度规，
+\[
+\partial'_\mu F'^{\nu\mu}
+=\Lambda^\nu{}_\beta\,\partial_\alpha F^{\beta\alpha}
+=j'^\nu;
+\]
+齐次方程同样按三个协变指标整体变换。结合既定取向，
+这些方程的微分形式表达就是式 \eqref{eq:4maxwell} 的
+$\dd F=0$、$\dd\star F=J$，其中 $F$ 与 $J$ 分别按
+式 \eqref{eq:defF}、\eqref{eq:defJ} 定义。
+Lorentz 协变性限定方程的变换形式，Maxwell 动力学的具体内容由物理规律给定。
+
+计算机推进初值时还需选定时间方向：四维方程中哪些分量成为演化式，
+哪些成为 Gauss 约束，以及这些约束如何在连续演化和离散计算中保持，
+正是第二章及后续数值章节要研究的问题。
+
+\section{物理输入与协变表达}
+式 \eqref{eq:maxwell3} 提供动力学，Lorentz 变换检验不同惯性观察者的描述是否相容。
+开篇的计算据此识别了统一的场变量；接下来把它写成二形式，
+使演化、约束和电荷守恒能够由同一组几何运算组织。
+场的变换与协变方程也可参照
+\href{https://ocw.mit.edu/courses/8-033-introduction-to-relativity-and-spacetime-physics-fall-2024/mit8_033_f24_lec_full.pdf}{Hughes 讲义第 11--12 讲}；
+比较分量时仍以本卷的指标与符号约定为准。
 
 \section{电磁场强度二形式}
 \begin{askai}
-请按照本卷的度规号差 $(-,+,+,+)$ 与 $F=B-\dd t\wedge E$ 约定，逐项写出场强二形式的六个独立分量，并解释电场与磁场如何出现在同一个反对称张量中。
+取本章被动 boost，令 $S$ 中仅有 $E_y=E_0$ 非零。用逆 Jacobian
+显式计算 $K^{\mathsf T}FK$，核对 $E_y'$、$B_z'$，再用 $-v$ 恢复原场。
 
 进一步展开：为何仅要求 Lorentz 协变性不能唯一确定 Maxwell 动力学？请比较两个协变方程的例子。
 \end{askai}
@@ -305,22 +414,17 @@ B=B_x\dd y\wedge\dd z+B_y\dd z\wedge\dd x+B_z\dd x\wedge\dd y.
 \begin{equation}\label{eq:defF}
 \boxed{F=B+E\wedge\dd t=B-\dd t\wedge E\in\Omega^2(M).}
 \end{equation}
-等价的张量分量为 $F_{0i}=-E_i$、$F_{ij}=\epsilon_{ijk}B_k$，即
+开篇的反对称矩阵正是这一二形式的坐标分量：
 \begin{equation}
-(F_{\mu\nu})=
-\begin{pmatrix}
-0&-E_x&-E_y&-E_z\\
-E_x&0&B_z&-B_y\\
-E_y&-B_z&0&B_x\\
-E_z&B_y&-B_x&0
-\end{pmatrix}.
+F=\frac12F_{\mu\nu}\,\dd x^\mu\wedge\dd x^\nu,\qquad
+F_{0i}=-E_i,\quad F_{ij}=\epsilon_{ijk}B_k.
 \end{equation}
-Lorentz 变换 $x'=\Lambda x$ 下，$F$ 作为几何二形式不变，其分量按二阶张量规则变换：
+张量变换律保证同一几何对象的两种坐标展开相等：
 \begin{equation}
-F'_{\mu\nu}=\frac{\partial x^\alpha}{\partial x'^\mu}
-\frac{\partial x^\beta}{\partial x'^\nu}F_{\alpha\beta}.
+F=\frac12F_{\mu\nu}\,\dd x^\mu\wedge\dd x^\nu
+=\frac12F'_{\mu\nu}\,\dd x'^\mu\wedge\dd x'^\nu.
 \end{equation}
-因此不同观察者给出的 $\bm E$ 和 $\bm B$ 一般不同，但所描述的是同一 $F$。这里略去 boost 下的分量计算、规范选择与作用量变分；可按 Lorentz transformation of electromagnetic fields、gauge potential 和 Maxwell action 检索。
+因此观察者改变的是电磁分解与分量，所描述的 $F$ 保持为同一对象。
 
 \section{四维表达与三种不同的“次数”}
 取时空 Hodge 星 $\star$，将四维电流 $j^\mu=(\rho,\bm j)$ 写成三形式
@@ -1579,6 +1683,8 @@ $-\mathrm i\theta$ 最近的特征值。
 \raggedright
 \item D. J. Griffiths, \emph{Introduction to Electrodynamics}. 适于复习三维 Maxwell 方程和电磁波。
 \item B. F. Schutz, \emph{A First Course in General Relativity}. 适于学习四维张量和简单的时空几何。
+\item S. A. Hughes, \href{https://ocw.mit.edu/courses/8-033-introduction-to-relativity-and-spacetime-physics-fall-2024/mit8_033_f24_lec_full.pdf}{\emph{Introduction to Relativity and Spacetime Physics}}, MIT 8.033 (2024), Lectures 11--12.
+适于核对惯性系间的电磁场变换与 Maxwell 方程的张量表达。
 \item H. Flanders, \emph{Differential Forms with Applications to the Physical Sciences}. 适于从向量分析走向外微分形式。
 \item D. Tong, \href{https://www.davidtong.org/teaching/general-relativity/grhtml/S2}{\emph{General Relativity}, Chapter 2}.
 第 2.3.1、2.3.2、2.4.1 节分别介绍对偶坐标基、形式的 Lie 导数与外微分。

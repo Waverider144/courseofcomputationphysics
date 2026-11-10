@@ -74,6 +74,11 @@
 \maketitle
 \chapter*{Preface}
 \addcontentsline{toc}{chapter}{Preface}
+\begin{quote}
+\itshape
+This book is dedicated to Landau and Lifshitz.\\
+With gratitude for guiding generations to the beauty of theory and the wonder it inspires.
+\end{quote}
 \begin{tcolorbox}[colback=red!3,colframe=red!65!black,title={Required: AI Explanations and Code Experiments},fonttitle=\bfseries,boxrule=0.8pt,arc=1mm,breakable]
 \textbf{Do not study from the text alone. Use AI explanations and code experiments alongside these books.}
 The text is a highly compressed knowledge map. When a conceptual link, derivation,
@@ -274,22 +279,132 @@ Its one-step map is symplectic and, under suitable step-size conditions, avoids 
 \chapter{Lorentz Covariance and Four-Dimensional Maxwell Equations}
 \label{ch:lorentz}
 \begin{chaptersummary}
-Differential forms and the Hodge star express the known three-dimensional Maxwell equations as relations between a spacetime field and current. Covariance specifies transformation rules, while the physical equations supply dynamics. The exterior-derivative identity also imposes charge conservation. This formulation is the starting point for separating evolution from constraints.
+The three-dimensional Maxwell equations describe the same electromagnetic phenomena in different inertial frames, while Lorentz transformations mix temporal and spatial derivatives. A component calculation first reveals the mixing of electric and magnetic fields. An antisymmetric tensor then unifies all six components and connects the spacetime equations to charge conservation, preparing the separation of evolution and constraints.
 \end{chaptersummary}
-\studyroute{Component calculations for Lorentz boosts and the variational derivation are omitted. Maxwell equations are taken as physical input.}{electromagnetic field tensor; Lorentz covariance; Maxwell action}{Using this volume's signature and orientation, calculate $F_{\mu\nu}$ after an $x$-directed boost and check the electric and magnetic components.}
-\section{Physical Input and Covariant Form}
-Start with the sourced vacuum Maxwell equations in three dimensions:
+\studyroute{An axis-aligned boost is derived here; arbitrary-direction transformations and the variational derivation are omitted. Maxwell equations are physical input.}{passive Lorentz boost; electromagnetic field transformation; covariant Maxwell equations}{For this chapter's passive boost, start with only $E_y$ nonzero, then only $B_z$ nonzero. Calculate the transformed fields and check them with the inverse boost $-v$.}
+
+\paragraph{Begin with a change of inertial frame.}
+The same electromagnetic phenomenon must obey the same physical laws in different inertial frames. We start from the experimentally established three-dimensional Maxwell equations:
 \begin{equation}\label{eq:maxwell3}
 \begin{aligned}
 \partial_t\bm B+\curl\bm E&=0,&\Div\bm B&=0,\\
 \partial_t\bm E-\curl\bm B&=-\bm j,&\Div\bm E&=\rho.
 \end{aligned}
 \end{equation}
-Lorentz transformations mix time and space, and correspondingly mix electric and magnetic components. A four-dimensional tensor formulation describes the fields measured by different inertial observers within one geometric framework.
+Let the inertial frame $S'$ move with velocity $v$ along $+x$ relative to $S$, with $|v|<1$.
+Coordinates of the same event satisfy
+\[
+t'=\gamma(t-vx),\qquad x'=\gamma(x-vt),\qquad
+y'=y,\quad z'=z,\qquad \gamma=(1-v^2)^{-1/2}.
+\]
+This is the passive coordinate transformation $x'=\Lambda x$. Primes label components
+of the same physical field in the new coordinates; unprimed fields are evaluated at
+the corresponding event $x=\Lambda^{-1}x'$. The field distribution is not actively displaced.
+The chain rule gives
+\[
+\partial_t=\gamma(\partial_{t'}-v\partial_{x'}),\qquad
+\partial_x=\gamma(\partial_{x'}-v\partial_{t'}).
+\]
+Substitute into the $z$ component of Faraday's law:
+\[
+\begin{aligned}
+0&=\partial_tB_z+\partial_xE_y-\partial_yE_x\\
+ &=\partial_{t'}\!\left[\gamma(B_z-vE_y)\right]
+  +\partial_{x'}\!\left[\gamma(E_y-vB_z)\right]-\partial_{y'}E_x.
+\end{aligned}
+\]
+The new time derivative acts on $B_z-vE_y$, rather than $B_z$ alone.
+Reorganizing the result as Faraday's law for the new observer introduces
+$B_z'=\gamma(B_z-vE_y)$ and $E_y'=\gamma(E_y-vB_z)$.
+All remaining components and source equations must agree as well; the tensor construction supplies that check.
+
+\paragraph{One transformation for six components.}
+Arrange the field components as
+\[
+(F_{\mu\nu})=
+\begin{pmatrix}
+0&-E_x&-E_y&-E_z\\
+E_x&0&B_z&-B_y\\
+E_y&-B_z&0&B_x\\
+E_z&B_y&-B_x&0
+\end{pmatrix},\qquad F_{\nu\mu}=-F_{\mu\nu}.
+\]
+Throughout, $F_{0i}=-E_i$, $F_{ij}=\epsilon_{ijk}B_k$, and $\epsilon_{123}=1$.
+Antisymmetry makes an exchange of the two ordered indices reverse the sign.
+There are exactly $\binom42=6$ independent components, matching the three electric
+and three magnetic components. Let this object transform as a covariant rank-two tensor:
+\[
+F'_{\mu\nu}(x')=K^\alpha{}_\mu K^\beta{}_\nu F_{\alpha\beta}(x),
+\qquad K^\alpha{}_\mu=\frac{\partial x^\alpha}{\partial x'^\mu}
+=(\Lambda^{-1})^\alpha{}_\mu.
+\]
+The time--space block of the inverse Jacobian has
+$K^0{}_0=K^1{}_1=\gamma$ and $K^0{}_1=K^1{}_0=\gamma v$.
+For example,
+\[
+F'_{02}=\gamma F_{02}+\gamma vF_{12}
+=-\gamma(E_y-vB_z).
+\]
+Computing all six independent components gives
+\[
+\boxed{\begin{aligned}
+E_x'&=E_x,& B_x'&=B_x,\\
+E_y'&=\gamma(E_y-vB_z),& B_y'&=\gamma(B_y+vE_z),\\
+E_z'&=\gamma(E_z+vB_y),& B_z'&=\gamma(B_z-vE_y).
+\end{aligned}}
+\]
+This agrees with the component calculation above. Electric and magnetic fields are
+the observer-dependent parts of one spacetime field. Their unification rests on
+a common transformation law, rather than the addition of a time coordinate to two spatial vectors.
+
+\paragraph{Covariant equations.}
+Raising indices with $\eta=\operatorname{diag}(-1,1,1,1)$ gives
+$F^{0i}=E_i$ and $F^{i0}=-E_i$, while spatial components are unchanged. Hence
+\[
+\partial_\mu F^{0\mu}=\Div\bm E,\qquad
+\partial_\mu F^{i\mu}=(\curl\bm B)_i-\partial_tE_i.
+\]
+These equal $\rho$ and $j_i$, respectively. The $(123)$ and $(0ij)$ components
+of the antisymmetrized derivative give the magnetic Gauss constraint and Faraday's law.
+The four three-dimensional equations are thereby organized as
+\[
+\partial_{[\lambda}F_{\mu\nu]}=0,\qquad
+\partial_\mu F^{\nu\mu}=j^\nu,\qquad j^\nu=(\rho,\bm j).
+\]
+Square brackets denote complete antisymmetrization.
+The current transforms as a four-vector, $j'^\nu=\Lambda^\nu{}_\beta j^\beta$;
+in particular, $\rho'=\gamma(\rho-vj_x)$ and $j_x'=\gamma(j_x-v\rho)$.
+Since $\partial'_\mu=K^\alpha{}_\mu\partial_\alpha$ and Lorentz transformations preserve the metric,
+\[
+\partial'_\mu F'^{\nu\mu}
+=\Lambda^\nu{}_\beta\,\partial_\alpha F^{\beta\alpha}
+=j'^\nu;
+\]
+the homogeneous equation likewise transforms as a whole with three covariant indices.
+With the stated orientation, their differential-form expressions are precisely
+$\dd F=0$ and $\dd\star F=J$ in \eqref{eq:4maxwell}, with $F$ and $J$ defined
+by \eqref{eq:defF} and \eqref{eq:defJ}.
+Lorentz covariance restricts the transformation of the equations; physical laws supply
+the specific Maxwell dynamics.
+
+Numerical evolution additionally requires a time direction. Which components become
+evolution equations, which become Gauss constraints, and how those constraints persist
+in continuous evolution and discrete computation are the questions of Chapter 2 and the numerical chapters.
+
+\section{Physical Input and Covariant Form}
+Equation \eqref{eq:maxwell3} supplies the dynamics; Lorentz transformations test compatibility
+between inertial observers' descriptions. The opening calculation identifies a unified field.
+Its two-form expression now organizes evolution, constraints, and charge conservation
+through a common set of geometric operations.
+For field transformations and covariant equations, see
+\href{https://ocw.mit.edu/courses/8-033-introduction-to-relativity-and-spacetime-physics-fall-2024/mit8_033_f24_lec_full.pdf}{Hughes, Lectures 11--12};
+component comparisons must follow this volume's index and sign conventions.
 
 \section{The Electromagnetic Two-Form}
 \begin{askai}
-With signature $(-,+,+,+)$ and $F=B-\dd t\wedge E$, write all six independent field components and explain their organization into one antisymmetric tensor.
+For this chapter's passive boost, take only $E_y=E_0$ nonzero in $S$.
+Calculate $K^{\mathsf T}FK$ using the inverse Jacobian, check $E_y'$ and $B_z'$,
+then recover the original field with $-v$.
 
 Follow-up: compare two covariant equations to show why covariance alone does not uniquely specify Maxwell dynamics.
 \end{askai}
@@ -301,22 +416,17 @@ Combine them as
 \begin{equation}\label{eq:defF}
 \boxed{F=B+E\wedge\dd t=B-\dd t\wedge E\in\Omega^2(M).}
 \end{equation}
-The corresponding components are $F_{0i}=-E_i$ and $F_{ij}=\epsilon_{ijk}B_k$:
+The antisymmetric matrix in the opening is the coordinate representation of this two-form:
 \begin{equation}
-(F_{\mu\nu})=
-\begin{pmatrix}
-0&-E_x&-E_y&-E_z\\
-E_x&0&B_z&-B_y\\
-E_y&-B_z&0&B_x\\
-E_z&B_y&-B_x&0
-\end{pmatrix}.
+F=\frac12F_{\mu\nu}\,\dd x^\mu\wedge\dd x^\nu,\qquad
+F_{0i}=-E_i,\quad F_{ij}=\epsilon_{ijk}B_k.
 \end{equation}
-Under the coordinate transformation $x'=\Lambda x$, the geometric two-form $F$ is unchanged and its components transform tensorially:
+The tensor transformation law makes the two coordinate expansions of the same geometric object equal:
 \begin{equation}
-F'_{\mu\nu}=\frac{\partial x^\alpha}{\partial x'^\mu}
-\frac{\partial x^\beta}{\partial x'^\nu}F_{\alpha\beta}.
+F=\frac12F_{\mu\nu}\,\dd x^\mu\wedge\dd x^\nu
+=\frac12F'_{\mu\nu}\,\dd x'^\mu\wedge\dd x'^\nu.
 \end{equation}
-Different observers generally report different $\bm E$ and $\bm B$ while describing the same $F$. Boost calculations, gauge choices, and variation of the action are omitted here; search for Lorentz transformation of electromagnetic fields, gauge potential, and Maxwell action.
+Changing observer changes the electromagnetic decomposition and components while describing the same $F$.
 
 \section{Spacetime Dimension and Form Degree}
 Using the spacetime Hodge star $\star$, write the four-current $j^\mu=(\rho,\bm j)$ as a three-form
@@ -333,7 +443,7 @@ With these conventions, the equivalent tensor equations are
 \partial_{[\lambda}F_{\mu\nu]}=0,
 \qquad \partial_\mu F^{\nu\mu}=j^\nu.
 \end{equation}
-A convention with $F_{0i}=+E_i$ changes the index order or right-hand-side sign in the second equation accordingly.
+A convention defining $F_{0i}$ as $+E_i$ changes the index order or right-hand-side sign in the second equation accordingly.
 
 Spacetime has dimension four, $F$ has degree two, and the Maxwell equations have degree three. The conservation identity below has degree four.
 
@@ -341,7 +451,7 @@ Spacetime has dimension four, $F$ has degree two, and the Maxwell equations have
 \begin{checkpoint}
 Starting from $\dd\star F=J$, explain why $\dd J=0$ is a compatibility condition. Can smooth solutions exist for prescribed sources that violate charge continuity?
 \end{checkpoint}
-Apply $\dd$ once more to $\dd\star F=J$:
+Apply the exterior derivative once more to $\dd\star F=J$:
 \begin{equation}\label{eq:dJ}
 \dd J=\dd^2\star F=0.
 \end{equation}
@@ -1609,6 +1719,8 @@ When comparing formulas, align metric signatures, electromagnetic tensor compone
 \raggedright
 \item D. J. Griffiths, \emph{Introduction to Electrodynamics}. Three-dimensional Maxwell equations and electromagnetic waves.
 \item B. F. Schutz, \emph{A First Course in General Relativity}. Four-dimensional tensors and introductory space--time geometry.
+\item S. A. Hughes, \href{https://ocw.mit.edu/courses/8-033-introduction-to-relativity-and-spacetime-physics-fall-2024/mit8_033_f24_lec_full.pdf}{\emph{Introduction to Relativity and Spacetime Physics}}, MIT 8.033 (2024), Lectures 11--12.
+Field transformations between inertial frames and the tensor form of Maxwell equations.
 \item H. Flanders, \emph{Differential Forms with Applications to the Physical Sciences}. A route from vector analysis to exterior differential forms.
 \item D. Tong, \href{https://www.davidtong.org/teaching/general-relativity/grhtml/S2}{\emph{General Relativity}, Chapter 2}.
 Sections 2.3.1, 2.3.2, and 2.4.1 discuss dual coordinate bases, Lie derivatives of forms, and exterior differentiation.

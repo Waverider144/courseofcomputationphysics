@@ -1,6 +1,6 @@
 \chapter{Computational and Memory Fingerprints of Discretizations}\label{v0ch:23}
 \begin{chaptersummary}
-Roofline analysis begins with an operator's work and data traffic. Comparing finite differences, finite volumes, FEM, DG, FR, and LBM shows how degrees of freedom, locality, order, and geometry shape reuse. These computational and access patterns form performance signatures, made concrete by the following Yee update and integrated experiments.
+Roofline analysis begins with each operator's operation count and data-movement profile. Comparing finite differences, finite volumes, FEM, DG, FR, and LBM reveals how degrees of freedom, stencil locality, polynomial order, and mesh geometry govern reuse, establishing performance fingerprints that the Yee update and integrated benchmarks make concrete.
 \end{chaptersummary}
 \learninggoals{Construct work and access models; distinguish assembled and matrix-free operators; compare volume, face, streaming, and collision terms.}
 \paragraph{Core Question}How does spatial discretization determine what a machine reads and computes?
@@ -12,25 +12,25 @@ A three-dimensional seven-point Laplacian can be evaluated as
  =h^{-2}(u_{i+1,j,k}+u_{i-1,j,k}+u_{i,j+1,k}
  +u_{i,j-1,k}+u_{i,j,k+1}+u_{i,j,k-1}-6u_{ijk})
 \]
-Counting five neighbor additions, multiplication by 6, subtraction, and scaling gives 8 FLOPs. Seven reads and one write give 64 semantic bytes per double-precision output. Ideal spatial reuse approaches one read and one write, or 16 bytes, excluding write allocation. Spatial and temporal blocking improve within-step and cross-step reuse, subject to boundaries and dependencies.
-Finite volumes combine gradient reconstruction, limiters, face Riemann fluxes, and residual accumulation. Unstructured faces introduce gathers/scatters. Computing each face once avoids duplicate fluxes but may require coloring, atomics, or buffers; independent cell traversal avoids write conflicts but repeats flux work. Compare at equal accuracy and conservation requirements.
+Counting five neighbor additions, one multiplication by 6, one subtraction, and one scaling gives 8 FLOPs per point. Seven reads and one write correspond to 64 semantic bytes in double precision, while ideal spatial reuse approaches one read and one write (16 bytes, excluding write allocation); spatial and temporal blocking improve within-step and cross-step reuse subject to boundary conditions and data dependencies.
+Finite-volume schemes combine gradient reconstruction, slope limiters, face Riemann fluxes, and residual accumulation, with unstructured meshes introducing gather--scatter access. Visiting each face once avoids duplicate flux evaluations at the expense of coloring, atomics, or staging buffers, whereas cell-centric traversal avoids write conflicts by recomputing fluxes; fair comparisons evaluate both strategies at matched accuracy and conservation.
 \section{Finite Elements, DG, and FR}
-Low-order assembled FEM may be dominated by sparse multiplication, while assembly also involves quadrature, geometry, and sparse accumulation. Matrix-free evaluation recomputes element actions, trading arithmetic for entry and index traffic.
-For three-dimensional tensor elements with $n=p+1$ points per direction, a dense volume operator can cost $O(n^6)$; sum factorization reduces directional derivatives to $O(n^4)$:
+Low-order assembled FEM is typically governed by sparse matrix--vector products during solves and by quadrature, geometry, and sparse scatter during assembly, whereas matrix-free evaluation recomputes element actions on the fly to trade arithmetic for matrix-entry and index traffic.
+On three-dimensional tensor-product elements with $n=p+1$ nodes per direction, a dense volume operator costs $O(n^6)$ operations, while sum factorization reduces directional differentiation to $O(n^4)$:
 \[
  (\partial_\xi u)_{ijk}=\sum_{\ell=0}^{p}D_{i\ell}u_{\ell jk}.
 \]
-Each direction uses $n^3$ length-$n$ dot products, totaling $3n^3(2n-1)$ FLOPs. Reading the input once and writing three derivatives gives approximately $32n^3$ bytes of field traffic, plus derivative matrices, geometry, and materials. Batching, register pressure, and faces change actual reuse.
-DG volume terms, face fluxes, and liftings admit separate models; FR combines nodal derivatives with interface-flux corrections. Both exploit local matrix products on tensor grids. Correction functions, quadrature, and nodes determine their operator relationship, while energy or spectral estimates establish stability.
-\conceptbridge{How can higher order be faster despite more operations per element?}{Higher order may improve reuse and reach a target error with fewer elements. It also changes unknown counts, face costs, and explicit stability limits. Evaluate spatial error, temporal error, and total step count together.}{High-order local work $\longrightarrow$ reuse and error changes $\longrightarrow$ total-cost comparison.}
+Each spatial direction performs $n^3$ dot products of length $n$, totaling $3n^3(2n-1)$ FLOPs, while reading the input once and writing three derivatives moves roughly $32n^3$ bytes of field data plus derivative matrices, metric factors, and material coefficients; batching, register pressure, and face operations modulate actual reuse.
+DG volume integrals, face fluxes, and surface lifting admit separate cost models, and FR pairs nodal derivatives with interface-flux corrections; both leverage dense local contractions on tensor grids, with correction functions, quadrature rules, and node sets determining their algebraic equivalence and energy or spectral estimates governing stability.
+\conceptbridge{How can higher order be faster despite more operations per element?}{Higher polynomial order increases local data reuse and achieves a target spatial error with far fewer elements, while simultaneously modifying unknown counts, face-flux overhead, and explicit CFL limits. Evaluating spatial error, temporal error, and total step count jointly determines the net speedup.}{High-order local work $\longrightarrow$ reuse and error changes $\longrightarrow$ total-cost comparison.}
 \section{LBM Streaming and Collision}
-Each lattice site stores $Q$ populations; BGK collision is
+Each lattice site stores $Q$ discrete populations updated by BGK collision and streaming:
 \[
  f_q^*=f_q-\tau^{-1}(f_q-f_q^{\rm eq}),\qquad
  f_q(\bm x+\bm c_q\Delta t,t+\Delta t)=f_q^*(\bm x,t).
 \]
-D2Q9, D3Q19, and D3Q27 have 9, 19, and 27 populations. Two-buffer streaming requires at least $2Q$ scalar reads/writes; double-precision D2Q9 gives 144 bytes/site before collision temporaries and boundaries.
-SoA groups one population across sites; AoS groups populations at each site. Suitability depends on SIMD/SIMT mapping and collision implementation. Push writes postcollision values to neighbors; pull reads from neighbors. Injective periodic streaming avoids write conflicts, while complex boundaries require separate treatment.
+Standard lattices D2Q9, D3Q19, and D3Q27 carry 9, 19, and 27 populations, respectively; two-buffer streaming moves at least $2Q$ scalars per site, corresponding to 144 bytes/site for double-precision D2Q9 before collision temporaries and boundary handling.
+Struct-of-arrays (SoA) layouts group each population contiguously across sites, whereas array-of-structures (AoS) layouts group all populations at each site, with performance depending on SIMD/SIMT mapping and collision implementation. Push schemes scatter post-collision values to neighbors while pull schemes gather from neighbors; injective periodic streaming is conflict-free, whereas complex boundaries require dedicated kernels.
 \section{A Common Comparison}
 \begin{center}\small
 \begin{tabularx}{\textwidth}{lXX}
@@ -44,7 +44,7 @@ LBM&Population streaming and collision&Layout, storage, complex boundaries\\
 FDTD&Staggered curl stencils&Two-phase dependencies, bandwidth, dispersion\\\bottomrule
 \end{tabularx}
 \end{center}
-\costnote{The table uses access patterns to locate bottlenecks. Method comparisons fix the physical problem, error, precision, hardware, and parallel scale. For NumPy implementations, include temporary-array traffic in addition to the ideal fused-kernel model.}
+\costnote{The comparison table maps each discretization's access pattern to its primary hardware constraints. Meaningful cross-method benchmarks hold the physical problem, target error, precision, hardware, and parallel scale fixed, and NumPy traffic models include intermediate temporary arrays alongside ideal fused-kernel bounds.}
 \coderef{roofline/kernels.py; dg_fr/transport.py; lbm/stream_collision.py}
 \aiexercise{List operations and reads/writes for seven-point Laplacian, tensor derivatives, and D2Q9 streaming. Identify cache-reusable reads.}{Compare first-order upwind FVM and high-order DG for the same periodic sine transport, recording spatial error, steps, and total time. Keep LBM fluid physics distinct from arbitrary scalar transport.}
 \studyroute{General curved-element sum factorization and FR energy-stability proofs are omitted. See \cite{hesthaven,vcjh,frdisp,roofline}.}{sum factorization; matrix-free FEM; DG volume surface; FR correction; LBM SoA AoS}

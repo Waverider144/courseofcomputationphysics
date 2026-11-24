@@ -6,52 +6,48 @@ The preceding chapters separated discrete operators, algebraic algorithms, and e
 \paragraph{Core Question}How can we establish that a faster implementation still solves the same problem?
 
 \section{Krylov and AMG: From Poisson to Preconditioning}
-Start with Volume I's two-dimensional Dirichlet Poisson discretization. Manufacture algebraic data to check direct, CG, and preconditioned true residuals; then use a continuous exact solution to assess discretization error. Record unknowns, $\nnz$, ordering, fill, setup, iterations, time, and error.
-Use the algebraically manufactured right-hand side $\bm b=A\bm x_*$ to check the linear solver, then a continuous analytic solution to test PDE convergence. The code records these error levels separately. Multiple right-hand sides reuse the same factors to expose setup amortization, while the two-level AMG example verifies coarse-space correction.
-Separate Krylov SpMV, preconditioning, dot products, and orthogonalization. Record AMG smoothing, restriction, coarse solve, and interpolation by level. At small sizes, fewer iterations may not offset setup and Python overhead; at large sizes, coarse communication and reductions can change the comparison. Serial teaching hierarchies do not measure distributed AMG scaling.
+Starting from Volume~I's two-dimensional Dirichlet Poisson discretization, an algebraically manufactured right-hand side $\bm b=A\bm x_*$ verifies true residuals for direct, CG, and preconditioned solvers, while a continuous analytic solution tests PDE discretization convergence; unknowns, $\nnz$, ordering, fill, setup, iterations, runtime, and both error levels are recorded separately. Reusing factors across multiple right-hand sides quantifies setup amortization, and the two-level AMG case verifies coarse-space correction.
+Profiling separates Krylov SpMV, preconditioning, dot products, and orthogonalization, and logs AMG smoothing, restriction, coarse solve, and interpolation by level. At small problem sizes, fewer iterations may be offset by setup and Python overhead, whereas at large parallel scales, coarse-grid communication and reductions dominate and require dedicated distributed AMG experiments.
 \section{Complete Maxwell Evolution}
-On the periodic unit cube with vacuum $c=1$, use the right-going transverse wave
+On the periodic unit cube in vacuum ($c=1$), consider the right-going transverse wave
 \[
  E_y(x,t)=\sin(2\pi(x-t)),\qquad B_z(x,t)=\sin(2\pi(x-t)).
 \]
-All other components vanish. Initialize the magnetic field at its own spatial locations and $t=-\Delta t/2$, choosing
-$\Delta t\le\nu h$, $\nu<1/\sqrt3$, and adjusting the step to reach the same $T$ exactly. Compare $L^2$ error, phase, steps, and time on two grids. Half-time initial data must not be treated as full-time values.
-The CPU code also computes curls of random edge fields, checking divergence and monitoring $\diverg_h B$ and modified energy. The source-free electric-divergence test represents zero charge; sources require compatible current and continuity updates.
+All other components vanish. The electric field is initialized at integer time and the magnetic field at its staggered spatial locations and half-step $t=-\Delta t/2$, choosing
+$\Delta t\le\nu h$ ($\nu<1/\sqrt3$) and adjusting the final step to reach the same physical time $T$ exactly when comparing $L^2$ error, phase, step counts, and runtime across grids.
+The CPU code also evaluates curls of random edge fields to test discrete divergence identities and monitors $\diverg_h B$ and modified energy throughout evolution; the source-free electric-divergence check corresponds to zero charge, while nonzero sources require compatible current and continuity updates.
 \begin{figure}[htbp]\centering
 \IfFileExists{Vol0_Linear_Algebra_HPC/figures/convergence.pdf}{\includegraphics[width=.88\textwidth]{Vol0_Linear_Algebra_HPC/figures/convergence.pdf}}{}
-\caption{Measured CPU convergence data for Yee transverse waves and periodic transport. Error definitions and parameters accompany the records.}
+\caption{Measured CPU convergence data for Yee transverse waves and periodic transport (error definitions and parameters accompany the records).}
 \end{figure}
-GPU execution preserves SoA, phase order, and initial data. MPI exchanges required fields per phase before interior/boundary work. The CUDA full-field program provides a device path; the MPI solver includes phase halos and global constraints. The appendix and data record execution scope; cross-node and multi-GPU coupling can then be measured under the same error and constraint conventions.
+GPU execution preserves SoA layout, two-phase ordering, and staggered initialization, while MPI exchanges required fields per phase before interior and boundary updates. The companion CUDA and MPI full-field programs provide device execution and halo-coupled parallel evolution with global constraint diagnostics; cross-node and multi-GPU extensions follow the same error and constraint conventions.
 \section{Complete High-Order DG and the FR Interface}
-For $u_t+u_x=0$ with periodic $u(x,0)=\sin(2\pi x)$, use elementwise Legendre modes
-$u_h=\sum_{m=0}^{p}\widehat u_mP_m(\xi)$. The weak form is
+For $u_t+u_x=0$ with periodic $u(x,0)=\sin(2\pi x)$, elementwise Legendre modes $u_h=\sum_{m=0}^{p}\widehat u_mP_m(\xi)$ yield the weak form
 \[
  \frac h2 M\dot{\widehat{\bm u}}
  =S\widehat{\bm u}-\bm\phi(1)\widehat f_R
                          +\bm\phi(-1)\widehat f_L,\quad
  M_{mm}=\frac2{2m+1},\quad S_{m\ell}=\int_{-1}^{1}P'_mP_\ell.
 \]
-For positive speed, upwinding takes the left trace. Volume terms, face fluxes, and diagonal mass inversion are directly implementable. RK4 with conservative steps compares $p=1,2,3$ and element counts in error, unknowns, steps, and time.
-At the two $p=1$ Lobatto endpoints, the FR test uses
-$g_L=(P_2-P_1)/2$, $g_R=(P_2+P_1)/2$
-Construct derivative corrections and verify equivalence with nodal DG under the same exact-mass and quadrature conventions. For other correction functions, compare their lifting and volume operators directly. Three-dimensional tensor derivatives are also checked against dense Kronecker application to verify sum factorization.
-MPI partitions elements, exchanges upwind traces at every RK stage, and retains local mass inversion. GPU optimization can batch same-order elements, reuse derivative matrices, and separate volume/face work. Increasing order raises register demand and volume-to-face ratio. Executed GPU checks currently cover Yee and layout; a complete DG GPU port is a separate extension.
-\conceptbridge{Why can higher kernel throughput accompany a slower complete DG run?}{High-order local work increases intensity but also changes stable steps, stages, and error. Local throughput becomes an end-to-end benefit only through the element and step counts required for target accuracy.}{Kernel reuse $\longrightarrow$ accuracy and stable step $\longrightarrow$ cost to physical final time.}
+For positive wave speed, the upwind flux takes the left trace, and volume terms, face fluxes, and diagonal mass inversion implement directly. RK4 with conservative step sizes compares $p=1,2,3$ across element counts in error, unknowns, steps, and runtime.
+At the two $p=1$ Lobatto endpoints, the FR test uses $g_L=(P_2-P_1)/2$ and $g_R=(P_2+P_1)/2$ to construct derivative corrections and verify equivalence with nodal DG under identical exact-mass and quadrature conventions, while alternative correction functions are compared through their lifting and volume operators. Three-dimensional tensor derivatives are likewise verified against dense Kronecker application to check sum factorization.
+The MPI version partitions elements, exchanges upwind traces at every RK stage, and keeps mass inversion element-local. GPU implementations can batch same-order elements, reuse derivative matrices, and separate volume and face kernels, with higher order increasing both register demand and volume-to-face ratio; current GPU validation covers Yee and layout benchmarks, leaving a full DG GPU port as an independent extension.
+\conceptbridge{Why can higher kernel throughput accompany a slower complete DG run?}{Higher-order local arithmetic raises operational intensity while also tightening explicit step restrictions and altering stage counts and error constants. Local throughput translates into an end-to-end gain only when it reduces the total elements and steps needed to reach target accuracy.}{Kernel reuse $\longrightarrow$ accuracy and stable step $\longrightarrow$ cost to physical final time.}
 \section{Access Comparisons: FDM, FVM, FEM, and LBM}
-First-order upwind FVM solves the same periodic transport problem as DG, enabling error and total-time comparisons. Seven-point FDM, Yee, DG tensors, LBM streaming and collision, and CSR/GEMM expose different access patterns. Cross-model update rates describe implementation signatures; method selection uses a common physical problem and target error.
-FEM checks assembled against local matrix-free actions. FVM/DG checks shared-flux conservation; LBM checks periodic mass. Accept correctness before timing.
+First-order upwind FVM solves the same periodic transport problem as DG for direct error and total-time comparison, while seven-point FDM, Yee, DG tensors, LBM streaming/collision, and CSR/GEMM expose distinct access signatures. Cross-model update rates characterize implementation behavior, whereas method selection compares solutions to a common physical problem at equal target error.
+Each implementation passes numerical validation prior to timing: FEM checks assembled versus matrix-free equivalence, FVM and DG check shared-flux conservation, and LBM checks periodic mass conservation.
 \subsection{Regular and Staggered Stencils}
-Seven-point FDM outputs one scalar field per application; Yee updates six staggered components in two phases. Both support contiguous indexing and halos, but equal site counts imply neither equal unknowns nor equal physics. Distinguish the 8-FLOP Laplacian, 42-FLOP difference-based Yee, and 30-FLOP fused Yee, stating traffic assumptions.
+Seven-point FDM updates one scalar field per pass, whereas Yee updates six staggered components across two phases. Although both use contiguous indexing and halos, identical grid counts represent different unknown counts and physical systems; analyses therefore distinguish the 8-FLOP Laplacian, 42-FLOP difference-based Yee, and 30-FLOP fused Yee alongside their traffic models.
 \subsection{Adjacency, Irregular Access, and Geometry}
-The FVM case renumbers nonuniform periodic cells, gathers states through left/right face indices, computes fluxes, and accumulates residuals. Verify permutation equivalence and zero volume-weighted residual sum. This isolates numbering and gather/scatter. General unstructured meshes additionally require normals, areas, reconstruction neighborhoods, and graph partitioning. MPI exchanges follow partition-crossing faces, not a presumed fixed array-neighbor pattern.
+The FVM benchmark renumbers nonuniform periodic cells, gathers states via left/right face indices, evaluates fluxes, and scatters residuals, verifying permutation invariance and zero volume-weighted residual sum. This isolates numbering and gather/scatter behavior; general unstructured meshes additionally require face normals, areas, reconstruction stencils, and graph partitioning, with MPI exchanges driven by partition-crossing faces.
 \subsection{Local Matrices and Population Layout}
-One-dimensional P1 FEM compares CSR with elementwise difference accumulation under identical boundary elimination. LBM separately times streaming, collision, and complete steps. Streaming tests check push/pull and AoS/SoA equality; periodic BGK checks mass. Collision live variables and boundary branches also influence GPU occupancy, which a CPU layout test alone cannot predict.
+One-dimensional P1 FEM compares CSR multiplication against elementwise accumulation under identical boundary elimination. LBM times streaming, collision, and full steps separately, verifying push/pull and AoS/SoA equivalence in streaming and mass conservation in periodic BGK; GPU occupancy further depends on collision live variables and boundary branching and is measured directly on target hardware.
 \paragraph{The Eight Case Interfaces}
-FDM--Yee stencils, FVM adjacency, DG/FR volume/face structure, LBM streaming/collision, Krylov, AMG, complete Maxwell, and complete high-order DG cover eight performance interfaces. Code and appendices specify acceptance criteria and execution scopes.
+FDM--Yee stencils, FVM adjacency, DG/FR volume--face structure, LBM streaming/collision, Krylov, AMG, complete Maxwell, and complete high-order DG cover the volume's eight performance interfaces, with acceptance criteria and execution scopes documented in the code and appendices.
 \section{Common Acceptance and Selection}
 \begin{center}\small
 \begin{tabularx}{\textwidth}{lX}
-\toprule Dimension&Required record\\\midrule
+\toprule Dimension&Recorded items\\\midrule
 Physics/discretization&Equations, boundaries, initial data, $T$, mesh, order, unknowns\\
 Accuracy&Space/time error, phase, true residual, conservation, constraints\\
 Algorithmic work&Steps, stages, iterations, preconditioning, hierarchy complexity\\
@@ -59,7 +55,7 @@ Resources&Array/factor storage, modeled FLOPs/traffic, messages, reductions\\
 Timing scope&Inclusion of setup, advance, transfer, communication, checks, output\\\bottomrule
 \end{tabularx}
 \end{center}
-\costnote{Fixed-unknown comparisons analyze implementations; fixed-error comparisons select methods. Report both. Small CPU tests validate the workflow; large-scale optimization requires representative working sets, parallel scale, and counters.}
+\costnote{Fixed-unknown benchmarks diagnose implementations, whereas fixed-error comparisons guide method selection; reporting both provides a complete picture. Small CPU runs validate the workflow, while large-scale optimization relies on representative working sets, parallel scale, and hardware counters.}
 \coderef{run_all.py; run_accelerators.py; fdtd/yee.py; dg_fr/transport.py}
 \aiexercise{Run the experiments and plot error against time and unknown count from JSON. Check that physics, final time, and error norm agree within each comparison.}{Choose an error threshold and search mesh, order, and time step jointly for Yee or DG, including setup, communication, and output in the budget.}
 \studyroute{Cross-node benchmarks and engineering-scale complex boundaries are further experiments. The experiment guide supplies reproduction commands and timing conventions. References: \cite{yee,hesthaven,roofline}.}{verification versus validation; manufactured solution; error versus cost; constraint preservation; time to solution}

@@ -66,7 +66,7 @@ Its control-volume form is
 =
 -\int_{\partial\Omega}\rho\bm u\cdot\bm n\dd S.
 \]
-which is the starting point of finite-volume methods.
+This integral balance forms the starting point of finite-volume methods.
 
 The first moment gives the momentum equation:
 \[
@@ -158,7 +158,7 @@ The energy moment gives the total-energy equation:
 -\nabla\cdot\bm q
 +\rho\bm b\cdot\bm u,
 \]
-Here $e$ is internal energy per unit mass. A monatomic ideal gas satisfies $p=\rho k_BT/m$ and $e=3k_BT/(2m)$. Newtonian stress and Fourier heat flux correspond to near-local-equilibrium conditions and scales long compared with the mean free path.
+where $e$ is internal energy per unit mass, and a monatomic ideal gas satisfies $p=\rho k_BT/m$ and $e=3k_BT/(2m)$. Newtonian stress and Fourier heat flux apply near local thermodynamic equilibrium on scales long compared with the mean free path.
 \[
 E=e+\frac12|\bm u|^2,
 \qquad

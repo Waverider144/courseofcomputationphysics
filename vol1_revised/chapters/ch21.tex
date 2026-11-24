@@ -5,7 +5,7 @@
 \learninggoals{解释四类网格技术的状态与接口；由移动控制体推导相对通量；说明粗细转移、共享子面与重叠插值中的守恒要求。}
 \studyroute{正文围绕几何表示、界面传递与守恒组织网格方程；网格生成器、孔切搜索及边界强迫的完整实现留待进一步展开。}{immersed boundary; quadtree octree; AMR refluxing; ALE; geometric conservation law; overset}{对一个粗边与两条细边显式列出共同通量，再对一个移动控制体检验常数解，比较空间与几何守恒的要求。}
 \section{浸没边界与背景网格}
-浸没边界法把复杂物体放入简单背景网格，不要求网格贴合物体。在动量方程中加入边界作用：
+浸没边界法将复杂几何置于规整的背景网格中，无需网格贴合物体表面，而是通过在动量方程中引入边界强迫项施加壁面作用：
 \[
 \rho\left(
 \frac{\partial\bm u}{\partial t}

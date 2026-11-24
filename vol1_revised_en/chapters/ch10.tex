@@ -75,13 +75,10 @@ Taking $v_h=u_h$ and combining the two sides of each interface gives
 =\sum_f\left(\widehat f-a\{u_h\}\right)[u_h]
 =-\frac{|a|}{2}\sum_f[u_h]^2.
 \]
-Periodicity, constant coefficients, and exact integration close this identity. A central flux gives a zero right-hand side.
-Fully discrete stability additionally requires compatibility between the time integrator and spatial spectrum. Physical boundaries contribute boundary fluxes to the energy identity.
+Periodicity, constant coefficients, and exact integration close this identity, with a central flux yielding zero dissipation. Fully discrete stability additionally requires compatibility between the time integrator and the spatial spectrum, while physical boundaries contribute boundary fluxes to the energy balance.
 
 \section{Modal and Nodal Forms; Elliptic Problems}
-Modal DG stores basis coefficients; nodal DG stores values at interpolation nodes.
-If both represent the same polynomial space with identical integration and fluxes, a basis transformation connects their semidiscrete equations.
-Mass lumping or altered quadrature can change the discrete operator.
+Modal DG stores basis coefficients whereas nodal DG stores interpolation-node values. When both span the same polynomial space with identical quadrature and fluxes, an invertible basis transformation renders their semidiscrete equations equivalent, while mass lumping or altered quadrature produces distinct discrete operators.
 
 For periodic one-dimensional Poisson, the symmetric interior penalty form can be used on the mean-zero broken space:
 \begin{equation}\label{eq:sip}

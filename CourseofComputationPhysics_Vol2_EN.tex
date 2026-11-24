@@ -79,22 +79,20 @@
 This book is dedicated to Landau and Lifshitz.\\
 With gratitude for guiding generations to the beauty of theory and the wonder it inspires.
 \end{quote}
-\begin{tcolorbox}[colback=red!3,colframe=red!65!black,title={Required: AI Explanations and Code Experiments},fonttitle=\bfseries,boxrule=0.8pt,arc=1mm,breakable]
-\textbf{Do not study from the text alone. Use AI explanations and code experiments alongside these books.}
-The text is a highly compressed knowledge map. When a conceptual link, derivation,
-or prerequisite is unclear, give AI the current notation, assumptions, and precise
-question and request a step-by-step explanation. Run the companion code or a minimal
-example, vary parameters, and inspect error, conservation, or stability.
-Check AI explanations, derivations, and code against the stated assumptions,
-references, and numerical results.
+\begin{tcolorbox}[colback=red!3,colframe=red!65!black,title={Study Guide: AI Explanations and Code Experiments},fonttitle=\bfseries,boxrule=0.8pt,arc=1mm,breakable]
+\textbf{The main text is a compressed knowledge map intended to be studied alongside AI-guided derivations and code experiments.}
+Whenever a conceptual link, derivation, or prerequisite requires expansion,
+provide AI with the current notation, assumptions, and specific question for a step-by-step walkthrough.
+In parallel, run the companion code or construct a minimal test case, varying parameters to inspect error, conservation, and stability.
+AI-generated explanations, derivations, and code should be verified against the stated assumptions, references, and numerical results.
 \end{tcolorbox}
-Volume I connected particle and continuum models to partial differential equations, discretizations, and solvers. This volume uses Maxwell equations to examine the geometric structure of field equations and its consequences for computation.
+Volume~I connected particle and continuum models to partial differential equations, discretizations, and solvers. This volume uses Maxwell's equations to examine the geometric structure of field equations and its consequences for numerical computation.
 
-The sequence of topics is the four-dimensional electromagnetic field; the decomposition into evolution equations and constraints; symmetric hyperbolicity, energy estimates, and conservation form; and the preservation of divergence constraints under discretization.
+The exposition progresses through four stages: the four-dimensional electromagnetic field; spacetime decomposition into evolution equations and constraints; symmetric hyperbolicity, energy estimates, and conservation form; and preservation of divergence constraints under discretization.
 
-The prerequisites are multivariable calculus, linear algebra, ordinary differential equations, elementary PDEs, and vector analysis. Chapter 0 introduces differential forms, function spaces, and symplectic structure. Chapter 5.5 develops time integration; Chapter 7 connects weak formulations to Galerkin and DG methods.
+Prerequisites include multivariable calculus, linear algebra, ordinary differential equations, elementary PDEs, and vector analysis. Chapter~0 introduces differential forms, function spaces, and symplectic structure; Chapter~5.5 develops time integration; and Chapter~7 connects weak formulations to Galerkin and DG methods.
 
-Three-dimensional Maxwell equations supply the physical input for the four-dimensional formulation. Lorentz covariance constrains the transformation of the equations; physical laws specify their dynamics.
+Three-dimensional Maxwell equations serve as the physical starting point for the four-dimensional geometric formulation: Lorentz covariance constrains the transformation structure of the equations, while physical laws determine their specific dynamics.
 
 \paragraph{Conventions.}
 Unless stated otherwise, we use vacuum in flat spacetime with dimensionless units $c=\varepsilon_0=\mu_0=1$, metric signature $(-,+,+,+)$, coordinates $(t,x,y,z)$, spacetime orientation $\dd t\wedge\dd x\wedge\dd y\wedge\dd z$, and spatial orientation $\dd x\wedge\dd y\wedge\dd z$. Spatial vectors and one-forms are identified using the Euclidean metric. Classical derivations assume sufficient smoothness; weak solutions and discrete problems are treated later. Changing conventions changes some component and Hodge-star signs while leaving the physical equations equivalent.
@@ -297,9 +295,9 @@ Coordinates of the same event satisfy
 t'=\gamma(t-vx),\qquad x'=\gamma(x-vt),\qquad
 y'=y,\quad z'=z,\qquad \gamma=(1-v^2)^{-1/2}.
 \]
-This is the passive coordinate transformation $x'=\Lambda x$. Primes label components
-of the same physical field in the new coordinates; unprimed fields are evaluated at
-the corresponding event $x=\Lambda^{-1}x'$. The field distribution is not actively displaced.
+This is the passive coordinate transformation $x'=\Lambda x$: primes label components
+of the same physical field in the new coordinates, while unprimed fields are evaluated at
+the corresponding event $x=\Lambda^{-1}x'$.
 The chain rule gives
 \[
 \partial_t=\gamma(\partial_{t'}-v\partial_{x'}),\qquad
@@ -1262,7 +1260,7 @@ The discrete integral Faraday law on each oriented face is
 \begin{equation}\label{eq:CT}
 \frac{\dd B_f}{\dd t}=-\sum_{e\subset\partial f}\operatorname{sgn}(f,e)E_e.
 \end{equation}
-Here $B_f$ is the integrated magnetic flux, not a point value, and $E_e$ is an electric-field line integral; $\operatorname{sgn}(f,e)$ is determined by orientation.
+where $B_f$ is the integrated magnetic flux across face $f$, $E_e$ is the electric-field line integral along edge $e$, and $\operatorname{sgn}(f,e)$ encodes relative orientation.
 Sum the outward magnetic fluxes over the boundary of a cell.
 Every edge in the \emph{boundary of the boundary} occurs twice with opposite signs, hence
 \begin{equation}\label{eq:dd0discrete}
@@ -1463,8 +1461,8 @@ Take the right-going scalar characteristic equation $\partial_tu+\partial_xu=0$
 on uniform periodic cells of width $h$.
 Expand $u_h$ in Legendre polynomials $P_\ell(\xi)$ on the reference interval $\xi\in[-1,1]$,
 using \emph{exact integration and upwind flux}. Set
-$\theta=kh$,$z=e^{-\mathrm i\theta}$,
-Use Bloch form for the cell coefficients:
+$\theta=kh$ and $z=e^{-\mathrm i\theta}$,
+and adopt the Bloch form for the cell coefficients:
 $u_{j,\ell}(t)=\widehat u_\ell(t)e^{\mathrm ij\theta}$.
 For $i,j=0,\ldots,p$, define
 \begin{equation}\label{eq:dgsymbol}
@@ -1654,8 +1652,7 @@ $D_hC_h=0$ & Discrete divergence of discrete curl vanishes within a compatible c
 
 \paragraph{Three meanings of a star or dual.}
 The Hodge star is distinct from complex conjugation and the matrix adjoint $A^*$.
-The squares of the four-dimensional Lorentzian and three-dimensional Euclidean Hodge stars generally have different signs;
-the three-dimensional identity $\star^2=1$ cannot be transferred directly to four dimensions.
+Moreover, the four-dimensional Lorentzian and three-dimensional Euclidean Hodge stars obey different sign identities upon squaring, so the three-dimensional relation $\star^2=1$ takes a degree-dependent sign in four-dimensional Lorentzian signature.
 
 \paragraph{Metric and units.}
 Restoring $c$ and material constitutive laws also restores the physical units relating $\bm E$ and $\bm B$.

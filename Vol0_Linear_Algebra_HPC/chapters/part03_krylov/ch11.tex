@@ -35,10 +35,10 @@ Krylov 幂向量生成了搜索空间，但逐步增强的线性相关性会影�
  \bar H_2=\begin{bmatrix}0&\sqrt5\\2\sqrt5&19/5\\0&7/5\end{bmatrix}.
 \]
 逐项检查 $\bm v_i^T\bm v_j=\delta_{ij}$ 和 $AV_2=V_3\bar H_2$。
-\conceptbridge{小矩阵为什么还能保留原问题的求解信息？}{Arnoldi 没有近似已生成基向量的矩阵作用，而是将这些作用精确表示在扩展基中。后续只在选定试探空间内求最优解，近似来自空间限制；有限精度下还需监测正交误差。}{大算子作用 $\longrightarrow$ 正交坐标 $\longrightarrow$ 小型 Hessenberg 问题。}
+\conceptbridge{小型 Hessenberg 矩阵为何能够完整保留原系统的投影信息？}{Arnoldi 过程并未近似已生成基向量上的算子作用，而是将其精确表示在扩展后的标准正交基中。随后的近似仅来源于将解限制在选定的试探子空间内；在有限精度算术中，则需额外关注正交误差的累积。}{大算子作用 $\longrightarrow$ 正交坐标 $\longrightarrow$ 小型 Hessenberg 问题。}
 \section{失效诊断与成本}
-$h_{j+1,j}=0$ 表示当前子空间对 $A$ 不变；对可逆系统和当前残差，最小残差求解可获得精确解，称为 happy breakdown。有限精度下，接近零的次对角元则触发真实残差检查，以判定是否达到收敛阈值。
-\costnote{$m$ 步需约 $m$ 次矩阵向量乘、$O(Nm^2)$ 正交化工作和 $O(Nm)$ 存储。MGS 可能失去正交，必要时再次投影或采用更稳定策略；分布式点积还带来归约成本。}
+当 $h_{j+1,j}=0$ 时，当前子空间关于 $A$ 不变；对于可逆系统，最小残差求解此时直接给出精确解，称为 happy breakdown。在有限精度计算中，接近零的次对角元会触发真实残差核验，以确认解是否已满足收敛阈值。
+\costnote{执行 $m$ 步 Arnoldi 需约 $m$ 次矩阵向量乘、$O(Nm^2)$ 的正交化计算量及 $O(Nm)$ 的存储空间。在有限精度下，MGS 可能出现正交性衰减，需视情况引入重正交化；在分布式环境中，内积计算还伴随着全局归约通信开销。}
 \coderef{sparse_linear_algebra/solvers.py}
 \aiexercise{完全按 MGS 顺序重算本章两步，比较 $AV_2$ 与 $V_3\bar H_2$，并核验全部内积。}{给幂基加入舍入扰动，比较经典 Gram--Schmidt、MGS 与两次 MGS 的正交误差。}
 \studyroute{略去选择性重正交与通信规避 Arnoldi。参考 \cite{saad}。}{Arnoldi; Hessenberg; reorthogonalization; happy breakdown; orthogonality loss}

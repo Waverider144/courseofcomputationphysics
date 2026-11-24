@@ -1,5 +1,5 @@
 \section{Recorded Numerical Results}
-These tables are generated from the shared JSON records, not from new runs. CPU: Intel Core Ultra 7 155H; NumPy 1.26.4; SciPy 1.15.3. Double precision and single-thread BLAS. Times describe these implementations and small workloads.
+These tables summarize the recorded measurements from the shared JSON archives. CPU runs were executed on an Intel Core Ultra 7 155H using NumPy 1.26.4 and SciPy 1.15.3 in double precision with single-threaded BLAS, reflecting the reference implementations and small-scale benchmark workloads.
 \begin{center}\small\begin{tabular}{lrrrrr}\toprule
 Case & Cells/elements & $p$ & Steps & $L^2$ error & Advance/s\\\midrule
 Yee & 12 & -- & 14 & 2.076e-02 & 1.424e-03\\
@@ -13,9 +13,9 @@ DG & 16 & 3 & 471 & 5.295e-06 & 2.169e-02\\
 FVM & 32 & 0 & 12 & 5.534e-02 & 6.787e-05\\
 FVM & 64 & 0 & 24 & 2.786e-02 & 1.272e-04\\
 \bottomrule\end{tabular}\end{center}
-Yee uses $T=0.5$; DG/FVM use $T=0.15$. DG and FVM errors compare reconstructed fields against exact fields by integration. FVM cell-average error is also stored. Errors and times for different equations are interpreted separately.
+The Yee benchmark runs to $T=0.5$, whereas the DG and FVM benchmarks run to $T=0.15$. For DG and FVM, errors are computed by integrating the difference between the reconstructed and exact fields; cell-average errors for FVM are also archived. Because each method solves its own governing equation, errors and timings are evaluated within each discretization family.
 \section{GPU and MPI Records}
-GPU kernels use constant-coefficient fusion: 30 FLOPs per cell-step. Device advance and transfer-inclusive times are separate. Both grids use 30 steps but different final times; their error ratio is not a convergence-order estimate. Remote GPU timings are short shared-load validation runs.
+The GPU kernels apply constant-coefficient fusion at 30 FLOPs per cell-step, with device-only advance time and transfer-inclusive wall time reported separately. Because both grid resolutions execute 30 time steps over different physical final times, each row reports accuracy at its listed final time rather than a fixed-time convergence ratio. Remote GPU entries correspond to short validation runs on shared hardware.
 \begin{center}\small\begin{tabular}{lrrrrr}\toprule
 Device & $n$ & $T$ & Kernel/s & With transfers/s & CPU max.\ difference\\\midrule
 Local RTX 500 Ada & 32 & 0.3750 & 5.591e-04 & 1.427e-03 & 3.37e-16\\
@@ -23,7 +23,7 @@ Local RTX 500 Ada & 64 & 0.1875 & 3.622e-03 & 1.015e-02 & 4.44e-16\\
 GK RTX 4090 & 32 & 0.3750 & 1.745e-04 & 8.856e-04 & 3.37e-16\\
 GK RTX 4090 & 64 & 0.1875 & 4.792e-04 & 5.303e-03 & 4.44e-16\\
 \bottomrule\end{tabular}\end{center}
-MPI runs use one host, include halos, and do not measure cross-node scaling.
+The MPI benchmarks execute on a single host with full halo exchanges, validating distributed numerical equivalence and intra-node communication.
 \begin{center}\small\begin{tabular}{llrrrr}\toprule
 Host & Case & Cells/elements & Ranks & $L^2$ error & Max.\ rank time/s\\\midrule
 Local & Yee & 12 & 2 & 2.076e-02 & 2.516e-04\\
@@ -35,4 +35,4 @@ GK & Yee & 24 & 2 & 5.094e-03 & 1.768e-03\\
 GK & DG($p=3$) & 8 & 2 & 7.970e-05 & 2.962e-04\\
 GK & DG($p=3$) & 16 & 2 & 5.295e-06 & 6.748e-04\\
 \bottomrule\end{tabular}\end{center}
-The hardware JSON files retain one-/two-rank records, conservation, and constraints. No DRAM counters or calibrated roofs were used; semantic traffic and ideal reuse are separate models in the main text.
+The hardware JSON archives preserve single- and two-rank records alongside conservation and constraint diagnostics. Traffic analyses in the main text treat semantic traffic and ideal reuse as separate analytical models without hardware DRAM counters or empirical Roofline calibration.

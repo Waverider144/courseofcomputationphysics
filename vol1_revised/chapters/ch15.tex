@@ -100,11 +100,7 @@ $\rho/\rho_0=1+O(\mathrm{Ma}^2)$，且
 \begin{equation}\label{eq:lbm-viscosity}
 \nu=c_s^2\left(\tau_{\mathrm{LB}}-\frac{\Delta t}{2}\right).
 \end{equation}
-$\tau_{\mathrm{LB}}>\Delta t/2$ 给出正黏度。
-黏度正性给出松弛参数的基本范围，完整更新的稳定性还包括平衡态正性、边界与非流体模态。
-连续 BGK 碰撞时间与离散 $\tau_{\mathrm{LB}}$ 的对应取决于时间积分；
-式~\eqref{eq:lbm-viscosity}~适用于这里给定的更新。
-标准等温二阶模型的宏观结论受低 Mach 和长波假设约束~\cite{qian1992}。
+$\tau_{\mathrm{LB}}>\Delta t/2$ 保证正黏度，构成松弛参数的基本物理区间；完整格式的数值稳定性还涉及平衡态正性、边界条件与非流体模态。连续 BGK 碰撞时间与离散参数 $\tau_{\mathrm{LB}}$ 的对应关系取决于所选时间离散格式，式~\eqref{eq:lbm-viscosity}~适用于上述二阶精度更新，而标准等温二阶模型的宏观流体极限则建立在低 Mach 数与长波假设之上~\cite{qian1992}。
 
 \aiexercise{列出 D2Q9 的九个速度与权重，直接计算平衡态的质量、动量和二阶矩。写出无边界周期格子的碰撞与迁移，逐步证明总质量守恒。}
 {固定目标运动黏度，改变 $\Delta t$ 后重新计算 $\tau_{\mathrm{LB}}$；对周期剪切波 $u_x(y,0)=U_0\sin ky$ 测量衰减率 $\nu k^2$，区分格子单位与物理单位。}

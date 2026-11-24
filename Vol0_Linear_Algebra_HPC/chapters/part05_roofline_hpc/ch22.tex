@@ -12,22 +12,22 @@
  P_{\rm attained}\le\min(P_{\rm peak},BI),\qquad
  I_{\rm ridge}=P_{\rm peak}/B.
 \]
-Roofline 以横轴算术强度、纵轴吞吐呈现资源上界。\cite{roofline}
-模型是现代性能分析的组织工具；计算、存储与通信限制本身早于该模型。延迟、依赖、指令混合、并行度和负载不均会使实际点低于上界。
-处理器通过流水线、向量单元、多核与加速器提高算术吞吐，而主存延迟与可用带宽未必按相同比例增长，形成所谓 memory wall。缓存、分块和批量计算通过复用缓和失衡；machine balance $P_{\rm peak}/B$ 则给出转入计算受限所需的强度尺度。\cite{architecture}
-计算峰值利用率为 $P_{\rm attained}/P_{\rm peak}$；相对 Roofline 利用率为 $P_{\rm attained}/\min(P_{\rm peak},BI)$。两者必须使用相同精度、工作量与流量口径，不能混为一个效率数值。
-\conceptbridge{为什么不能只统计执行了多少次加乘？}{相同算术可能反复使用寄存器中的数据，也可能每次都等待新数据。算术强度把工作量与所选层级的数据搬运联系起来。只减少 FLOPs 可能不减少关键流量，甚至降低吞吐指标却缩短时间。}{算子工作量 $\longrightarrow$ 数据复用 $\longrightarrow$ 受限资源与运行时间。}
+Roofline 模型以算术强度为横轴、计算吞吐为纵轴，直观呈现这两类硬件资源上界。\cite{roofline}
+实际运行性能往往低于理论包络，原因包括指令延迟、数据依赖、指令配比、并行度不足及负载不均。
+在现代处理器体系结构中，流水线、向量单元、多核与加速器持续推高算术峰值，而主存延迟与带宽增长相对滞后，形成了所谓的 memory wall；缓存层级、数据分块与批量计算通过提高复用率缓解这一失衡，而机器平衡点 $P_{\rm peak}/B$ 则界定了由访存受限转向计算受限的强度阈值。\cite{architecture}
+性能评估中通常区分两类指标：计算峰值利用率为 $P_{\rm attained}/P_{\rm peak}$，相对 Roofline 利用率为 $P_{\rm attained}/\min(P_{\rm peak},BI)$；二者均须建立在统一的精度、工作量与流量口径之上。
+\conceptbridge{为何不能仅凭浮点运算次数评估计算耗时？}{相同数量的浮点运算，在寄存器高度复用与每次均需从主存加载数据两种情形下耗时悬殊。算术强度将计算工作量与特定存储层级的数据搬运统一起来；若优化仅削减浮点运算而未减少关键路径上的数据流量，运行时间往往难以缩短。}{算子工作量 $\longrightarrow$ 数据复用 $\longrightarrow$ 受限资源与运行时间。}
 \section{GEMM 与 CSR-SpMV}
-稠密方阵乘 $C=AB$ 约 $2n^3$ FLOPs；理想每个输入读一次、输出写一次，双精度流量约 $24n^2$ bytes，故理想强度约 $n/12$。实际缓存容量、分块和写分配会改变流量。
-CSR-SpMV 每非零元按一次乘加计 2 FLOPs。双精度值与 32 位列索引至少需 12 bytes，再加行指针、$\bm x$ 访问及输出；即使 $\bm x$ 大量复用，强度通常仍较低。具体字节模型由索引宽度、缓存命中和访问方式确定。
+稠密方阵乘法 $C=AB$ 约含 $2n^3$ FLOPs；在理想复用下，每个输入矩阵读取一次、输出矩阵写回一次，双精度总流量约为 $24n^2$ bytes，对应理想算术强度约 $n/12$，实际流量还会受缓存容量、分块策略与写分配影响。
+相比之下，CSR-SpMV 每非零元对应一次乘加（2 FLOPs），仅双精度数值与 32 位列索引即需至少 12 bytes，叠加行指针、向量 $\bm x$ 访问与输出写回后，即便 $\bm x$ 高度复用，算术强度依然偏低；具体流量模型取决于索引宽度、缓存命中率与访问模式。
 \section{估算、计时与标定}
-本卷示意图设 $P_{\rm peak}=1000$ GFLOP/s、$B=100$ GB/s，ridge 为 10 FLOP/byte，用于展示屋顶的几何含义。CPU 核函数图则依据实际计时与工作量模型绘制；定位本机性能点时，应另行标定相应硬件屋顶。
+本卷示意图采用 $P_{\rm peak}=1000$ GFLOP/s、$B=100$ GB/s（拐点为 10 FLOP/byte）以展示 Roofline 包络的几何特征；CPU 核函数数据则由实测计时与显式工作量模型绘制，定位具体机器上的性能点需另行标定硬件屋顶。
 \begin{figure}[htbp]\centering
 \IfFileExists{Vol0_Linear_Algebra_HPC/figures/roofline_model.pdf}{\includegraphics[width=.84\textwidth]{Vol0_Linear_Algebra_HPC/figures/roofline_model.pdf}}{}
-\caption{假设硬件的 Roofline 示意；屋顶与字节模型均非 DRAM 计数器实测。}
+\caption{假设硬件参数的 Roofline 示意图（屋顶与字节模型均基于解析假设）。}
 \end{figure}
-标定时需分别测持续带宽、对应精度计算吞吐及真实数据流量；不同缓存层级可建立不同屋顶。小数组驻留缓存时，DRAM 流量模型不适用。
-\costnote{带宽受限核优先减少流量、改善复用与布局；计算受限核优先提升向量化和指令效率。GFLOP/s 用于定位资源利用，固定误差下的总时间用于评价计算收益。}
+硬件标定需分别测定持续带宽、对应精度下的计算吞吐及实际数据流量，并为各级缓存建立相应屋顶；当小数组完全驻留缓存时，应采用对应缓存层级的流量与带宽模型。
+\costnote{带宽受限核的优化重点在于减少数据流量、提升局部复用与改进内存布局，计算受限核则侧重向量化与指令吞吐。GFLOP/s 反映硬件资源利用效率，而固定误差下的总耗时决定最终计算收益。}
 \coderef{roofline/kernels.py}
 \aiexercise{对 32 位与 64 位索引 CSR 分别推导理想和逐非零读取 $x$ 的字节模型，计算强度，并说明写分配遗漏在哪里。}{给定 GEMM、SpMV 的实际计时和数组大小，判断能否把它们放到同一 DRAM Roofline；列出还缺的测量。}
 \studyroute{略去硬件计数器校准与经验多层 Roofline 工具实现。参考 \cite{roofline,cuda}。}{arithmetic intensity; operational intensity; ridge point; sustained bandwidth; hierarchical Roofline}

@@ -79,7 +79,7 @@ D_if_i+\frac{\Delta t}{2}D_i^2f_i+\cdots
 \]
 Order the spatial and temporal derivatives by a small parameter and write
 $f_i=f_i^{(0)}+\epsilon f_i^{(1)}+\epsilon^2f_i^{(2)}+\cdots$,
-Impose zero mass and momentum moments on the nonequilibrium parts.
+imposing zero mass and momentum moments on the nonequilibrium parts.
 Zeroth order gives $f_i^{(0)}=f_i^{\mathrm{eq}}$; first order gives
 \[
 f_i^{(1)}=-\tau_{\mathrm{LB}}D_i^{(1)}f_i^{\mathrm{eq}}.
@@ -100,11 +100,7 @@ $\rho/\rho_0=1+O(\mathrm{Ma}^2)$, and
 \begin{equation}\label{eq:lbm-viscosity}
 \nu=c_s^2\left(\tau_{\mathrm{LB}}-\frac{\Delta t}{2}\right).
 \end{equation}
-Positive viscosity requires $\tau_{\mathrm{LB}}>\Delta t/2$.
-Positive viscosity sets a basic relaxation-parameter range; stability of the complete update also involves equilibrium positivity, boundaries, and nonhydrodynamic modes.
-The relation between continuous BGK collision time and discrete $\tau_{\mathrm{LB}}$ depends on time integration;
-equation~\eqref{eq:lbm-viscosity} applies to the update specified here.
-The macroscopic limit of this standard second-order isothermal model assumes low Mach number and long wavelengths~\cite{qian1992}.
+Positive viscosity requires $\tau_{\mathrm{LB}}>\Delta t/2$, setting a basic range for the relaxation parameter, while stability of the complete update also involves equilibrium positivity, boundaries, and nonhydrodynamic modes. The relation between the continuous BGK collision time and discrete $\tau_{\mathrm{LB}}$ depends on time integration, with equation~\eqref{eq:lbm-viscosity} applying to the update above and the macroscopic limit of this standard second-order isothermal model holding in the low-Mach, long-wavelength regime~\cite{qian1992}.
 
 \aiexercise{List all nine D2Q9 velocities and weights, and compute equilibrium mass, momentum, and second moments directly. Write collision and streaming on a periodic lattice without physical boundaries, and prove global mass conservation step by step.}
 {At fixed target kinematic viscosity, change $\Delta t$ and recompute $\tau_{\mathrm{LB}}$. For a periodic shear wave $u_x(y,0)=U_0\sin ky$, measure the decay rate $\nu k^2$ and distinguish lattice from physical units.}

@@ -5,17 +5,9 @@ Representation, scale reduction, closure, discretization, and meshes now form a 
 \learninggoals{Select models and discretizations for a physical objective; distinguish five error classes; vary spatial resolution, time steps, and tolerances independently; distinguish numerical verification from physical validation.}
 \studyroute{Verification strategies are organized here; experimental uncertainty, error estimators, and project-scale data management are omitted. Algebraic solvers and computer architecture are developed in Volume~0.}{verification and validation; grid convergence; temporal convergence; model error; reduction error; quantity of interest}{For a wave or transport problem, define a quantity of interest and vary model, mesh, degree, time step, and algebraic tolerance independently to separate error sources.}
 \section{Method Selection and Combined Strategies}
-For fixed geometry and high wall-accuracy requirements, body-fitted meshes directly resolve boundary layers.
+Mesh strategy follows geometry and physical objectives: body-fitted meshes resolve boundary layers directly on fixed geometries, immersed boundaries simplify meshing for complex moving bodies when wall shear is secondary, quadtree or octree adaptation addresses strongly varying local scales, moving meshes handle moderate boundary deformations, and overset grids accommodate large relative motions among multiple rigid bodies.
 
-For complex moving geometry, immersed boundaries simplify meshing when wall shear is secondary to the main target.
-
-For strongly varying local scales, use quadtree or octree adaptation.
-
-For moderate boundary motion, use moving meshes.
-
-For large relative motion of several rigid bodies, use overset grids.
-
-Industrial software often combines
+Engineering solvers frequently combine these strategies:
 \[
 \text{Body-fitted wall layers}
 +

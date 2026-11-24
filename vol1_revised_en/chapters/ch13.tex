@@ -46,24 +46,18 @@ $P_s\bm1_s=\bm1_m$, hence
 If one coarse edge meets several mortar subfaces, sum their loads;
 the coarse and fine sides still use the same integrals.
 
-For a linear energy estimate, further assume that the common space reproduces both traces exactly
-and that quadrature exactly integrates the relevant products. Then
-$P_s^{\mathsf T}M_mP_s=M_s$,
-For multiple subfaces, sum the matrices on the left.
-For constant normal speed $a_n$, use
+For a linear energy estimate, further assume that the common space reproduces both traces exactly and that quadrature exactly integrates the relevant products. Then $P_s^{\mathsf T}M_mP_s=M_s$ (summing the left-hand side over subfaces when multiple subfaces meet one edge). For constant normal speed $a_n$, choosing
 \[
 f_m^*=a_n\{u_m\}-\frac{|a_n|}{2}[u_m],
 \]
-The combined DG interface energy contribution is
+gives the combined DG interface energy contribution
 \[
 -\frac{|a_n|}{2}[u_m]^{\mathsf T}M_m[u_m]\le0.
 \]
-If the common space has lower degree or the geometry and quadrature differ, the trace-norm identity requires a corresponding replacement construction.
-Constant preservation supplies total conservation; trace reproduction, quadrature, and mass-adjoint transfer additionally support the energy estimate.
+If the common space has lower degree or the geometry and quadrature differ, an alternative stabilization is required; constant preservation ensures total conservation, whereas trace reproduction, exact quadrature, and mass-adjoint transfer jointly support energy stability.
 
 \section{A Hand-Computable Nonconforming Interface}
-Let $\Gamma=[-1,1]$, with left trace basis $(1,s)$ and a constant-only right trace.
-Use mortar basis $(1,s)$. Exact integration gives
+Let $\Gamma=[-1,1]$, with left trace basis $(1,s)$ and a constant-only right trace, and take mortar basis $(1,s)$. Exact integration gives
 \[
 M_m=\begin{pmatrix}2&0\\0&2/3\end{pmatrix},\quad
 P_L=I_2,\quad P_R=\begin{pmatrix}1\\0\end{pmatrix}.
@@ -72,8 +66,7 @@ For shared flux coefficients $(F_0,F_1)^{\mathsf T}$,
 \[
 r_L=\begin{pmatrix}2F_0\\2F_1/3\end{pmatrix},\qquad r_R=-2F_0.
 \]
-a constant test reads only the first left component, so the total flux cancels exactly.
-The linear component contributes to the left trace residual. Changing interface spaces during hp adaptation requires updating projections and physical measures together.
+A constant test reads only the first left component, so the total flux cancels exactly, while the linear component enters the left trace residual. Updating interface spaces during hp adaptation requires updating projections and physical measures together.
 
 \aiexercise{Use a quadratic left trace and linear right trace, with three Gauss points for exact integration. Construct $M_m,B_{mL},B_{mR}$ and verify constant reproduction, mass adjointness, and upwind interface energy.}
 {Split the right edge into two subfaces with linear traces. Write the subface-map Jacobians and prove that the coarse-side total load is the negative sum of the two fine-side loads.}

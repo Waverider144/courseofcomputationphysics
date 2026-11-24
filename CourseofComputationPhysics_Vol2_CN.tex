@@ -77,20 +77,20 @@
 此书献给朗道与栗夫席次。\\
 感谢你们为无数后来者引路，让我们得见理论之美，并为之震撼。
 \end{quote}
-\begin{tcolorbox}[colback=red!3,colframe=red!65!black,title={使用要求：AI 讲解与代码实验},fonttitle=\bfseries,boxrule=0.8pt,arc=1mm,breakable]
-\textbf{请勿仅凭正文孤立自学；本书须结合 AI 讲解与代码实验使用。}
-正文提供高度压缩的知识地图。遇到难以理解的概念联系、推导或先备知识，
-请携带当前符号、假设和具体疑问，让 AI 逐步展开；
-同时运行配套代码或构造最小算例，改变参数并检查误差、守恒量或稳定性。
-AI 的解释、推导与代码须对照正文假设、参考文献及数值结果核验。
+\begin{tcolorbox}[colback=red!3,colframe=red!65!black,title={使用说明：AI 讲解与代码实验},fonttitle=\bfseries,boxrule=0.8pt,arc=1mm,breakable]
+\textbf{本书正文采用高度浓缩的知识图谱结构，需配合 AI 讲解与代码实验共同使用。}
+对于需要进一步展开的概念联系、推导过程或先备知识，
+可结合当前符号、假设与具体问题，借助 AI 逐步推演；
+同时运行配套代码或构造最小算例，通过改变参数检验误差、守恒量与稳定性。
+AI 给出的推导、解释与代码均以正文假设、参考文献及数值结果为核验基准。
 \end{tcolorbox}
-\noindent 第一卷建立了粒子与连续介质模型、偏微分方程和离散求解之间的联系。本卷以 Maxwell 方程为主线，研究场方程的几何结构及其对数值计算的影响。
+\noindent 第一卷建立了粒子与连续介质模型、偏微分方程及离散求解之间的联系；本卷以 Maxwell 方程为主线，研究场方程的几何结构及其对数值计算的影响。
 
-本卷依次讨论：电磁场的四维表示；演化方程与约束的时空分解；对称双曲性、能量估计和守恒型；以及散度约束在数值离散中的保持。
+全卷依次展开四个主题：电磁场的四维表示，演化方程与约束的时空分解，对称双曲性、能量估计与守恒型，以及散度约束在数值离散中的保持。
 
-本卷假定读者熟悉多元微积分、线性代数、常微分方程、基本偏微分方程及向量分析。第 0 章介绍后文所需的微分形式、函数空间与辛结构；第 5.5 章讨论时间推进，第 7 章从弱形式进入 Galerkin 与 DG。
+本卷假定读者具备多元微积分、线性代数、常微分方程、基础偏微分方程及向量分析背景。第 0 章补充后文所需的微分形式、函数空间与辛结构，第 5.5 章系统讨论时间推进，第 7 章则由弱形式衔接 Galerkin 与 DG 方法。
 
-本卷以三维 Maxwell 方程为物理输入，将其组织为四维几何表达。Lorentz 协变性约束方程的变换形式，而动力学内容需要由物理规律给定。
+全书以三维 Maxwell 方程作为物理出发点并构建其四维几何表述：Lorentz 协变性限定方程的变换结构，物理规律决定具体的动力学内容。
 
 \paragraph{贯穿全文的约定} 除专门指出外，取真空、平直时空、无量纲化单位 $c=\varepsilon_0=\mu_0=1$；时空度规号差为 $(-,+,+,+)$；坐标为 $(t,x,y,z)$；四维取向为 $\dd t\wedge\dd x\wedge\dd y\wedge\dd z$；三维空间取向为 $\dd x\wedge\dd y\wedge\dd z$。空间向量与一形式之间的升降指标使用欧氏度规。所有经典推导先假设足够光滑；弱解和离散问题在后文讨论。符号约定一经改变，若干 Hodge 星与分量公式会出现符号差异，但物理方程不变。
 
@@ -105,7 +105,7 @@ AI 的解释、推导与代码须对照正文假设、参考文献及数值结�
 \end{chaptersummary}
 \studyroute{这里略去外代数、迹定理与辛几何的一般证明，保留后文使用的定义和算子关系。}{differential forms; Hodge star; Sobolev traces; symplectic map}{把 $\dd^2=0$ 翻译成向量恒等式，再说明哪些步骤使用度规、哪些仅使用微分结构。}
 \section{数学对象与分析目标}
-数学物理方法通常教我们求一个给定 PDE 的解；现代 PDE 理论还关心：什么是合适的初值？解是否存在、唯一、稳定？方程中有没有必须始终满足的约束？数值离散是否保留其结构？为讨论这些问题，我们依次补充\emph{微分形式}、\emph{时空分解}、\emph{函数空间}和\emph{守恒律}的基础语言。
+经典数学物理方法侧重求解给定 PDE 的解析解，而现代 PDE 理论进一步考察初值的适定条件、解的存在唯一性与连续依赖性、演化过程中必须维持的约束，以及数值离散对上述结构的保持。围绕这些问题，本章依次引入\emph{微分形式}、\emph{时空分解}、\emph{函数空间}与\emph{守恒律}的基础语言。
 
 \begin{center}
 \begin{tikzpicture}[>=stealth, node distance=8mm]
@@ -117,7 +117,7 @@ AI 的解释、推导与代码须对照正文假设、参考文献及数值结�
 \end{center}
 
 \section{多重线性代数：为何需要反对称对象}
-在三维，向量叉乘非常便利，但它依赖维数、度量和取向；在四维，反对称张量更加自然。一个 $k$ 形式可以理解为一个对 $k$ 个向量输入呈线性、且交换两个输入就变号的函数。
+三维向量叉乘依赖于空间维数、度规与取向，而在四维时空中，反对称张量提供了更自然的表达框架。一个 $k$ 形式是对 $k$ 个向量输入呈多重线性、且交换任意两个输入即反号的映射。
 
 一形式的例子为
 \begin{equation}
@@ -132,7 +132,7 @@ $\wedge$ 称为外积，满足 $\dd x\wedge\dd y=-\dd y\wedge\dd x$，尤其 $\d
 \alpha\wedge\beta=(-1)^{pq}\beta\wedge\alpha,\qquad
 \alpha\wedge\beta\in\Omega^{p+q}.
 \end{equation}
-一个 $n$ 维空间中独立 $k$ 形式的数目是 $\binom nk$；比如四维有 6 个独立二形式和 4 个独立三形式。$\Omega^k$ 表示所有光滑 $k$ 形式构成的集合（更准确地说是向量空间）。
+一个 $n$ 维空间中独立 $k$ 形式的数目为 $\binom nk$，例如四维空间中存在 6 个独立二形式与 4 个独立三形式；记 $\Omega^k$ 为全体光滑 $k$ 形式构成的向量空间。
 
 \section{外微分：把 grad、curl、div 合成一个算子}
 定义外微分 $\dd:\Omega^k\to\Omega^{k+1}$。在欧氏三维空间，
@@ -250,10 +250,7 @@ $\Phi:z\mapsto\Phi(z)$ 称为\emph{保辛}，如果
 \begin{equation}\label{eq:sympmap}
 (D\Phi)^\mathsf T\mathbb J(D\Phi)=\mathbb J.
 \end{equation}
-正则 Hamilton 系统的精确时间流保持此结构。保辛数值积分器的设计目标，
-就是让\emph{一步映射}也满足 \eqref{eq:sympmap}。
-辛结构保持、能量精确守恒和约束保持是\textbf{三个不同的命题}；在一般非线性 Hamilton 系统中，
-保辛并不意味着每步能量完全不变。
+正则 Hamilton 系统的精确时间流保持该结构，保辛数值积分器即要求其\emph{一步映射}满足 \eqref{eq:sympmap}。需要区分的是，辛结构保持、能量精确守恒与约束保持属于\textbf{三个独立的数学性质}；对于一般非线性 Hamilton 系统，保辛方法在长期演化中通常表现为能量的有界振荡。
 
 \paragraph{时间推进为何会影响长期计算？}
 显式 Euler 作用于振子，
@@ -300,8 +297,7 @@ $\Phi:z\mapsto\Phi(z)$ 称为\emph{保辛}，如果
 t'=\gamma(t-vx),\qquad x'=\gamma(x-vt),\qquad
 y'=y,\quad z'=z,\qquad \gamma=(1-v^2)^{-1/2}.
 \]
-这是被动坐标变换 $x'=\Lambda x$；撇号表示同一物理场在新坐标中的分量，
-未撇分量均在对应事件 $x=\Lambda^{-1}x'$ 取值，并非主动移动场分布。
+该式对应被动坐标变换 $x'=\Lambda x$：撇号表示同一物理场在新坐标系中的分量，未撇分量则在对应时空事件 $x=\Lambda^{-1}x'$ 处取值。
 链式法则给出
 \[
 \partial_t=\gamma(\partial_{t'}-v\partial_{x'}),\qquad
@@ -876,7 +872,7 @@ q^i(U)=\tfrac12 U^\mathsf TA^iU=(\bm E\times\bm B)_i.
 \label{ch:bridge}
 
 \begin{chaptersummary}
-守恒律和弱形式仍是连续问题。本章明确通向算法的三个选择：空间自由度、界面数值通量和时间推进，并说明稳定性与长期结构取决于它们的配合。这一框架连接后续的有限体积、散度保持与高阶 DG；单独选择某一个方法并不能决定完整算法的全部性质。
+守恒律与弱形式仍属于连续层面的表述。本章明确通向离散算法的三个核心选择——空间自由度、界面数值通量与时间推进，说明完整算法的稳定性与长期保结构性质由三者协同决定，并以此串联后续的有限体积、散度保持与高阶 DG 方法。
 \end{chaptersummary}
 \studyroute{这里略去高阶方法的全部系数表与阶条件证明；新增 ADER、CERK、LTS 和 IMEX 小节给出计算结构与最小算例。}{method of lines; ADER predictor; continuous RK; conservative LTS; additive Runge--Kutta}{区分空间残差、步内预测、时间调度和刚性分拆，列出这些步骤各自需要的数据。}
 
@@ -894,8 +890,7 @@ q^i(U)=\tfrac12 U^\mathsf TA^iU=(\bm E\times\bm B)_i.
 M_h\dot u_h=R_h(u_h,t),\qquad
 \dot u_h=L_h(u_h,t):=M_h^{-1}R_h(u_h,t).
 \end{equation}
-$M_h$ 是质量矩阵，$R_h$ 含体积分、界面通量、边界条件与源项。这叫\emph{线法}
-（method of lines）。另一些方法同时离散时间、空间；工程中线法是理解算法结构的好起点。
+其中 $M_h$ 为质量矩阵，$R_h$ 包含体积分、界面通量、边界条件与源项，此即\emph{线法}（method of lines）。与之并行，亦存在时空耦合离散格式，而线法是剖析算法结构与稳定性的清晰起点。
 
 \begin{center}
 \begin{tikzpicture}[>=stealth,node distance=6mm,
@@ -1259,7 +1254,7 @@ Maxwell 求解器应分别验证面通量平衡与散度约束传播。
 \begin{equation}\label{eq:CT}
 \frac{\dd B_f}{\dd t}=-\sum_{e\subset\partial f}\operatorname{sgn}(f,e)E_e.
 \end{equation}
-这里 $B_f$ 表示穿过面的磁通量（不是点值），$E_e$ 表示沿边的电场线积分；$\operatorname{sgn}(f,e)$ 由取向决定。对某个网格体，把所有外表面的磁通量按有向求和：每条内部边在\emph{边界的边界}中出现两次且符号相反，所以
+其中 $B_f$ 表示穿过有向面的积分磁通量，$E_e$ 表示沿有向边的电场线积分，$\operatorname{sgn}(f,e)$ 由几何取向决定。对任一网格单元的外表面磁通量作有向求和时，每条边界棱在\emph{边界的边界}中恰好出现两次且符号相反，从而得到
 \begin{equation}\label{eq:dd0discrete}
 \frac{\dd}{\dd t}\sum_{f\subset\partial K}\operatorname{sgn}(K,f)B_f=0.
 \end{equation}
@@ -1354,7 +1349,7 @@ V_h^p=\{v:\;v|_K\in\mathbb P_p(K)\},
 其中 $\mathbb P_p(K)$ 是次数不高于 $p$ 的多项式。
 在单元界面上，左、右迹 $v^-,v^+$ 可以不同，定义
 $\{v\}=(v^-+v^+)/2$ 与 $[v]=v^+-v^-$（此处是一维取向约定）。
-一般多维网格的外法线随单元变化，不可机械照搬标量跳跃的符号。
+在一般多维网格中，外法向随单元变化，标量跳跃符号须遵循相应的几何取向约定。
 
 考虑一维常系数对称系统
 \begin{equation}\label{eq:dgmodel}
@@ -1545,7 +1540,7 @@ $\omega_{h,\Delta t}$ 仍可能偏离连续模型的频率。
 中点法的式 \eqref{eq:midpointdisp} 给出了时间色散的具体表达。
 这也解释了工程中的常见搭配：高阶 DG + 与其精度匹配的 RK 时间格式；
 或在长期结构保持优先时，采用针对离散 Hamilton/Poisson 结构设计的推进策略。
-\emph{数值色散小}、\emph{数值耗散小}、\emph{离散能量/辛结构好}是互相关联但不能互相替代的评价维度。
+\emph{低数值色散}、\emph{低数值耗散}与\emph{离散能量/辛结构保持}是三个相互关联而各自独立的评价维度。
 
 \section{三维 Maxwell DG 的空间与约束设计}
 Maxwell DG 通常取每个单元的电场与磁场分量为局部多项式，
@@ -1627,7 +1622,7 @@ $D_hC_h=0$ & 离散散度作用在离散旋度上为零，依赖同一离散复�
 \bottomrule
 \end{longtable}
 
-\paragraph{三种不同的“星”或对偶}这里的 Hodge 星不等于复共轭，也不等于矩阵伴随符号 $A^*$。四维 Lorentz Hodge 星与三维欧氏 Hodge 星在平方后的符号一般不同；不要直接把 $\star^2=1$ 从三维照搬到四维。
+\paragraph{三种不同的“星”或对偶}这里的 Hodge 星算子有别于复共轭及矩阵伴随符号 $A^*$。此外，四维 Lorentz Hodge 星与三维欧氏 Hodge 星在平方后的符号规律不同，三维恒等式 $\star^2=1$ 在四维 Lorentz 签名下需按形式次数相应修正。
 
 \paragraph{度规与单位}把 $c$ 和材料本构恢复后，$\bm E$、$\bm B$ 之间还涉及物理单位与本构关系。对非均匀介质，最自然的变量可能是 $\bm D,\bm H$；主部矩阵、能量内积和特征速度都会随本构变化。本卷的 $\pm1$ 传播速度只适用于所选单位制下的真空平直时空。
 
@@ -1669,9 +1664,7 @@ for theta in (0.5, 1.0, 1.5):
         errors.append(error_phase)
     print(theta, *(f'{err:.6e}' for err in errors))
 \end{lstlisting}
-在 $\theta$ 接近周期 Brillouin 区边缘、物理模态与其它分支变得接近时，
-应采用沿波数连续追踪特征分支的方法，而不是始终简单选择距离
-$-\mathrm i\theta$ 最近的特征值。
+当 $\theta$ 临近周期 Brillouin 区边缘、物理模态与非物理分支趋近时，宜沿波数连续追踪特征分支，以保持分支识别的一致性。
 
 \chapter{参考读物与扩展方向}
 \begin{chaptersummary}

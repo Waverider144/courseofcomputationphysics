@@ -75,10 +75,7 @@ are orthogonal with weight $(1-x^2)^{-1/2}$. This weighted inner product must be
 Spectral collocation can use Chebyshev--Lobatto nodes $x_j=\cos(j\pi/p)$,
 with $D_{ij}=\ell_j'(x_i)$. Differential residuals are constrained at interior nodes, and boundary values at boundary nodes.
 
-For sufficiently smooth solutions with suitable analytic continuation, increasing the global degree can yield rapid or exponential convergence.
-Finite regularity or discontinuities generally yield algebraic convergence, with possible Gibbs oscillations near interfaces.
-Local polynomials facilitate geometry adaptation and refinement; global modes exploit global smoothness.
-Error comparisons should report total degrees of freedom, quadrature error, and temporal error.
+For analytic smooth solutions, increasing the global polynomial degree yields rapid or exponential convergence, whereas finite regularity or discontinuities reduce convergence to algebraic rates and can induce Gibbs oscillations near interfaces. In practice, local polynomials facilitate geometric adaptation and local refinement while global modes exploit global smoothness, so cross-method comparisons should report total degrees of freedom alongside quadrature and temporal errors.
 
 \section{Integral Operators and the Method of Moments}\index{Method of moments}
 The method of moments in computational electromagnetics typically starts from an integral equation:

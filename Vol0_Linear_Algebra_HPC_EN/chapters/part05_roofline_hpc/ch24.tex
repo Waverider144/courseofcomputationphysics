@@ -1,17 +1,17 @@
 \chapter{Yee-FDTD: Discrete Structure and Performance}\label{v0ch:24}
 \begin{chaptersummary}
-Volume II established compatible discretizations of Maxwell evolution and constraints. Yee degrees of freedom, staggered time levels, and curl structure now turn topological identities into array updates and explicit work and traffic models. The discrete complex, phase relations, and two-phase dependencies define the constraints within which performance is optimized.
+Volume~II established structure-preserving discretizations of Maxwell's equations and their divergence constraints. On the Yee grid, staggered degrees of freedom, leapfrog time levels, and discrete curl operators translate those topological identities directly into array updates with explicit work and traffic models, defining the structural constraints within which performance optimization operates.
 \end{chaptersummary}
 \learninggoals{Write Yee updates and constraints; distinguish incidence from material Hodge operators; calculate three traffic models and check dispersion and energy.}
 \paragraph{Core Question}How can Yee bottlenecks be identified while preserving Maxwell structure?
 
 \section{Degrees of Freedom, Materials, and the Grid}
-For stationary, nondispersive isotropic media,
+In stationary, nondispersive isotropic media, Maxwell's equations read
 \[
  \varepsilon\partial_t\bm E=\nabla\times\bm H-\bm j,\qquad
  \partial_t\bm B=-\nabla\times\bm E,\qquad \bm B=\mu\bm H.
 \]
-The coefficients $\varepsilon,\mu$ remain explicit in material and wave-speed relations. On a cubic grid, $E_x$ lies at $(i+\tfrac12,j,k)$, with $E_y,E_z$ obtained cyclically; $B_x$ lies at $(i,j+\tfrac12,k+\tfrac12)$, with the others cyclic. $E$ uses integer times and $B$ half-integer times.
+Here $\varepsilon,\mu$ enter the constitutive and wave-speed relations explicitly. On a cubic grid, $E_x$ is located at $(i+\tfrac12,j,k)$, $E_y,E_z$ follow by cyclic permutation, and $B_x$ is at $(i,j+\tfrac12,k+\tfrac12)$ with the remaining magnetic components similarly permuted; $E$ resides at integer time steps and $B$ at half-integer time steps.
 
 \begin{figure}[H]\centering
 \begin{tikzpicture}[x={(4cm,0cm)},y={(1.4cm,1cm)},z={(0cm,3cm)},>=Stealth]
@@ -33,15 +33,15 @@ The coefficients $\varepsilon,\mu$ remain explicit in material and wave-speed re
 \caption{Representative edge electric and face magnetic components in a cubic cell. Arrows indicate component directions; not all edge/face unknowns are shown.}
 \end{figure}
 
-Point components are samples on a uniform grid. Integral unknowns are edge circulations $e_\ell=\int_\ell E$ and face fluxes $b_f=\int_f B$. Lengths, areas, and materials connect the representations; point arrays are not dimensionless incidence matrices.
+Point field components sample the fields on a uniform grid, whereas integral unknowns represent edge circulations $e_\ell=\int_\ell E$ and face fluxes $b_f=\int_f B$; metric lengths, areas, and material tensors link the two representations, distinguishing point-value arrays from dimensionless incidence matrices.
 \section{Topology and Matrix-Free Updates}
-Incidence matrices $G,C,D$ satisfy $CG=0,DC=0$. With compatible primal/dual grids and boundary pairing,
+The discrete incidence matrices $G,C,D$ satisfy $CG=0,DC=0$. On compatible primal and dual grids with matching boundary pairings,
 \[
  \dot{\bm b}=-C\bm e,\qquad
  M_\varepsilon\dot{\bm e}=C^TM_{\mu^{-1}}\bm b-\bm j_h .
 \]
-$C$ encodes orientation; $M_\varepsilon,M_{\mu^{-1}}$ encode metric and material data. Uniform orthogonal Yee grids admit diagonal material actions. Thus $\partial_t(D\bm b)=0$. With dual-divergence convention $D_e=-G^T$, charge is $\bm q=D_eM_\varepsilon\bm e$ and continuity requires $\dot{\bm q}=-D_e\bm j_h$, with compatible boundary fluxes.
-Define forward differences $\delta_\alpha^+$ and backward differences $\delta_\alpha^-$. On a periodic uniform grid,
+Here $C$ encodes topological orientation and $M_\varepsilon,M_{\mu^{-1}}$ encode metric and material properties, reducing to diagonal operators on uniform orthogonal Yee grids. Consequently $\partial_t(D\bm b)=0$; with the dual-divergence convention $D_e=-G^T$, the discrete charge $\bm q=D_eM_\varepsilon\bm e$ satisfies $\dot{\bm q}=-D_e\bm j_h$ under compatible boundary fluxes.
+Defining forward differences $\delta_\alpha^+$ and backward differences $\delta_\alpha^-$, the periodic uniform-grid update takes the form
 \[
  B_x^{n+1/2}=B_x^{n-1/2}
  -\Delta t(\delta_y^+E_z^n-\delta_z^+E_y^n),
@@ -50,7 +50,7 @@ Define forward differences $\delta_\alpha^+$ and backward differences $\delta_\a
  E_x^{n+1}=E_x^n+\frac{\Delta t}{\varepsilon}
  [\delta_y^-H_z^{n+1/2}-\delta_z^-H_y^{n+1/2}-j_x^{n+1/2}],
 \]
-with cyclic counterparts. This is a block-sparse action without CSR assembly. Explicit matrices remain useful for small spectral checks, implicit integration, and operator comparisons. The execution order is
+together with the cyclic counterparts, realizing a block-sparse operator without CSR assembly, while explicit matrices remain helpful for small spectral checks, implicit stepping, and operator verification. The resulting two-phase execution order is
 \begin{quote}\ttfamily\small
 for each time step:\\
 \quad exchange required E halos\\
@@ -58,11 +58,11 @@ for each time step:\\
 \quad exchange required B\_half halos\\
 \quad E = E + dt * curl\_backward(B\_half)
 \end{quote}
-\conceptbridge{Why can curl updates not be changed arbitrarily to in-place operations?}{Both curls must retain consistent time levels and spatial orientation. The magnetic half-step reads old electric fields; the electric step reads new magnetic fields. Overwriting unread values changes the operator, stability, dispersion, and constraints.}{Staggered unknowns $\longrightarrow$ two-phase dependency graph $\longrightarrow$ admissible fusion and synchronization.}
+\conceptbridge{Why can curl updates not be changed arbitrarily to in-place operations?}{Each curl update relies on consistent time levels and spatial orientation: the magnetic half-step consumes the current electric field, and the electric step consumes the newly updated magnetic field. Overwriting unread values alters the discrete operator, modifying stability, numerical dispersion, and divergence conservation.}{Staggered unknowns $\longrightarrow$ two-phase dependency graph $\longrightarrow$ admissible fusion and synchronization.}
 \section{Auditable Work and Traffic}
-For source-free, constant-coefficient vacuum with precomputed inverse spacings, each component uses two differences, two scalings, a subtraction, a $\Delta t$ multiplication, and an update: 7 FLOPs, or 42 per six-component cell-step. An FMA counts as two FLOPs.
-This counts separately formed directional differences. On an isotropic equal-spacing grid, precombining $\Delta t/h$ gives three subtractions, one scaling, and one update per component: 5 FLOPs, or 30 per cell-step. The CUDA/MPI code uses this form. Count the implemented work; do not assign 42 FLOPs to the fused kernel.
-For double precision, excluding materials and sources:
+For source-free, constant-coefficient vacuum with precomputed inverse spacings, each component performs two differences, two scalings, one subtraction, one $\Delta t$ multiplication, and one accumulation—7 FLOPs per component, or 42 FLOPs per six-component cell-step (counting an FMA as two FLOPs) when directional differences are formed separately.
+On an isotropic equal-spacing grid, precombining $\Delta t/h$ reduces this to three subtractions, one scaling, and one accumulation—5 FLOPs per component, or 30 FLOPs per cell-step, which is the formulation implemented in the CUDA and MPI kernels; work counts always match the executed kernel formulation.
+In double precision, excluding material arrays and sources, three traffic models bracket the data movement:
 \[
 \begin{array}{l|r|r}
 \text{Model}&\text{bytes/cell-step}&I\ (\text{FLOP/byte})\\\hline
@@ -71,26 +71,26 @@ For double precision, excluding materials and sources:
 \text{Six fields resident for full step}&96&42/96
 \end{array}
 \]
-The three values describe traffic under specified reuse assumptions. Actual DRAM traffic also depends on caches, write allocation, temporaries, boundaries, and coefficient access. For large two-phase arrays, working-set size determines whether whole-step residency is feasible.
-Six SoA arrays support contiguous spatial access by neighboring threads. GPU execution can use separate $B/E$ launches, further split by component if needed. Registers, launch cost, and global synchronization determine the tradeoff. Shared memory helps only when it reduces actual repeated movement without unduly reducing parallelism.
+Each row corresponds to an explicit data-reuse regime, while actual DRAM traffic also reflects cache hierarchy, write allocation, temporary arrays, boundary updates, and material loads; for large two-phase grids, working-set size determines whether full-step cache residency is attainable.
+Six SoA arrays enable contiguous spatial access across neighboring threads. On GPUs, $B/E$ updates can run as separate kernel launches—or be split further by component—trading register pressure against launch overhead and global synchronization, while shared memory improves throughput when it eliminates repeated global-memory reads without excessively lowering occupancy.
 \section{Stability, Dispersion, and Acceptance}
-With vacuum wave speed $c=(\varepsilon\mu)^{-1/2}$, the uniform three-dimensional condition is
+With vacuum wave speed $c=(\varepsilon\mu)^{-1/2}$, the uniform three-dimensional CFL condition is
 \[
  c^2\Delta t^2(h_x^{-2}+h_y^{-2}+h_z^{-2})\le1.
 \]
-Periodic Fourier modes satisfy
+Periodic Fourier modes obey the numerical dispersion relation
 \[
  \frac{\sin^2(\omega_h\Delta t/2)}{c^2\Delta t^2}
  =\sum_\alpha\frac{\sin^2(k_\alpha h_\alpha/2)}{h_\alpha^2}.
 \]
-CFL controls numerical growth, while the dispersion relation describes phase propagation. Evaluate fixed-distance propagation errors together with direction, resolution, and total step count.
-For normalized periodic vacuum, an exact-arithmetic invariant is
+Whereas the CFL bound prevents exponential growth, the dispersion relation governs phase accuracy, which is evaluated over fixed propagation distances alongside propagation direction, grid resolution, and total step count.
+For normalized periodic vacuum, the leapfrog update preserves the exact-arithmetic invariant
 \[
  {\cal H}^n=\frac12\norm{E^n}^2+
  \frac12\langle B^{n-1/2},B^{n+1/2}\rangle
 \]
-with the appropriate volume weights. This is a modified staggered energy, not a sum of squares at unrelated times. Its relation to physical energy under stable time steps must be specified.
-\costnote{Record initial phase, final physical time, error, $\diverg_h B$, charge residual, modified energy, and advance time. Include nontrivial random-field curl--divergence checks, not just a transverse wave. Periodic lossless modes have unit-modulus amplification in the stable range; boundaries, material losses, and filtering may add dissipation and require separate records.}
+with the appropriate volume weights. This modified staggered energy combines adjacent half-step magnetic fields rather than summing squares at a single instant, and remains positive definite and close to the physical electromagnetic energy throughout the CFL-stable range.
+\costnote{Complete validation records report initial phase, physical final time, field error, $\diverg_h B$, charge residual, modified energy, and advance time, including random-field curl--divergence tests alongside smooth transverse waves. Periodic lossless modes exhibit unit-modulus amplification within the CFL limit, whereas open boundaries, conductive losses, and filtering introduce dissipation tracked separately.}
 \coderef{fdtd/yee.py}
 \aiexercise{Derive neighboring indices for $B_x$ and $E_x$ from their locations. Verify $D C=0$ term by term and identify the length/area factors.}{Derive Yee dispersion and CFL from Fourier updates. Compare modified staggered energy with sums of squares at different times.}
 \crossref{Volume II explains geometry and constraints; the material matrices, traffic, and time levels here support Chapters 25, 28, and 29.}

@@ -13,21 +13,15 @@
 This book is dedicated to Landau and Lifshitz.\\
 With gratitude for guiding generations to the beauty of theory and the wonder it inspires.
 \end{quote}
-\begin{tcolorbox}[colback=red!3,colframe=red!65!black,title={Required: AI Explanations and Code Experiments},fonttitle=\bfseries,boxrule=0.8pt,arc=1mm,breakable]
-\textbf{Do not study from the text alone. Use AI explanations and code experiments alongside these books.}
-The text is a highly compressed knowledge map. When a conceptual link, derivation,
-or prerequisite is unclear, give AI the current notation, assumptions, and precise
-question and request a step-by-step explanation. Run the companion code or a minimal
-example, vary parameters, and inspect error, conservation, or stability.
-Check AI explanations, derivations, and code against the stated assumptions,
-references, and numerical results.
+\begin{tcolorbox}[colback=red!3,colframe=red!65!black,title={Using AI Explanations and Code Experiments},fonttitle=\bfseries,boxrule=0.8pt,arc=1mm,breakable]
+\textbf{This text is designed to be studied alongside interactive AI explanations and hands-on code experiments.}
+Because the exposition is structured as a compact knowledge map, any conceptual link, derivation, or prerequisite can be expanded by providing an AI assistant with the local notation, stated assumptions, and specific question for a step-by-step walkthrough. Running the companion scripts or constructing minimal test cases—varying parameters while monitoring error, conservation, and stability—grounds the theory in numerical behavior, and all generated derivations and code can be verified directly against the stated assumptions, references, and recorded benchmarks.
 \end{tcolorbox}
-Spatial discretization produces finite-dimensional operators. Their structure constrains solvers, and the solvers' data dependencies constrain machine execution. This volume follows that chain through factorization, Krylov spaces, preconditioning, multigrid, and performance analysis.
-Volume I develops physical modeling and spatial discretization; Volume II develops field geometry, constraints, and structure-preserving discretization. Here these results become inputs to reliable and efficient computation.
+Spatial discretization produces finite-dimensional operators whose algebraic structure governs solver design, while the data dependencies of those solvers govern machine execution. This volume traces that chain through matrix factorization, Krylov subspace methods, preconditioning, multigrid, and performance modeling. Whereas Volume~I develops physical modeling and spatial discretization and Volume~II addresses field geometry, constraints, and structure-preserving discretization, the present volume takes those discrete systems as the starting point for accurate and efficient computation.
 \par
-The first three chapters establish matrix, residual, and error terminology. Parts II and III study factorization and projection; Part IV combines them through preconditioning and multilevel methods. Part V uses Roofline to connect operators, time integration, and parallel communication. A first pass may follow Chapters 1, 2, 3, 4, 10, 12, 16, 19, 22, 24, and 29 before returning to assumptions and variants.
+The first three chapters establish the core terminology of matrices, residuals, and error analysis. Parts~II and~III examine matrix factorization and Krylov projection, and Part~IV combines both paradigms through preconditioning and multilevel methods. Part~V applies the Roofline model to connect discrete operators, time integration, and parallel communication. For a first pass through the material, readers may follow Chapters~1, 2, 3, 4, 10, 12, 16, 19, 22, 24, and~29 before returning to detailed assumptions and algorithmic variants.
 \par
-Each chapter supplies objectives, conceptual connections, minimal examples, and specific AI expansion questions. Omitted proofs and implementation details have search terms. Scalars are real unless stated otherwise; replace transpose by conjugate transpose for complex problems. $N$ usually counts algebraic unknowns; $n$ counts grid points per direction. CPU experiments use double precision. Code, figures, and measurement records are shared with the Chinese edition under \path{Vol0_Linear_Algebra_HPC/}. Models, timings, and unexecuted experiments are identified separately.
+Each chapter provides learning goals, conceptual links, minimal numerical examples, and targeted AI exploration prompts, together with search keywords for omitted proofs and implementation details. Unless noted otherwise, scalars are real; for complex problems, transposes become conjugate transposes. Throughout the text, $N$ typically denotes the number of algebraic unknowns and $n$ denotes the number of grid points per spatial direction. All CPU experiments use double precision, and the companion code, figures, and measurement records are shared with the Chinese edition under \path{Vol0_Linear_Algebra_HPC/}, with analytical models and benchmark timings reported separately.
 \tableofcontents
 \mainmatter
 \part{From Discrete Equations to Matrix Systems}

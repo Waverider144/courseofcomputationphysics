@@ -35,11 +35,11 @@ $\bm x_2=(1/11,7/11)^T$。
  \le2\left(\frac{\sqrt\kappa-1}{\sqrt\kappa+1}\right)^k,
  \qquad \kappa=\kappa_2(A).
 \]
-这是最坏情形上界；特征值聚簇与右端方向可使实际收敛更快，二范数残差也不保证逐步单调。
+该不等式刻画了最坏情形下的收敛上界；当特征值高度聚簇或右端向量位于特定谱子空间时，实际收敛往往显著快于该界，同时二范数残差在迭代过程中可能出现非单调波动。
 \section{PCG 的正确条件}
-取固定 SPD $M$，解 $\bm z_k=M^{-1}\bm r_k$。将 $\alpha$ 分子改为 $\bm r_k^T\bm z_k$，$\beta$ 改为相邻该内积之比，方向更新为 $\bm z_{k+1}+\beta_k\bm p_k$。有效 SPD 算子是 $M^{-1/2}AM^{-1/2}$，并非要求 $M^{-1}A$ 在 Euclidean 内积下对称。
-\conceptbridge{原矩阵 SPD，为什么任意预条件后不能直接运行标准 CG？}{预条件改变了算法使用的几何。固定 SPD 逆作用对应一个合法能量坐标变换；非对称或随迭代改变的作用通常破坏短递推依赖的正交关系。}{原能量 $\longrightarrow$ 对称正定变换 $\longrightarrow$ 可保持的共轭结构。}
-\costnote{每步一次 $A\bm p$、少量向量更新与点积，存储为 $O(N)$；分布式归约延迟可能主导时间。选用 ILU 或 AMG 时，应按标准 PCG 的固定、对称和正定条件检查其完整逆作用。}
+给定固定的 SPD 预条件器 $M$，每步求解 $\bm z_k=M^{-1}\bm r_k$，将 $\alpha$ 的分子替换为 $\bm r_k^T\bm z_k$、$\beta$ 替换为相邻该内积之比，并按 $\bm z_{k+1}+\beta_k\bm p_k$ 更新搜索方向。其本质是在能量坐标下作用于有效 SPD 算子 $M^{-1/2}AM^{-1/2}$，而无需 $M^{-1}A$ 在 Euclidean 内积下对称。
+\conceptbridge{原矩阵为 SPD 时，为何不能直接搭配任意预条件器运行标准 CG？}{预条件变换改变了投影所依赖的内积几何。固定 SPD 逆作用诱导了合法的对称正定坐标变换，而非对称或随步变化的预条件则会破坏短递推所依赖的共轭与正交结构。}{原能量 $\longrightarrow$ 对称正定变换 $\longrightarrow$ 可保持的共轭结构。}
+\costnote{每步迭代仅需一次 $A\bm p$ 运算、少量向量更新与点积，存储需求为 $O(N)$，在分布式环境下全局归约延迟往往成为瓶颈。采用 ILU 或 AMG 作为标准 PCG 预条件器时，需确认其完整逆作用满足固定、对称与正定条件。}
 \coderef{sparse_linear_algebra/solvers.py}
-\aiexercise{手算两步 CG 的全部内积，验证两方向 A-共轭，并比较能量误差与二范数残差。}{用 IC 与非对称 ILU 分别预条件同一 SPD 系统，检查算法条件，不以一次成功运行代替适用性判断。}
+\aiexercise{手算两步 CG 的全部内积，验证两方向 A-共轭，并比较能量误差与二范数残差。}{分别用 IC 与非对称 ILU 预条件同一 SPD 系统，结合理论条件分析两种配置的适用性。}
 \studyroute{略去有限精度共轭丢失及流水化 CG 稳定性证明。参考 \cite{saad,templates}。}{conjugate gradient; A norm; PCG; SPD preconditioner; finite precision CG}

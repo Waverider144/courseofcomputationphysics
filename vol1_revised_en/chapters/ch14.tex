@@ -36,8 +36,7 @@ For a source-free finite-volume update,
 =-\sum_{f\subset\partial K}\int_{t_n}^{t_{n+1}}\int_f
 \widehat F(q_K,q_{K_f};\bm n_f)\dd S\dd t.
 \]
-the local prediction is followed by a correction coupling neighbors through shared fluxes. Accuracy depends on reconstruction, the predictor, and integration order;
-explicit hyperbolic updates retain their corresponding CFL constraint.
+The local prediction is followed by a correction coupling neighbors through shared fluxes. Accuracy depends on reconstruction, the predictor, and integration order, while explicit hyperbolic updates retain their corresponding CFL constraint.
 See \href{https://doi.org/10.1016/j.cma.2014.07.019}{Dumbser's ADER--LTS construction}.
 
 In ADER--DG, the same local predictor $q_K$ also supplies basis-weighted volume residuals.
@@ -72,10 +71,8 @@ If a coarse element advances by $\Delta T$ while a fine neighbor takes $m$ subst
 \Phi_f^{\mathrm{coarse}}
 =\sum_{r=1}^{m}\Phi_{f,r}^{\mathrm{fine}},
 \]
-All terms use one normal convention and enter neighboring updates with opposite signs.
-ADER or CERK can provide within-step states; LTS additionally requires scheduling, quadrature, and flux accumulation.
-Physical-time LTS must preserve temporal accuracy; local pseudo-time stepping for steady-state acceleration has a different objective.
-Efficiency depends on the fraction of small elements and the costs of interface prediction, integration, and synchronization.
+where all terms use one normal convention and enter neighboring updates with opposite signs.
+ADER or CERK can supply within-step states, while LTS additionally coordinates scheduling, quadrature, and flux accumulation. Physical-time LTS maintains temporal accuracy, whereas local pseudo-time stepping accelerates steady-state convergence; overall efficiency depends on the fraction of small elements and the costs of interface prediction, integration, and synchronization.
 
 \begin{askai}
 \textbf{Ask AI:}\par

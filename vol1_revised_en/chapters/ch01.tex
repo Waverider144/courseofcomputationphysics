@@ -34,7 +34,7 @@ When macroscopic statistics are the quantities of interest and particle-by-parti
 "Why move from deterministic \(N\)-particle trajectories to a probability density?"
 
 \textbf{Author Supplement:}
-Many engineering problems concern density, temperature, or mean flow rather than individual trajectories. For systems containing enormous numbers of particles, tracking every degree of freedom is usually prohibitively expensive; direct evaluation of all pair interactions alone costs $O(N^2)$. A probability description focuses on possible states and their statistical laws, and represents uncertainty in the initial microscopic state. Particle methods or Eulerian--Lagrangian hybrid methods remain available when particular particles must be tracked.
+Many physical and engineering problems concern macroscopic quantities such as density, temperature, or mean velocity rather than individual particle trajectories. For systems with large particle counts, tracking every degree of freedom is computationally prohibitive, as direct evaluation of all pairwise interactions alone scales as $O(N^2)$. A probabilistic description shifts focus to accessible states and their statistical laws while naturally representing uncertainty in the initial microscopic state; particle or Eulerian--Lagrangian hybrid methods remain available when specific trajectories are required.
 
 \textbf{Core Conceptual Connection:}
 \[
@@ -71,7 +71,7 @@ Hamiltonian systems satisfy
 \[
 \nabla_\Gamma\cdot\dot\Gamma=0,
 \]
-Hence
+hence
 \[
 \frac{\partial \rho_N}{\partial t}
 +
@@ -82,16 +82,16 @@ or
 \frac{\partial \rho_N}{\partial t}+\{\rho_N,H\}=0.
 \]
 
-The Liouville equation describes transport of probability density by microscopic dynamics; Hamiltonian flow preserves phase-space volume. The equation remains \(6N\)-dimensional. Only subsequent marginalization reduces the number of explicit coordinates.
+The Liouville equation describes transport of probability density by microscopic dynamics, with Hamiltonian flow preserving phase-space volume. The equation remains \(6N\)-dimensional, and only subsequent marginalization reduces the number of explicit coordinates.
 
 \begin{authornote}
 \textbf{Potential Question:}
 "Why does a probability description remain high-dimensional, and which information does marginalization retain or discard?"
 
 \textbf{Author Supplement:}
-The density \(\rho_N\) depends on all \(6N\) phase-space coordinates, so a probability description alone does not reduce dimension. Even the one-particle distribution \(f(\bm x,\bm v,t)\) requires approximately \(N_x^3N_v^3\) degrees of freedom on a direct tensor-product grid: every spatial point carries a three-dimensional velocity distribution. With 100 points per coordinate direction, there are \(10^{12}\) values; one double-precision scalar array alone occupies approximately 8 TB. Actual cost also depends on dimensional reduction, mesh design, collision model, and parallel implementation.
+Because \(\rho_N\) depends on all \(6N\) phase-space coordinates, reformulating the problem probabilistically does not reduce its dimensionality. Even the one-particle distribution \(f(\bm x,\bm v,t)\) requires roughly \(N_x^3N_v^3\) degrees of freedom on a direct tensor-product grid, since each spatial node carries a three-dimensional velocity distribution: with 100 points per coordinate direction, there are \(10^{12}\) values, and a single double-precision scalar array occupies approximately 8 TB.
 
-Marginalization integrates out the other particles' explicit positions, velocities, and joint information unavailable in a one-particle distribution. Interactions still transmit the effects of these correlations to the retained variables, motivating closure. The roles are distinct: marginalization defines retained variables, closure models unresolved correlations, and initial and boundary conditions supply space-time data.
+Marginalization integrates out the explicit positions and velocities of the remaining particles along with joint correlations absent from a one-particle description. Because interparticle interactions continue to influence the retained variables through these correlations, a closure approximation is required. The three operations play distinct roles: marginalization defines the retained variables, closure models unresolved correlations, and initial and boundary conditions supply space-time data.
 
 \textbf{Core Conceptual Connection:}
 \[
@@ -102,13 +102,13 @@ f(\bm x,\bm v,t)
 \end{authornote}
 
 \section{Marginal Distributions, Normalization, and Correlation Hierarchies}\index{Marginalization}
-For particles of the same mass $m$, replace momentum coordinates by velocity coordinates and define
+For particles of identical mass $m$, replace momentum coordinates by velocity coordinates and define
 \[
 \varrho_N(\bm x_1,\bm v_1,\ldots,\bm x_N,\bm v_N,t)
 =m^{3N}\rho_N(\bm x_1,\ldots,m\bm v_N,t),\qquad
 \int\varrho_N\dd z_1\cdots\dd z_N=1,
 \]
-Here $z_i=(\bm x_i,\bm v_i)$, and every momentum argument of $\rho_N$ on the right is evaluated at $\bm p_i=m\bm v_i$.
+where $z_i=(\bm x_i,\bm v_i)$ and every momentum argument of $\rho_N$ on the right is evaluated at $\bm p_i=m\bm v_i$.
 Probability-normalized and number-density marginals are, respectively,
 \[
 g_s(z_1,\ldots,z_s)=\int\varrho_N\dd z_{s+1}\cdots\dd z_N,\qquad

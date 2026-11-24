@@ -1,29 +1,29 @@
 \chapter{LU-SGS and Approximate Factorization}\label{v0ch:9}
 \begin{chaptersummary}
-Incomplete factorization controls cost by dropping entries; LU-SGS constructs approximate factors through forward and backward sweeps. Its connection with symmetric Gauss--Seidel clarifies three roles: stationary iteration, preconditioning, and pseudo-time updating. The outer mechanism determines the task of a sweep and the convergence conditions to be checked.
+Whereas incomplete factorization controls cost by dropping fill entries, LU-SGS builds approximate factors directly from forward and backward sweeps. Its equivalence to symmetric Gauss--Seidel clarifies three distinct roles—stationary iteration, Krylov preconditioning, and pseudo-time relaxation—in which the outer framework defines both the sweep's objective and the applicable convergence criteria.
 \end{chaptersummary}
 \learninggoals{Expand the SGS factors; implement both sweeps; distinguish CFD diagonal approximations from linear-algebraic assumptions.}
 \paragraph{Core Question}How can two local sweeps approximate global implicit coupling?
 
 \section{Approximate Factors and Two Triangular Solves}
-Write $A=D+L+U$, with $L,U$ retaining their entries' signs. For invertible $D$, define
+Split the matrix as $A=D+L+U$, where $L,U$ retain the signs of the off-diagonal entries. For invertible $D$, define
 \[
  M=(D+L)D^{-1}(D+U)
    =A+LD^{-1}U.
 \]
-Solving $M\delta\bm x=\bm r$ is equivalent to
+Solving $M\delta\bm x=\bm r$ splits into two triangular sweeps:
 \[
  (D+L)\bm y=\bm r,\qquad
  (D+U)\delta\bm x=D\bm y.
 \]
-No product $M$ need be formed. If $A$ is symmetric and $D$ positive definite, $U=L^T$ and $M$ is SPD. Standard PCG also requires a fixed symmetric overall preconditioner action.
+The product $M$ is never formed explicitly. When $A$ is symmetric and $D$ is positive definite, $U=L^T$ and $M$ is SPD; using it inside standard PCG further requires that the overall preconditioner action remain fixed and symmetric.
 \section{Iteration, Preconditioning, and Pseudo-Time}
-The stationary iteration $\bm x_{k+1}=\bm x_k+M^{-1}(\bm b-A\bm x_k)$ has error matrix $I-M^{-1}A$ and converges when its spectral radius is below 1. As a preconditioner, the same inverse action is combined by an outer Krylov method whose projection selects the correction coefficients.
-CFD LU-SGS often approximates diagonal blocks and Jacobian splittings of $\Delta t^{-1}M_t+J$. Pseudo-time drives the steady residual toward zero; its step is not physical-time resolution. Specify the actual diagonal terms and boundary treatment.
-\conceptbridge{Why does LU-SGS generally differ from exact LU?}{Convenient triangular parts are selected first and multiplied to approximate the operator. The extra cross term reveals the approximation. Exact LU computes elimination factors whose product equals the permuted matrix.}{Implicit coupling $\longrightarrow$ sweep-based approximation $\longrightarrow$ outer correction of remaining error.}
+As a stationary iteration, $\bm x_{k+1}=\bm x_k+M^{-1}(\bm b-A\bm x_k)$ has error-propagation matrix $I-M^{-1}A$ and converges when its spectral radius is strictly less than 1. Used as a preconditioner, the same inverse action feeds an outer Krylov solver whose projection selects optimal combination coefficients.
+In CFD, LU-SGS typically approximates diagonal blocks and Jacobian splittings of $\Delta t^{-1}M_t+J$, where pseudo-time stepping drives the steady-state residual to zero independently of physical time accuracy; the exact diagonal approximation and boundary treatment therefore define the effective operator.
+\conceptbridge{Why does LU-SGS generally differ from exact LU?}{LU-SGS chooses convenient triangular parts from the original matrix and multiplies them to approximate the operator, leaving the cross term as the approximation error, whereas exact LU computes elimination factors whose product equals the permuted matrix.}{Implicit coupling $\longrightarrow$ sweep-based approximation $\longrightarrow$ outer correction of remaining error.}
 \section{A Three-Point Check}
-For three-by-three $A=\operatorname{tridiag}(-1,2,-1)$, calculate $LD^{-1}U$ and compare $M^{-1}\bm r$ with $A^{-1}\bm r$. Sequential sweeps use updated neighboring values. Multicolor or block-Jacobi parallelization changes the operator and requires renewed evaluation.
-\costnote{Each application uses approximately two sparse triangular solves with $O(\nnz A)$ storage. Sequential dependence limits throughput. Local blocks or subdomains increase parallelism but generally weaken treatment of global coupling.}
+For the three-by-three matrix $A=\operatorname{tridiag}(-1,2,-1)$, evaluating $LD^{-1}U$ and comparing $M^{-1}\bm r$ against $A^{-1}\bm r$ quantifies this discrepancy directly. Because sequential sweeps immediately incorporate updated neighbor values, parallelizing them via multicolor orderings or block-Jacobi partitioning changes the underlying splitting and alters convergence behavior.
+\costnote{Each application costs roughly two sparse triangular solves with $O(\nnz A)$ storage, making sequential data dependence the primary throughput bottleneck. Partitioning into local blocks or subdomains exposes parallelism while generally weakening global coupling.}
 \aiexercise{For three-point Poisson, compute $M$, $M^{-1}\bm r$, and the error iteration matrix. Distinguish one preconditioner application from stationary convergence.}{Replace the sweep with red--black or block updates, identify the changed splitting, and compare outer GMRES counts.}
 \crossref{Chapter 17 unifies stationary iterations; Chapter 18 addresses parallel subdomains.}
 \studyroute{Compressible-flow Jacobian splittings and pseudo-time parameter estimates are omitted. See \cite{saad}.}{LU-SGS; symmetric Gauss Seidel; approximate factorization; pseudo time stepping}

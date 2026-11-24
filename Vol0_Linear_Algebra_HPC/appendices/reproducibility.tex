@@ -1,11 +1,11 @@
 \chapter{实验复现与记录口径}
-在仓库根目录执行 \texttt{make vol0-examples} 生成 CPU 实验、图和 JSON 记录，再执行 \texttt{make vol0} 编译本卷。依赖为 Python、NumPy、SciPy、Matplotlib 和 XeLaTeX。实验默认单线程 BLAS，避免将线程配置差异混入算法比较。
+在仓库根目录依次执行 \texttt{make vol0-examples} 与 \texttt{make vol0}，即可生成 CPU 实验数据、附图与 JSON 记录并编译本卷。运行依赖包括 Python、NumPy、SciPy、Matplotlib 与 XeLaTeX；实验默认采用单线程 BLAS，以隔离线程配置差异对算法对比的影响。
 \par
-\path{results/measurements.json} 记录环境、参数、时间、残差和误差。\path{results/validation.json} 保存不依赖计时的断言。字节数采用指定工作量模型，\texttt{dram\_bytes\_measured} 保持为空，表示没有使用硬件计数器；以该模型计算的有效带宽不能解释为 DRAM 带宽实测。
+\path{results/measurements.json} 保存运行环境、参数、计时、残差与误差，\path{results/validation.json} 保存与计时无关的数值断言。字节流量依据显式工作量模型估算，\texttt{dram\_bytes\_measured} 留空表示未采集硬件计数器，相应有效带宽反映模型流量口径下的吞吐。
 \par
-GPU 与 MPI 源程序分别位于示例目录的 \texttt{gpu/} 和 \texttt{mpi/}。实验按编译、设备数值验证与跨节点性能三个层次记录，执行命令和计时约定见 \path{docs/experiments.md}。附图由代码生成，计时对应记录中的实现、工作负载与硬件配置。
+GPU 与 MPI 源码分别位于示例目录的 \texttt{gpu/} 与 \texttt{mpi/}，实验按编译验证、设备数值验证与跨节点性能评测三个层次记录，具体命令与计时约定见 \path{docs/experiments.md}。正文附图均由配套代码生成，计时对应记录中的实现、工作负载与硬件环境。
 \section{误差与成本的共同记录}
-每个完整演化实验应记录：方程和边界、初值、物理终止时间、网格与阶数、自由度、时间步和步数、精度、误差范数、约束量、预处理时间、推进时间以及硬件与线程配置。固定网格的核函数吞吐与固定误差的总求解时间分别报告。
+完整演化实验宜统一记录方程与边界、初值、物理终止时间、网格与阶数、自由度、时间步长与步数、浮点精度、误差范数、守恒与约束量、预处理耗时、推进耗时以及硬件与线程配置，并将固定网格核函数吞吐与固定误差总求解时间分列报告。
 \section{结果的可迁移性}
-改变处理器、电源模式、线程数、编译器或库版本后，应重新标定。缓存驻留数组采用对应缓存层级的屋顶；含 Python 临时数组的实现将中间读写纳入流量模型。跨节点实验进一步记录网络、进程绑定、消息大小和归约策略。
+当处理器型号、电源模式、线程配置、编译器或基础库版本变更时，需重新标定硬件基准。缓存驻留小数组对应相应缓存层级的 Roofline 屋顶，含 Python 临时数组的实现则将中间读写纳入流量模型；跨节点实验还应补充记录互连网络、进程绑定、消息尺寸与归约策略。
 \InputIfFileExists{Vol0_Linear_Algebra_HPC/results/summary.tex}{}{}

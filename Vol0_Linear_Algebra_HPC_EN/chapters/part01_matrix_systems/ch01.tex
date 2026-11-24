@@ -1,6 +1,6 @@
 \chapter{Why Scientific Computing Leads to Matrix Problems}\label{v0ch:1}
 \begin{chaptersummary}
-Volumes I and II construct finite-dimensional representations and discrete fluxes; the next task is to solve the resulting equations. Unknowns, local coupling, and boundary treatment establish the correspondence between a matrix and its discrete operator. This correspondence guides factorization and iterative methods and provides a common view of assembled and matrix-free implementations.
+Volumes I and II construct finite-dimensional representations and discrete fluxes; solving the resulting algebraic equations is the next stage of the workflow. The choice of unknowns, local coupling stencil, and boundary treatment establishes a direct correspondence between a matrix and its discrete operator, guiding both factorization and iterative solvers while unifying assembled and matrix-free implementations.
 \end{chaptersummary}
 \learninggoals{Derive a matrix from one-dimensional Poisson; distinguish mass, stiffness, and Jacobian matrices; recognize the common operator behind assembled and matrix-free implementations.}
 \paragraph{Core Question}How do local differential relations become couplings among finitely many unknowns?
@@ -15,8 +15,8 @@ Consider $-u''=f$ on $(0,1)$ with $u(0)=g_0,u(1)=g_1$. Set $h=1/6$ and $u_i\appr
  \end{bmatrix},\quad
  \bm b=\begin{bmatrix}f_1+g_0/h^2\\f_2\\f_3\\f_4\\f_5+g_1/h^2\end{bmatrix}.
 \]
-Rows represent equations and columns represent degrees of freedom. Each local difference reads three values, giving at most three nonzeros per row; boundary data enter the right-hand side with their coefficients. For $u=x(1-x)$ and $f=2$, the second difference is exact, providing a direct check of the matrix, signs, and boundary treatment.
-\conceptbridge{Why distinguish definitions of unknowns after obtaining a finite-dimensional system?}{Nodal values, cell averages, and basis coefficients are different coordinates. The discrete operator maps them to residuals; its entries encode trial spaces, testing, and neighboring interactions. Changing coordinates or boundary elimination changes the matrix even when the PDE is unchanged.}{Continuous operator $\longrightarrow$ degrees of freedom and testing $\longrightarrow$ algebraic coupling.}
+Rows correspond to discrete equations and columns to degrees of freedom. Because each local difference stencil accesses three neighboring values, every row contains at most three nonzeros, while boundary data enter the right-hand side scaled by their respective coefficients. For $u=x(1-x)$ and $f=2$, the second difference is exact, furnishing a direct verification of matrix assembly, sign conventions, and boundary treatment.
+\conceptbridge{Why distinguish definitions of unknowns after obtaining a finite-dimensional system?}{Nodal values, cell averages, and basis coefficients represent different coordinate choices for the same discrete space. The discrete operator maps these coordinates to residuals, with its entries encoding trial spaces, testing procedures, and neighbor interactions; changing coordinates or eliminating boundary values alters the matrix even when the underlying PDE remains identical.}{Continuous operator $\longrightarrow$ degrees of freedom and testing $\longrightarrow$ algebraic coupling.}
 \section{Assembly, Blocks, and Nonlinearity}
 The finite-element approximation $u_h=\sum_j u_j\phi_j$ gives
 \[
@@ -24,16 +24,15 @@ The finite-element approximation $u_h=\sum_j u_j\phi_j$ gives
  K_{ij}=\int\nabla\phi_i\cdot\nabla\phi_j,\qquad
  M\dot{\bm u}+K\bm u=\bm f.
 \]
-Basis functions with overlapping support couple. Local matrices are assembled through local-to-global numbering. In finite volumes, one interface flux enters both neighboring residuals. DG volume terms form element blocks, while face fluxes form adjacency blocks. Multiphysics may produce block or saddle-point systems. Globally supported spectral bases can yield dense differentiation matrices.
+Basis functions with overlapping support produce nonzero couplings, and element matrices are combined into the global system through local-to-global index maps. In finite-volume methods, each interface flux contributes to both adjacent cell residuals, whereas discontinuous Galerkin discretizations separate volume terms into element-local blocks and face fluxes into neighbor-coupling blocks. Multiphysics models frequently yield block or saddle-point structures, and globally supported spectral bases can produce dense differentiation matrices.
 For a nonlinear residual $\bm F(\bm u)=0$, the Newton correction satisfies
 \[
  J(\bm u_k)\delta\bm u=-\bm F(\bm u_k),\qquad J_{ij}=\partial F_i/\partial u_j.
 \]
-$J$ linearizes the residual at the current state. Together with time-discrete mass terms and boundary treatment, it determines the linear system.
+Here $J$ linearizes the residual about the current iterate and, together with time-discrete mass terms and boundary conditions, defines the linear system solved at each step.
 \section{Storing a Matrix or Applying an Operator}
-Banded, block-sparse, Kronecker, and regular-stencil representations describe different structures at the same system size.
-A matrix-free implementation computes $\bm v\mapsto A\bm v$ directly, using element integration or neighboring differences without storing all entries. Preconditioning may still use an assembled approximation.
-\costnote{Tridiagonal multiplication takes $O(N)$ time and storage; dense storage takes $O(N^2)$. Matrix-free evaluation reduces entry and index reads but can repeat geometry, coefficient, or integration work. Compare implementations of the same operator at the same accuracy.}
+Banded, block-sparse, Kronecker, and regular-stencil layouts capture distinct structural patterns at the same problem size. A matrix-free implementation evaluates $\bm v\mapsto A\bm v$ directly through element integration or stencil differences without storing the full matrix, although preconditioning may still rely on an assembled approximation.
+\costnote{Tridiagonal matrix-vector multiplication requires $O(N)$ work and storage, compared with $O(N^2)$ for dense storage. Matrix-free evaluation reduces matrix-entry and index reads at the expense of recomputing geometric factors, coefficients, or quadrature; fair comparisons evaluate implementations of the same operator at matched accuracy.}
 \coderef{sparse_linear_algebra/solvers.py}
 \crossref{Volume I constructs $M,K,J$ through spatial discretization. Chapters 5, 23, and 26 discuss fill-in, operator fingerprints, and data layout.}
 \aiexercise{For the five-interior-point problem, take $g_0=1,g_1=2,f=0$. Derive each right-hand-side entry and verify the linear exact solution. Then construct the linear finite-element mass and stiffness matrices.}{Implement the same difference in CSR and as a matrix-free function. Compare outputs and identify their shared boundary convention.}

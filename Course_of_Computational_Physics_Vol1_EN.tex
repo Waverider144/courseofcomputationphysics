@@ -15,24 +15,22 @@
 This book is dedicated to Landau and Lifshitz.\\
 With gratitude for guiding generations to the beauty of theory and the wonder it inspires.
 \end{quote}
-\begin{tcolorbox}[colback=red!3,colframe=red!65!black,title={Required: AI Explanations and Code Experiments},fonttitle=\bfseries,boxrule=0.8pt,arc=1mm,breakable]
-\textbf{Do not study from the text alone. Use AI explanations and code experiments alongside these books.}
-The text is a highly compressed knowledge map. When a conceptual link, derivation,
-or prerequisite is unclear, give AI the current notation, assumptions, and precise
-question and request a step-by-step explanation. Run the companion code or a minimal
-example, vary parameters, and inspect error, conservation, or stability.
-Check AI explanations, derivations, and code against the stated assumptions,
-references, and numerical results.
+\begin{tcolorbox}[colback=red!3,colframe=red!65!black,title={Study Guide: AI Explanations and Code Experiments},fonttitle=\bfseries,boxrule=0.8pt,arc=1mm,breakable]
+\textbf{The main text is a compressed knowledge map intended to be studied alongside AI-guided derivations and code experiments.}
+Whenever a conceptual link, derivation, or prerequisite requires expansion,
+provide AI with the current notation, assumptions, and specific question for a step-by-step walkthrough.
+In parallel, run the companion code or construct a minimal test case, varying parameters to inspect error, conservation, and stability.
+AI-generated explanations, derivations, and code should be verified against the stated assumptions, references, and numerical results.
 \end{tcolorbox}
-Computational physics represents physical states, reduces degrees of freedom, closes unresolved effects, and constructs finite-dimensional evolution under finite computational resources. Each step must identify the information retained, the assumptions introduced, and the structures that can be verified. This volume evaluates these choices through conservation, stability, symmetry, and wave errors.
+Computational physics represents physical states, reduces degrees of freedom, closes unresolved effects, and constructs finite-dimensional evolution under finite computational resources. Each stage specifies the retained information, the underlying assumptions, and the verifiable mathematical structures, evaluated throughout this volume by conservation, stability, symmetry, and wave-propagation accuracy.
 
-Four questions organize the text: how to represent the state; how scales and statistics reduce dynamics; how physical assumptions close the influence of unresolved variables; and how finite-dimensional residuals are constrained by discretization. Model selection determines the computational object; numerical methods determine its approximate representation and evolution. Structure preservation connects these decisions.
+Four core questions organize the exposition: state representation, scale- and statistics-based dynamical reduction, physical closure of unresolved variables, and discretization of finite-dimensional residuals. Model selection defines the computational object, numerical methods define its approximate representation and evolution, and structure preservation links both layers.
 
-Part~I proceeds from Hamiltonian dynamics to Liouville, kinetic, and continuum descriptions. Part~II builds function spaces and weak formulations through integration by parts, comparing trial spaces, test spaces, and residual constraints. Part~III derives DG, FR, VCJH, mortar coupling, and time integration. Parts~IV and~V develop discrete-velocity and physical-reduction routes. Part~VI connects meshes, method selection, and verification.
+Part~I progresses from Hamiltonian dynamics to Liouville, kinetic, and continuum descriptions. Part~II establishes function spaces and weak formulations via integration by parts, comparing trial spaces, test spaces, and residual constraints. Part~III develops DG, FR, VCJH, mortar coupling, and time integration. Parts~IV and~V pursue discrete-velocity and physical-reduction routes, respectively, and Part~VI unifies meshes, method selection, and verification.
 
-The intended reader has upper-undergraduate mathematical preparation: multivariable calculus, linear algebra, ODEs, PDEs, and basic numerical analysis. The main text supplies key definitions, boundary terms, and algorithmic constructions. General trace theorems, error theory, and research topics have entry points through further-detail notes, search terms, and specific AI questions. Learning objectives and conceptual connections locate each chapter within the dependency chain.
+The text assumes upper-undergraduate preparation in multivariable calculus, linear algebra, ODEs, PDEs, and elementary numerical analysis. Key definitions, boundary terms, and algorithmic constructions appear in the main text, while general trace theorems, error analyses, and advanced topics are indexed through further-detail notes, search terms, and targeted AI prompts; learning objectives and conceptual connections situate each chapter within the overall dependency chain.
 
-At the formation of algebraic systems, this volume points to Volume~0, \emph{Numerical Linear Algebra and Modern High-Performance Computing}, which develops matrix structure, factorization, Krylov methods, preconditioning, multigrid, and parallel execution. Volume~II uses Maxwell's equations to study geometry, constraint propagation, and electromagnetic discretization.
+Where algebraic systems emerge, this volume connects directly to Volume~0, \emph{Numerical Linear Algebra and Modern High-Performance Computing}, covering matrix structure, factorization, Krylov methods, preconditioning, multigrid, and parallel execution. Volume~II then uses Maxwell's equations to examine field geometry, constraint propagation, and structure-preserving electromagnetic discretization.
 
 \paragraph{Notation}
 $\rho_N$ is a normalized many-particle probability density, $f_s$ a number-density distribution, $\rho$ a mass density, and $\rho_c$ a charge density. The scalar field is $u$; $U$ denotes conserved variables or their discrete coefficients, with dimensions specified for each model. Mesh size, polynomial degree, and time step are $h$, $p$, and $\Delta t$. In Chapters~10--14, one-dimensional interfaces use left trace $u^-$, right trace $u^+$, jump $[u]=u^+-u^-$, and average $\{u\}=(u^-+u^+)/2$. Normal numerical fluxes additionally include normal orientation. Collision times, viscous stresses, and discrete relaxation times are distinguished within each chapter.

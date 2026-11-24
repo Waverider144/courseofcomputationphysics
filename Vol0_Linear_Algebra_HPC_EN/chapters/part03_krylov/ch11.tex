@@ -1,6 +1,6 @@
 \chapter{Arnoldi and Hessenberg Decomposition}\label{v0ch:11}
 \begin{chaptersummary}
-Krylov powers generate a search space, but increasing linear dependence complicates numerical use. Arnoldi orthogonalizes each new direction and represents the large operator in a small Hessenberg matrix. This verifiable connection between large and small systems supplies the least-squares problem used by GMRES in the next chapter.
+Raw Krylov powers rapidly become nearly linearly dependent in finite precision, making them unsuitable as a numerical basis. The Arnoldi process orthogonalizes each new direction sequentially and compresses the action of the large operator into a small upper-Hessenberg matrix, supplying the exact projected structure that GMRES converts into a least-squares solve in the next chapter.
 \end{chaptersummary}
 \learninggoals{Perform MGS Arnoldi; calculate two steps; explain loss of orthogonality and happy breakdown.}
 \paragraph{Core Question}How can a reliable subspace basis be constructed without storing high matrix powers?
@@ -13,19 +13,19 @@ Set $\beta=\norm{\bm r_0}_2$, $\bm v_1=\bm r_0/\beta$. At step $j$,
  \bm w\leftarrow\bm w-h_{ij}\bm v_i\quad(i=1,\ldots,j);
  \qquad h_{j+1,j}=\norm{\bm w}_2.
 \]
-If $h_{j+1,j}\ne0$, set $\bm v_{j+1}=\bm w/h_{j+1,j}$. Consequently,
+If $h_{j+1,j}\ne0$, we normalize $\bm v_{j+1}=\bm w/h_{j+1,j}$, which in exact arithmetic yields
 \[
  AV_m=V_{m+1}\bar H_m,\qquad V_{m+1}^TV_{m+1}=I
 \]
-in exact arithmetic, where $\bar H_m$ is $(m+1)\times m$ and upper Hessenberg.
+where $\bar H_m$ is an $(m+1)\times m$ upper-Hessenberg matrix.
 \section{Two Steps for the Four-by-Four Matrix}
-Use $A$ from Chapter 4 and $\bm r_0=\bm e_1$. First,
+Taking $A$ from Chapter~4 and $\bm r_0=\bm e_1$, the first step yields
 \[
  A\bm e_1=(0,4,2,0)^T,\quad h_{11}=0,\quad
  h_{21}=2\sqrt5,\quad
  \bm v_2=(0,2,1,0)^T/\sqrt5.
 \]
-Next, $A\bm v_2=(5,8,3,3)^T/\sqrt5$. Sequential projection gives
+In the second step, $A\bm v_2=(5,8,3,3)^T/\sqrt5$, and sequential orthogonalization produces
 \[
  h_{12}=\sqrt5,\quad h_{22}=19/5,\quad
  h_{32}=7/5,\quad
@@ -34,11 +34,11 @@ Next, $A\bm v_2=(5,8,3,3)^T/\sqrt5$. Sequential projection gives
 \[
  \bar H_2=\begin{bmatrix}0&\sqrt5\\2\sqrt5&19/5\\0&7/5\end{bmatrix}.
 \]
-Check $\bm v_i^T\bm v_j=\delta_{ij}$ and $AV_2=V_3\bar H_2$.
-\conceptbridge{How does a small matrix retain solution information from the original problem?}{Arnoldi represents the action on generated basis vectors exactly in the extended basis. The later approximation comes from restricting the trial space, not from approximating these represented actions. Finite precision also requires monitoring orthogonality.}{Large operator action $\longrightarrow$ orthogonal coordinates $\longrightarrow$ small Hessenberg problem.}
+Direct evaluation verifies $\bm v_i^T\bm v_j=\delta_{ij}$ and $AV_2=V_3\bar H_2$.
+\conceptbridge{How does a small matrix retain solution information from the original problem?}{Arnoldi represents the action of the operator on the generated basis vectors exactly within the extended basis. Any subsequent approximation arises from restricting the solution to the current trial subspace rather than from approximating these represented actions, while finite-precision arithmetic makes orthogonality monitoring essential.}{Large operator action $\longrightarrow$ orthogonal coordinates $\longrightarrow$ small Hessenberg problem.}
 \section{Breakdown Diagnostics and Cost}
-The condition $h_{j+1,j}=0$ identifies an $A$-invariant subspace. For an invertible system and the current residual, residual minimization then gives the exact solution: happy breakdown. In finite precision, a nearly zero subdiagonal instead triggers a true-residual check against the convergence tolerance.
-\costnote{$m$ steps require approximately $m$ matrix products, $O(Nm^2)$ orthogonalization work, and $O(Nm)$ storage. MGS can lose orthogonality; repeat projection or use a more stable strategy when needed. Distributed inner products incur reductions.}
+Vanishing of the subdiagonal entry $h_{j+1,j}=0$ signals an $A$-invariant subspace: for an invertible system, residual minimization over this subspace recovers the exact solution, a phenomenon known as happy breakdown. In finite precision, a near-zero subdiagonal instead prompts a true-residual check against the stopping tolerance.
+\costnote{Running $m$ Arnoldi steps requires $m$ matrix--vector products, $O(Nm^2)$ orthogonalization work, and $O(Nm)$ vector storage. Because single-pass MGS can lose orthogonality on ill-conditioned bases, reorthogonalization or Householder-based variants are used when needed, and inner products incur global reductions in distributed memory.}
 \coderef{sparse_linear_algebra/solvers.py}
 \aiexercise{Recompute both steps in MGS order, compare $AV_2$ with $V_3\bar H_2$, and verify every inner product.}{Perturb a power basis by roundoff and compare orthogonality after classical Gram--Schmidt, MGS, and two-pass MGS.}
 \studyroute{Selective reorthogonalization and communication-avoiding Arnoldi are omitted. See \cite{saad}.}{Arnoldi; Hessenberg; reorthogonalization; happy breakdown; orthogonality loss}

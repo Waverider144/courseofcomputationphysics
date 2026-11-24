@@ -8,26 +8,26 @@
 \section{组合的条件}
 \begin{center}\small
 \begin{tabularx}{\textwidth}{lXX}
-\toprule 系统&候选组合&必须核验\\\midrule
-SPD 扩散&CG+IC，CG+对称 MG/AMG&固定 SPD 逆作用，零空间处理\\
-对称不定&MINRES+SPD 块预条件&对称性与预条件正定性\\
-非对称输运扩散&GMRES+ILU/AMG&重启、非正规性、真实残差\\
-变化内层求解&FGMRES+变化 MG/局部解&保留实际方向及内层成本\\
-多右端中等规模&稀疏直接法或回收 Krylov&构造摊销、内存与数值秩\\\bottomrule
+\toprule 系统&候选组合&关键核验项\\\midrule
+SPD 扩散&CG+IC，CG+对称 MG/AMG&固定 SPD 逆作用与零空间处理\\
+对称不定&MINRES+SPD 块预条件&矩阵对称性与预条件正定性\\
+非对称输运扩散&GMRES+ILU/AMG&重启长度、非正规性与真实残差\\
+变化内层求解&FGMRES+变化 MG/局部解&实际修正方向保存与内层开销\\
+多右端中等规模&稀疏直接法或回收 Krylov&构造成本摊销、内存与数值秩\\\bottomrule
 \end{tabularx}
 \end{center}
-表中各组合以相应矩阵结构为前提；AMG 的粗空间与平滑器还应匹配具体问题的难消除模式。
+各候选组合均以对应的矩阵结构为前提，其中 AMG 的粗空间与平滑器需与目标算子的难消除模式相匹配。
 \section{容差与非线性外迭代}
-Newton 步 $J_k\delta\bm u_k=-\bm F(\bm u_k)$ 可采用
+在非精确 Newton 迭代中，线性步 $J_k\delta\bm u_k=-\bm F(\bm u_k)$ 满足相对残差准则
 \[
  \norm{J_k\delta\bm u_k+\bm F(\bm u_k)}
  \le\eta_k\norm{\bm F(\bm u_k)}.
 \]
-前期采用较松的内层容差，接近解时再减小 $\eta_k$，可将线性工作量与外层收敛需求匹配；线搜索或信赖域负责相应的全局化。容差最终依据离散误差与目标量确定，软件默认值则作为初始配置。
-\conceptbridge{为什么每个线性系统都解得更准，整体反而未必更好？}{非线性早期 Jacobian 仅近似当前局部行为，过准的线性解不消除模型线性化误差；演化问题还存在时间与空间误差。总预算应分配到真正控制结果的误差源。}{总体目标误差 $\longrightarrow$ 分层容差 $\longrightarrow$ 总求解时间。}
+迭代初期采用较宽的内层容差、临近收敛时逐步收紧 $\eta_k$，可使线性求解开销与外层收敛速率相匹配，同时辅以线搜索或信赖域实现全局化。求解容差最终应依据离散误差与目标物理量设定，将求解器默认值作为初始基线。
+\conceptbridge{为何将每个线性子问题求解得更精确，整体效率反而未必提升？}{在非线性迭代早期，Jacobian 仅局部线性化当前状态，过度精确的线性解无法消除模型线性化误差；而在瞬态问题中，时空离散误差同样界定了有效精度。因此，计算预算应优先分配给主导总误差的环节。}{总体目标误差 $\longrightarrow$ 分层容差 $\longrightarrow$ 总求解时间。}
 \section{最小选型实验}
-同一组 Poisson 与对流扩散矩阵，比较直接法、无预条件 Krylov、ILU-GMRES 和两层预条件。每项先检查条件及最终误差，再记录构造时间、应用时间、次数、因子或层次存储；对十个右端重复，判断构造复用是否改变排序。
-\costnote{总时间包含装配、排序、预条件构造、每步算子、正交化、通信及最终验证。硬件上三角求解、SpMV、点积和稠密小块具有不同性能特征，下一部分分别分析。}
+在同一组 Poisson 与对流扩散矩阵上，可依次对比稀疏直接法、无预条件 Krylov、ILU-GMRES 与两层预条件方案。评估过程先核验适用条件与最终解误差，再记录构造时间、求解时间、迭代步数以及因子或层次存储；随后将其扩展至十个右端项，考察构造成本摊销对方法排序的影响。
+\costnote{端到端求解时间涵盖矩阵装配、排序、预条件构造、每步算子作用、正交化、并行通信及最终验收。在硬件层面，三角求解、SpMV、内积归约与稠密小块具有截然不同的性能特征，将在下一部分系统分析。}
 \coderef{sparse_linear_algebra/solvers.py; sparse_linear_algebra/multilevel.py}
 \aiexercise{为二维 Poisson 和非对称对流扩散各写一份选型记录：结构证据、方法条件、容差理由、构造成本及失败回退路径。}{用测得的 setup 和 solve 时间建立多右端摊销图，区分迭代数最少和总时间最短。}
 \studyroute{略去复杂耦合 PDE 的专用块预条件与非线性全局收敛理论。参考 \cite{saad,petsc}。}{solver configuration; setup amortization; inexact Newton; tolerance budget; time to solution}
